@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import timedelta
-from ..models import UserCreate, UserLogin, Token, UserResponse, MessageResponse
-from ..auth import (
+from backend.models import UserCreate, UserLogin, Token, UserResponse, MessageResponse
+from backend.auth import (
     authenticate_user, create_access_token, get_password_hash, 
     get_current_user, JWT_EXPIRE_MINUTES
 )
-from ..database import get_database
-from ..models import UserInDB, User
+from backend.database import get_database
+from backend.models import UserInDB, User
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
