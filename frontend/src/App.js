@@ -1830,16 +1830,6 @@ export default function App() {
         }
     };
 
-    const handleBonusNodeClick = (action) => {
-        const nodeIndex = bonusNodes.findIndex(node => node.action.type === action.type);
-        if (!isBonusNodeAccessible(nodeIndex)) {
-            setSubscriptionModalOpen(true);
-            return;
-        }
-
-        handleActionClick(action);
-    };
-
     const closeModal = () => setSelectedStep(null);
 
     const handleBonusNodeClick = (action) => {
