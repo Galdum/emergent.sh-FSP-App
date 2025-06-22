@@ -2260,6 +2260,7 @@ const AppContent = () => {
     const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
     const [freeMode, setFreeMode] = useState(false);
     const [leaderboardModalOpen, setLeaderboardModalOpen] = useState(false);
+    const [leaderboardModalOpen, setLeaderboardModalOpen] = useState(false);
     
     // Gamification states
     const [userStats, setUserStats] = useState(gamificationManager.getUserStats());
