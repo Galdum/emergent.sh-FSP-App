@@ -2324,6 +2324,8 @@ const AppContent = () => {
     const [activeQuiz, setActiveQuiz] = useState(null);
     const [achievements, setAchievements] = useState([]);
     const [pointsAnimation, setPointsAnimation] = useState(null);
+    const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
+    const [showProgressOptions, setShowProgressOptions] = useState(false);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
