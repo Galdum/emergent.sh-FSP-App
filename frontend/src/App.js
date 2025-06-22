@@ -1679,6 +1679,10 @@ export default function App() {
     const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
     useEffect(() => {
+        // Load subscription tier from localStorage
+        const savedTier = localStorage.getItem('subscriptionTier') || 'FREE';
+        setCurrentTier(savedTier);
+
         let loadedSteps = initialStepsData.map(step => {
             const savedStep = JSON.parse(localStorage.getItem(`step_${step.id}`) || 'null');
             return savedStep ? { ...step, ...savedStep } : { ...step, tasks: step.tasks.map(t => ({...t, completed: false, viewed: false})) };
