@@ -1487,7 +1487,7 @@ export default function App() {
                     </div>
                 </header>
                 
-                <main className="relative w-full h-[600px]">
+                <main className="relative w-full h-[520px]">
                     <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
                     <Cloud style={{ top: '60%', right: '5%', width: '60px', height: '60px' }} />
                     
