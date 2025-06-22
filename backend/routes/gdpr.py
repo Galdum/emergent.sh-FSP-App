@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 import json
 import os
 from typing import Optional
-from .auth import get_current_user
+from backend.auth import get_current_user
 from .models_gdpr import GDPRConsent, DataExportRequest, DataDeletionRequest, PrivacySettings, PRIVACY_POLICY, TERMS_OF_SERVICE
-from .database import get_database
+from backend.database import get_database
 import zipfile
 import io
 
