@@ -823,6 +823,49 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
         setUploadedImages(prev => prev.filter(img => img.id !== imageId));
     };
 
+    // Handle image upload
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            // Validate file
+            ImageOptimizer.validateFile(file);
+            
+            setUploadingImage(true);
+            
+            // Compress and convert to base64
+            const base64Image = await ImageOptimizer.fileToBase64(file);
+            
+            const newImage = {
+                id: Date.now(),
+                name: file.name,
+                data: base64Image,
+                size: file.size,
+                type: file.type
+            };
+            
+            setUploadedImages(prev => [...prev, newImage]);
+            
+            // Add to conversation context
+            const imageMessage = `📷 Am încărcat imaginea: ${file.name}. Poți să o analizezi și să-mi dai sfaturi specifice bazate pe documentul din imagine.`;
+            conversationManager.addMessage('user', imageMessage);
+            setHistory(prev => [...prev, { role: "user", parts: [{ text: imageMessage }] }]);
+            
+        } catch (error) {
+            alert(error.message || 'Eroare la încărcarea imaginii.');
+        } finally {
+            setUploadingImage(false);
+            if (imageInputRef.current) {
+                imageInputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleImageRemove = (imageId) => {
+        setUploadedImages(prev => prev.filter(img => img.id !== imageId));
+    };
+
     // Handle click outside - close completely since this is a top-level modal
     useEffect(() => {
         const handleClickOutside = (event) => {
