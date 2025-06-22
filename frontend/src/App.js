@@ -1113,15 +1113,24 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
 
     return (
         <g>
+            {/* Larger invisible clickable area */}
+            <circle
+                cx={position.x}
+                cy={position.y}
+                r="40"
+                className="fill-transparent cursor-pointer"
+                onClick={() => step.status !== 'locked' && onStepClick(step)}
+                style={{ cursor: step.status !== 'locked' ? 'pointer' : 'not-allowed' }}
+            />
+            {/* Visible circle */}
             <circle
                 cx={position.x}
                 cy={position.y}
                 r="30"
                 className={`transition-all duration-300 ${getStatusStyles()}`}
-                onClick={() => step.status !== 'locked' && onStepClick(step)}
-                style={{ cursor: step.status !== 'locked' ? 'pointer' : 'not-allowed' }}
+                style={{ pointerEvents: 'none' }}
             />
-            <foreignObject x={position.x - 12} y={position.y - 12} width="24" height="24">
+            <foreignObject x={position.x - 12} y={position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
                 <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
                     {getIcon()}
                 </div>
@@ -1139,14 +1148,23 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
 const BonusNode = ({ node, onClick }) => {
     return (
         <g>
+            {/* Larger invisible clickable area */}
+            <circle
+                cx={node.position.x}
+                cy={node.position.y}
+                r="35"
+                className="fill-transparent cursor-pointer"
+                onClick={() => onClick(node.action)}
+            />
+            {/* Visible circle */}
             <circle
                 cx={node.position.x}
                 cy={node.position.y}
                 r="25"
-                className="fill-orange-500 hover:fill-orange-600 cursor-pointer transition-all duration-300"
-                onClick={() => onClick(node.action)}
+                className="fill-orange-500 hover:fill-orange-600 transition-all duration-300"
+                style={{ pointerEvents: 'none' }}
             />
-            <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24">
+            <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
                 <div className="flex items-center justify-center w-full h-full text-white">
                     <node.icon size={20} />
                 </div>
