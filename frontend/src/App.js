@@ -925,7 +925,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                             {history.map((msg, index) => (
                                  <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                                      <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
-                                         {msg.parts[0].text}
+                                         {msg.role === 'user' ? msg.parts[0].text : renderMarkdown(msg.parts[0].text)}
                                      </div>
                                  </div>
                              ))}
