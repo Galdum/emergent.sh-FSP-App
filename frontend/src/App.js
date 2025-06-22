@@ -1956,14 +1956,13 @@ const AppContent = () => {
         handleActionClick(action);
     };
     const closeContentModal = () => setActiveContent(null); // This closes content modal but keeps step modal open
-    const backToStepFromContent = () => setActiveContent(null); // Same as above - goes back to step modal
-    const closeGeminiModal = () => setActiveGeminiModal(null);
-    const closeRecommenderModal = () => setRecommenderModalOpen(false);
-    const closeInfoHubModal = () => setInfoHubModalOpen(false);
     const backToStepFromContent = () => {
         setActiveContent(null);
         // Keep step modal open
     };
+    const closeGeminiModal = () => setActiveGeminiModal(null);
+    const closeRecommenderModal = () => setRecommenderModalOpen(false);
+    const closeInfoHubModal = () => setInfoHubModalOpen(false);
 
     const currentStep = displayedSteps.find(step => step.status === 'unlocked');
     const progressPercentage = (steps.filter(s => s.tasks.every(t => t.completed)).length / steps.length) * 100;
