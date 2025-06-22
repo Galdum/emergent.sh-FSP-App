@@ -2145,6 +2145,7 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
 
 // --- Bonus Node Component ---
 const BonusNode = ({ node, isAccessible, onClick }) => {
+    const { hasAIAccess } = useSubscription();
     const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
     const hasFullAIAccess = hasAIAccess();
     
