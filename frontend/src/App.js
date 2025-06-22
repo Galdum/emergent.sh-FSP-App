@@ -1703,6 +1703,8 @@ export default function App() {
     };
 
     const hasAIAccess = () => getCurrentSubscription().hasAI;
+
+    const displayedSteps = useMemo(() => {
         let currentSteps = steps.map(s => ({ ...s }));
         if (freeMode) {
             return currentSteps.map((s, i) => ({ ...s, status: 'unlocked', icon: initialStepsData[i].icon }));
