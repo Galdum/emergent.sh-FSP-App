@@ -217,7 +217,7 @@ frontend:
         comment: "Frontend is running successfully in development mode. The application is accessible and responding with 200 status code. Core components (InfoHub, Journey Map, Authentication, Personal File Management, AI features) are implemented in the codebase."
       - working: true
         agent: "main"
-        comment: "Fixed AdminPanel import error - removed duplicate import statements for AdminPanel and AuthModal. Frontend now compiles successfully and preview is accessible at https://e4822bc2-4de2-4f42-aa49-33a963be95a8.preview.emergentagent.com with 200 status code."
+        comment: "Fixed AdminPanel import error - removed duplicate import statements for AdminPanel and AuthModal. Frontend now compiles successfully and preview is accessible at https://981ce99e-9838-490b-bef9-0d4c86f335d2.preview.emergentagent.com with 200 status code."
   
   - task: "InfoHub Modal with New Sections"
     implemented: true
