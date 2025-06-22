@@ -2516,6 +2516,7 @@ const AppContent = () => {
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
     const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
     const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
+    const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
