@@ -2516,7 +2516,13 @@ const AppContent = () => {
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
     const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
     const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
-    const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Component will unmount itself after 4 seconds
+        }, 4000);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
