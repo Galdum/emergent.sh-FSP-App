@@ -284,8 +284,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Verify frontend functionality with API key"
-    - "Test AI-powered features"
+    - "All frontend components tested successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
