@@ -69,6 +69,7 @@ from routes.monitoring import router as monitoring_router
 from routes.backup import router as backup_router
 from routes.deployment import router as deployment_router
 from routes.gdpr import router as gdpr_router
+from routes.paypal import router as paypal_router
 
 # Override the auth dependency in routes
 import backend.routes.auth as auth_module
