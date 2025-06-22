@@ -1969,11 +1969,11 @@ const AppContent = () => {
             {/* Subscription info and upgrade button */}
             <div className="fixed top-4 left-4 z-40 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
                 <div className="text-sm font-semibold text-gray-700">
-                    Plan: <span className={`${currentTier === 'FREE' ? 'text-gray-600' : currentTier === 'BASIC' ? 'text-blue-600' : 'text-purple-600'}`}>
-                        {getCurrentSubscription().name}
+                    Plan: <span className={`${subscriptionTier === 'FREE' ? 'text-gray-600' : subscriptionTier === 'BASIC' ? 'text-blue-600' : 'text-purple-600'}`}>
+                        {SUBSCRIPTION_TIERS[subscriptionTier].name}
                     </span>
                 </div>
-                {currentTier !== 'PREMIUM' && (
+                {subscriptionTier !== 'PREMIUM' && (
                     <button 
                         onClick={() => setSubscriptionModalOpen(true)}
                         className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
@@ -1986,20 +1986,20 @@ const AppContent = () => {
                     <div className="text-gray-500">Test Mode:</div>
                     <div className="flex gap-1">
                         <button 
-                            onClick={() => { setCurrentTier('FREE'); localStorage.setItem('subscriptionTier', 'FREE'); }}
-                            className={`px-2 py-0.5 rounded text-xs ${currentTier === 'FREE' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                            onClick={() => setSubscriptionModalOpen(true)}
+                            className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'FREE' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Free
                         </button>
                         <button 
-                            onClick={() => { setCurrentTier('BASIC'); localStorage.setItem('subscriptionTier', 'BASIC'); }}
-                            className={`px-2 py-0.5 rounded text-xs ${currentTier === 'BASIC' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                            onClick={() => setSubscriptionModalOpen(true)}
+                            className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'BASIC' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Basic
                         </button>
                         <button 
-                            onClick={() => { setCurrentTier('PREMIUM'); localStorage.setItem('subscriptionTier', 'PREMIUM'); }}
-                            className={`px-2 py-0.5 rounded text-xs ${currentTier === 'PREMIUM' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                            onClick={() => setSubscriptionModalOpen(true)}
+                            className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'PREMIUM' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Premium
                         </button>
