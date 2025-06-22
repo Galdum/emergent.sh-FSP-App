@@ -6,7 +6,7 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-from .models import UserInDB, User
+from backend.models import UserInDB, User
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
