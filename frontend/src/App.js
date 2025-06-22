@@ -2090,7 +2090,7 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
                     {getIcon()}
                 </div>
             </foreignObject>
-            {((step.status === 'unlocked' || step.status === 'completed') && isAccessible) && (
+            {isAccessible && (
                 <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-700 text-sm font-semibold pointer-events-none">
                     {step.title}
                 </text>
