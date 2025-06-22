@@ -95,19 +95,30 @@ def test_register_admin():
     global admin_auth_token
     
     try:
+        # Try to register the admin user
         response = requests.post(
             f"{API_URL}/auth/register",
             json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}
         )
         
-        success = response.status_code == 200 and "access_token" in response.json()
-        
-        if success:
-            # Store the token for subsequent tests
-            admin_auth_token = response.json().get("access_token")
-            
-        print_test_result("Admin User Registration", success, response)
-        return success
+        # If registration fails because user already exists, try to login instead
+        if response.status_code == 400 and "already registered" in response.json().get("detail", ""):
+            login_response = requests.post(
+                f"{API_URL}/auth/login",
+                json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}
+            )
+            success = login_response.status_code == 200 and "access_token" in login_response.json()
+            if success:
+                admin_auth_token = login_response.json().get("access_token")
+                print_test_result("Admin User Registration (via login)", success, login_response)
+                return success
+        else:
+            success = response.status_code == 200 and "access_token" in response.json()
+            if success:
+                admin_auth_token = response.json().get("access_token")
+                
+            print_test_result("Admin User Registration", success, response)
+            return success
     except Exception as e:
         print_test_result("Admin User Registration", False, error=str(e))
         return False
