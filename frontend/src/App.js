@@ -368,21 +368,20 @@ const bonusNodes = [
     { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { x: 50, y: 440 }, action: { type: 'info_hub' } }
 ];
 
-// --- Personal File Modal Component ---
+// --- Personal File Modal Component - Updated to use new API integration ---
 const PersonalFileModal = ({ isOpen, onClose }) => {
-    const [items, setItems] = useState([]);
+    const { files, loading, addFile, uploadFile, deleteFile, handleFileClick } = usePersonalFiles();
     const [newItemType, setNewItemType] = useState(null);
     const [noteContent, setNoteContent] = useState('');
     const [linkUrl, setLinkUrl] = useState('');
     const [linkTitle, setLinkTitle] = useState('');
     const fileInputRef = useRef(null);
-    const [fileObjects, setFileObjects] = useState({});
     const modalRef = useRef(null);
 
     // Chatbot state
     const [history, setHistory] = useState([]);
     const [prompt, setPrompt] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [chatLoading, setChatLoading] = useState(false);
     const chatEndRef = useRef(null);
 
     // Handle click outside - close completely since this is a top-level modal
@@ -403,86 +402,63 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            try {
-                const savedItems = localStorage.getItem('personalFileItems');
-                setItems(savedItems ? JSON.parse(savedItems) : []);
-            } catch (e) {
-                console.error("Failed to parse personal items from localStorage", e);
-                setItems([]);
-            }
             setHistory([{role: 'model', parts: [{ text: 'Salut! Sunt asistentul tău personal. Mă poți întreba despre pașii următori, valabilitatea documentelor sau orice altceva legat de procesul de Approbation.'}]}]);
         }
     }, [isOpen]);
 
     useEffect(() => {
-        if (isOpen) {
-            try {
-                const itemsToSave = items.map(({ file, ...rest }) => rest);
-                localStorage.setItem('personalFileItems', JSON.stringify(itemsToSave));
-            } catch (e) {
-                console.error("Failed to save personal items to localStorage", e);
-            }
-        }
-    }, [items, isOpen]);
-
-    useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [history]);
 
-    const handleAddItem = () => {
+    const handleAddItem = async () => {
         let newItem = null;
         if (newItemType === 'note' && noteContent.trim()) {
-            newItem = { id: Date.now(), type: 'note', content: noteContent.trim() };
+            newItem = { type: 'note', content: noteContent.trim() };
         } else if (newItemType === 'link' && linkUrl.trim()) {
             let formattedUrl = linkUrl.trim();
             if (!/^https?:\/\//i.test(formattedUrl)) {
                 formattedUrl = 'https://' + formattedUrl;
             }
-            newItem = { id: Date.now(), type: 'link', url: formattedUrl, title: linkTitle.trim() || linkUrl.trim() };
+            newItem = { type: 'link', url: formattedUrl, title: linkTitle.trim() || linkUrl.trim() };
         }
         
         if (newItem) {
-            setItems(prevItems => [newItem, ...prevItems]);
-            setNewItemType(null);
-            setNoteContent('');
-            setLinkUrl('');
-            setLinkTitle('');
+            try {
+                await addFile(newItem);
+                setNewItemType(null);
+                setNoteContent('');
+                setLinkUrl('');
+                setLinkTitle('');
+            } catch (error) {
+                console.error('Failed to add item:', error);
+                alert('Failed to add item. Please try again.');
+            }
         }
     };
     
-    const handleFileUpload = (event) => {
+    const handleFileUpload = async (event) => {
         const file = event.target.files[0];
         if (file) {
-            const id = Date.now();
-            const newItem = { id, type: 'file', name: file.name, size: file.size };
-            setItems(prevItems => [newItem, ...prevItems]);
-            setFileObjects(prev => ({...prev, [id]: file }));
+            try {
+                await uploadFile(file);
+            } catch (error) {
+                console.error('Failed to upload file:', error);
+                alert('Failed to upload file. Please try again.');
+            }
         }
     };
     
-    const handleDeleteItem = (id) => {
-        setItems(prevItems => prevItems.filter(item => item.id !== id));
-        setFileObjects(prev => {
-            const newFileObjects = {...prev};
-            delete newFileObjects[id];
-            return newFileObjects;
-        });
-    };
-    
-    const handleItemClick = (item) => {
-        if (item.type === 'file') {
-            const file = fileObjects[item.id];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                window.open(url, '_blank');
-            } else {
-                alert('Fișierul nu este disponibil pentru vizualizare. Te rog, reîncarcă-l.');
-            }
+    const handleDeleteItem = async (id) => {
+        try {
+            await deleteFile(id);
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+            alert('Failed to delete item. Please try again.');
         }
     };
 
     const callGeminiAssistantAPI = async (currentPrompt) => {
-        setLoading(true);
+        setChatLoading(true);
         const systemPrompt = `Du bist ein hochqualifizierter Berater für ausländische Ärzte, die ihre Approbation in Deutschland anstreben. Du bist auf den Prozess für rumänische Ärzte spezialisiert. Deine Antworten müssen präzise, hilfreich und auf den bereitgestellten Dokumenten basieren.
         
         **Deine Aufgabe:**
@@ -493,7 +469,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
         5.  **Sei ermutigend und professionell.**
         
         **Aktueller Status der gespeicherten Elemente des Nutzers:**
-        ${items.length > 0 ? items.map(it => `- ${it.type.toUpperCase()}: ${it.name || it.title || it.content.substring(0, 40) + '...'}`).join('\n') : "Niciun element salvat."}
+        ${files.length > 0 ? files.map(it => `- ${it.type.toUpperCase()}: ${it.title || it.content?.substring(0, 40) + '...' || 'Untitled'}`).join('\n') : "Niciun element salvat."}
         
         Antworte jetzt auf die folgende Frage des Nutzers auf Rumänisch:`;
 
@@ -516,12 +492,12 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
             console.error("Error calling Gemini API:", error); 
             setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "A apărut o eroare. Vă rog să încercați din nou."}] }]); 
         } finally { 
-            setLoading(false); 
+            setChatLoading(false); 
             setPrompt(''); 
         } 
     };
 
-    const handleSend = () => { if (prompt.trim() && !loading) { callGeminiAssistantAPI(prompt.trim()); } };
+    const handleSend = () => { if (prompt.trim() && !chatLoading) { callGeminiAssistantAPI(prompt.trim()); } };
 
     const renderItem = (item) => {
         const itemIcon = {
@@ -535,13 +511,13 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
             <div 
                 key={item.id} 
                 className={`bg-white p-3 rounded-lg shadow-sm flex items-start gap-3 transition-all ${isClickable ? 'cursor-pointer hover:shadow-md hover:bg-gray-50' : ''}`}
-                onClick={() => handleItemClick(item)}
+                onClick={() => isClickable && handleFileClick(item)}
             >
                 <div className="mt-1">{itemIcon[item.type]}</div>
                 <div className="flex-grow min-w-0">
                     {item.type === 'note' && <p className="text-gray-700 whitespace-pre-wrap break-words">{item.content}</p>}
                     {item.type === 'link' && <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-blue-600 hover:underline break-all" title={item.url}>{item.title}</a>}
-                    {item.type === 'file' && <p className="text-gray-700 truncate" title={item.name}>{item.name}</p>}
+                    {item.type === 'file' && <p className="text-gray-700 truncate" title={item.title}>{item.title}</p>}
                 </div>
                 <button 
                     onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.id); }} 
@@ -588,7 +564,9 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                             </div>
                         )}
                         <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2">
-                             {items.length > 0 ? items.map(renderItem) : (
+                             {loading ? (
+                                <div className="text-center text-gray-500 pt-10">Se încarcă...</div>
+                             ) : files.length > 0 ? files.map(renderItem) : (
                                 <div className="text-center text-gray-500 pt-10">
                                     <p>Dosarul tău este gol.</p>
                                     <p className="text-sm">Folosește butoanele de mai sus pentru a adăuga elemente.</p>
@@ -608,12 +586,12 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                      </div>
                                  </div>
                              ))}
-                             {loading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-gray-100 text-gray-800">...</div></div>}
+                             {chatLoading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-gray-100 text-gray-800">...</div></div>}
                              <div ref={chatEndRef} />
                          </div>
                          <div className="flex items-center flex-shrink-0">
-                             <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()} className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare..." />
-                             <button onClick={handleSend} disabled={loading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
+                             <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare..." />
+                             <button onClick={handleSend} disabled={chatLoading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
                          </div>
                     </div>
                 </div>
