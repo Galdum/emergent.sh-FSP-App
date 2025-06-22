@@ -28,10 +28,11 @@ const Confetti = () => {
     const colors = ['#fde196', '#fdb497', '#F7941D', '#27AAE1', '#a3d4f4', '#81c784'];
     
     useEffect(() => {
-        const timer = setTimeout(() => {
-            // Component will unmount itself after 4 seconds
-        }, 4000);
-        return () => clearTimeout(timer);
+        // Check if user has accepted GDPR consent
+        const gdprConsent = localStorage.getItem('gdpr_consent');
+        if (!gdprConsent) {
+            setGdprConsentOpen(true);
+        }
     }, []);
 
     return (
