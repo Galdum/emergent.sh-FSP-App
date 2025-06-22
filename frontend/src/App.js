@@ -1419,9 +1419,9 @@ export default function App() {
                     <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
                     <Cloud style={{ top: '60%', right: '5%', width: '60px', height: '60px' }} />
                     
-                    <svg width="100%" height="100%" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" className="absolute top-0 left-0">
-                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 340 335, 160 385 T 240 475 Q 280 520, 140 550" stroke="#d6a770" strokeWidth="8" fill="none" strokeLinecap="round" />
-                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 340 335, 160 385 T 240 475 Q 280 520, 140 550" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="1 10" />
+                    <svg width="100%" height="100%" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet" className="absolute top-0 left-0">
+                        <path d="M 200 70 Q 120 105, 120 140 T 280 220 Q 340 255, 160 300 T 240 380 Q 280 410, 140 460" stroke="#d6a770" strokeWidth="8" fill="none" strokeLinecap="round" />
+                        <path d="M 200 70 Q 120 105, 120 140 T 280 220 Q 340 255, 160 300 T 240 380 Q 280 410, 140 460" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="1 10" />
                         
                         {displayedSteps.map((step, index) => ( 
                             <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} /> 
