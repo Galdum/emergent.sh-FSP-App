@@ -7,7 +7,7 @@ from backend.models_billing import (
 from backend.auth import get_current_user
 from backend.database import get_database
 from backend.models import UserInDB
-from ..services.stripe_service import stripe_service
+from backend.services.stripe_service import stripe_service
 import logging
 
 logger = logging.getLogger(__name__)
