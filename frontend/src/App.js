@@ -1792,8 +1792,6 @@ const AppContent = () => {
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
     const [adminPanelOpen, setAdminPanelOpen] = useState(false);
-    const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
-    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
