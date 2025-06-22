@@ -2521,15 +2521,35 @@ const AppContent = () => {
                     <h1 className="text-3xl md:text-4xl font-black text-gray-800">Approbation în Germania</h1>
                     <p className="text-gray-500 mt-1">Ghidul tău interactiv pas cu pas.</p>
                     
-                    {/* Gamification Header */}
-                    <div className="mt-3 mb-4">
-                        <GamificationProgress userStats={userStats} compact={true} />
-                    </div>
-                    
                     <div className="w-full bg-gray-200 rounded-full h-4 mt-4 overflow-hidden border border-gray-300">
                         <div className="bg-green-500 h-4 rounded-full transition-all duration-500" style={{ width: `${progressPercentage}%` }}></div>
                     </div>
                 </header>
+                
+                {/* Discrete Gamification Panel */}
+                <div className="fixed top-4 right-4 z-30">
+                    <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-xs">
+                        <div className="flex items-center gap-2 text-sm">
+                            <div className="flex items-center gap-1">
+                                <Star className="h-4 w-4 text-yellow-500" />
+                                <span className="font-semibold">Nivel {userStats.level}</span>
+                            </div>
+                            <div className="text-gray-500">•</div>
+                            <div className="text-purple-600 font-semibold">{userStats.points} XP</div>
+                            <div className="text-gray-500">•</div>
+                            <div className="flex items-center gap-1 text-orange-500">
+                                <Flame className="h-3 w-3" />
+                                <span className="text-xs">{userStats.streakDays}d</span>
+                            </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                            <div 
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-500"
+                                style={{ width: `${userStats.experienceProgress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
                 
                 <main className="relative w-full h-[600px]">
                     <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
