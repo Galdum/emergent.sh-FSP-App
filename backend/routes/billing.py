@@ -4,7 +4,7 @@ from backend.models_billing import (
     CheckoutSessionCreate, CheckoutSessionResponse, PaymentTransaction,
     SubscriptionPlan, AuditLog
 )
-from ..auth import get_current_user
+from backend.auth import get_current_user
 from ..database import get_database
 from ..models import UserInDB
 from ..services.stripe_service import stripe_service
