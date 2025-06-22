@@ -1861,7 +1861,10 @@ const AppContent = () => {
         const isNowCompleted = newStep.tasks.every(t => t.completed);
 
         if (!wasCompleted && isNowCompleted) {
-            setConfettiKey(Date.now()); // Trigger confetti
+            if (completed) {
+                setConfetti(true);
+                setTimeout(() => setConfetti(false), 4000);
+            }
         }
     };
 
