@@ -1909,6 +1909,12 @@ export default function App() {
             {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
             <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
             <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
+            <SubscriptionModal 
+                isOpen={subscriptionModalOpen} 
+                onClose={() => setSubscriptionModalOpen(false)}
+                currentTier={currentTier}
+                onUpgrade={handleSubscriptionUpgrade}
+            />
         </div>
     );
 }
