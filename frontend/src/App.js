@@ -1773,21 +1773,22 @@ const Cloud = ({ style }) => (
     <div className="absolute bg-white/80 rounded-full" style={style}></div>
 );
 
-// --- Main Application Component ---
-export default function App() {
+// --- Main Application Component with Authentication Integration ---
+const AppContent = () => {
+    const { isAuthenticated, user, logout } = useAuth();
+    const { canAccessStep, canAccessOrangeNode, hasAIAccess, subscriptionTier } = useSubscription();
+    const { updateTaskProgress, getTaskProgress, isStepUnlocked } = useProgress();
+    
     const [steps, setSteps] = useState(initialStepsData);
     const [selectedStep, setSelectedStep] = useState(null);
     const [activeContent, setActiveContent] = useState(null);
     const [activeGeminiModal, setActiveGeminiModal] = useState(null);
     const [personalFileModalOpen, setPersonalFileModalOpen] = useState(false);
-    const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
-    const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
-    const [freeMode, setFreeMode] = useState(false);
-    const [confettiKey, setConfettiKey] = useState(null);
-    
-    // Subscription state
-    const [currentTier, setCurrentTier] = useState('FREE'); // FREE, BASIC, PREMIUM
     const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+    const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
+    const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
+    const [confetti, setConfetti] = useState(false);
+    const [authModalOpen, setAuthModalOpen] = useState(false);
 
     useEffect(() => {
         // Load subscription tier from localStorage
