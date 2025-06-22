@@ -166,13 +166,16 @@ async def approve_subscription(
     db = Depends(get_database)
 ):
     try:
+        # Convert current_user to dict if it's not already
+        user_id = current_user.id if hasattr(current_user, 'id') else current_user["id"]
+        
         # Execute the billing agreement
         billing_agreement = paypalrestsdk.BillingAgreement.execute(token)
         
         if billing_agreement.id:
             # Find the subscription in database and update it
             subscription = await db.payment_transactions.find_one({
-                "user_id": current_user["id"],
+                "user_id": user_id,
                 "status": "PENDING_APPROVAL",
                 "provider": "paypal"
             })
