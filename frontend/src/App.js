@@ -1793,23 +1793,52 @@ const GeminiEmailModal = ({ onClose }) => {
     const generateEmail = async () => {
         setLoading(true);
         
-        const prompt = `Du bist ein Experte für offizielle Korrespondenz mit deutschen Behörden im Gesundheitswesen. Erstelle einen professionellen, höflichen und präzisen E-Mail-Text auf Deutsch.
+        const prompt = `Du bist ein rumänischer Arzt, der sehr gut Deutsch spricht aber mit einem subtilen, authentischen Stil schreibt - professionell aber nicht roboterhaft. Du schreibst einen E-Mail an deutsche Behörden für deine Approbation.
+
+WICHTIG: Schreibe wie ein echter rumänischer Arzt, der:
+- Höflich und respektvoll ist, aber natürlich klingt
+- Gelegentlich etwas direkter/emotionaler ist als ein Deutscher
+- Perfekte Grammatik hat, aber einen warmen, menschlichen Ton
+- Manchmal kleine kulturelle Nuancen zeigt (aber subtil)
 
 Template-Typ: ${selectedTemplate.title}
 Empfänger: ${formData.authority || 'Deutsche Behörde'}
-Absender: ${formData.name || 'Antragsteller'}
+Deine Identität: Dr. ${formData.name || 'Antragsteller'} (rumänischer Arzt)
 
-Weitere Informationen:
-${Object.entries(formData).map(([key, value]) => `${key}: ${value}`).join('\n')}
+DEINE SPEZIFISCHEN DETAILS:
+${Object.entries(formData)
+  .filter(([key, value]) => value && value.trim())
+  .map(([key, value]) => {
+    const labels = {
+      name: 'Vollständiger Name',
+      email: 'E-Mail Adresse', 
+      authority: 'Ziel-Behörde',
+      applicationNumber: 'Antragsnummer',
+      applicationDate: 'Antragsdatum',
+      examType: 'Prüfungstyp',
+      preferredDates: 'Bevorzugte Termine',
+      requestedDocument: 'Angefordertes Dokument',
+      reason: 'Grund/Kontext',
+      additionalInfo: 'Zusätzliche Informationen'
+    };
+    return `${labels[key] || key}: ${value}`;
+  }).join('\n')}
 
-Anforderungen:
-1. Formeller, respektvoller Ton
-2. Klare Struktur mit Betreff, Anrede, Inhalt, Schluss
-3. Korrekte deutsche Grammatik und Rechtschreibung
-4. Präzise und konkrete Formulierungen
-5. Angemessene Höflichkeitsformen
+SCHREIBSTIL:
+- Authentisch rumänisch-deutscher Mediziner
+- Professionell aber persönlich und warm
+- Zeige Respekt aber auch Selbstbewusstsein
+- Verwende gelegentlich leicht emotionale Ausdrücke (professionell angemessen)
+- Kleine Details die zeigen, dass du ein echter Mensch bist, nicht ein Template
 
-Bitte erstelle die komplette E-Mail inklusive Betreff.`;
+STRUKTUR:
+1. Betreff: Präzise und informativ
+2. Anrede: Formal aber herzlich  
+3. Hauptteil: Klar strukturiert, mit deinen echten Details
+4. Schluss: Dankbar aber selbstbewusst
+5. Grüße: Professionell-warm
+
+Erstelle die komplette E-Mail. Sie soll perfekt korrekt sein, aber menschlich und authentisch klingen - wie von einem echten rumänischen Arzt geschrieben.`;
 
         try {
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
