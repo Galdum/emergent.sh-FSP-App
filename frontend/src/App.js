@@ -1897,7 +1897,7 @@ export default function App() {
                         <path d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="1 10" />
                         
                         {displayedSteps.map((step, index) => ( 
-                            <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} /> 
+                            <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} isAccessible={isStepAccessible(index)} /> 
                         ))}
                         
                         {bonusNodes.map((node, index) => 
