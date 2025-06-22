@@ -2503,6 +2503,7 @@ const AppContent = () => {
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
     const [freeMode, setFreeMode] = useState(false);
+    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
     const [leaderboardModalOpen, setLeaderboardModalOpen] = useState(false);
     
     // Gamification states
