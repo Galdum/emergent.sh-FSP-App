@@ -1960,6 +1960,10 @@ const AppContent = () => {
     const closeGeminiModal = () => setActiveGeminiModal(null);
     const closeRecommenderModal = () => setRecommenderModalOpen(false);
     const closeInfoHubModal = () => setInfoHubModalOpen(false);
+    const backToStepFromContent = () => {
+        setActiveContent(null);
+        // Keep step modal open
+    };
 
     const currentStep = displayedSteps.find(step => step.status === 'unlocked');
     const progressPercentage = (steps.filter(s => s.tasks.every(t => t.completed)).length / steps.length) * 100;
