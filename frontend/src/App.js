@@ -2454,6 +2454,11 @@ const AppContent = () => {
             return; 
         }
 
+        if (action.type === 'email_verification') {
+            setEmailVerificationOpen(true);
+            return;
+        }
+
         if (stepId && taskId) {
             setSteps(prevSteps => {
                 const newSteps = prevSteps.map(step => {
