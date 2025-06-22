@@ -360,12 +360,29 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
     const [linkTitle, setLinkTitle] = useState('');
     const fileInputRef = useRef(null);
     const [fileObjects, setFileObjects] = useState({});
+    const modalRef = useRef(null);
 
     // Chatbot state
     const [history, setHistory] = useState([]);
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
     const chatEndRef = useRef(null);
+
+    // Handle click outside - close completely since this is a top-level modal
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                onClose();
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [isOpen, onClose]);
 
     useEffect(() => {
         if (isOpen) {
