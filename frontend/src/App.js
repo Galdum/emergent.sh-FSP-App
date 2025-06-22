@@ -127,7 +127,179 @@ const infoDocs = [
     }
 ];
 
-// --- Step data structure (updated based on screenshots) ---
+// Subscription tiers
+const SUBSCRIPTION_TIERS = {
+    FREE: { name: 'Free', price: 0, maxSteps: 2, maxOrangeNodes: 1, hasAI: false },
+    BASIC: { name: 'Basic', price: 10, maxSteps: 6, maxOrangeNodes: 4, hasAI: false },
+    PREMIUM: { name: 'Premium', price: 30, maxSteps: 6, maxOrangeNodes: 4, hasAI: true }
+};
+
+// Subscription Modal Component
+const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[70] p-4 animate-fade-in-fast">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
+                    <X size={28} />
+                </button>
+                
+                <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Alege Planul Tău</h2>
+                <p className="text-gray-600 text-center mb-8">Deblocează toate funcționalitățile pentru călătoria ta către Approbation</p>
+                
+                <div className="grid md:grid-cols-3 gap-6">
+                    {/* Free Tier */}
+                    <div className="border-2 border-gray-200 rounded-xl p-6 relative">
+                        {currentTier === 'FREE' && (
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                Plan Actual
+                            </div>
+                        )}
+                        <h3 className="text-xl font-bold text-center mb-2">Free</h3>
+                        <div className="text-center mb-4">
+                            <span className="text-3xl font-bold">€0</span>
+                            <span className="text-gray-500">/lună</span>
+                        </div>
+                        <ul className="space-y-3 mb-6">
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Primii 2 pași</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">1 funcție bonus</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Dosarul personal complet</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <X size={16} className="text-red-500" />
+                                <span className="text-sm text-gray-500">Fără suport AI</span>
+                            </li>
+                        </ul>
+                        <button 
+                            disabled={currentTier === 'FREE'}
+                            className="w-full py-3 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed"
+                        >
+                            Plan Curent
+                        </button>
+                    </div>
+
+                    {/* Basic Tier */}
+                    <div className="border-2 border-blue-500 rounded-xl p-6 relative">
+                        {currentTier === 'BASIC' && (
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                Plan Actual
+                            </div>
+                        )}
+                        <h3 className="text-xl font-bold text-center mb-2 text-blue-600">Basic</h3>
+                        <div className="text-center mb-4">
+                            <span className="text-3xl font-bold">€10</span>
+                            <span className="text-gray-500">/lună</span>
+                        </div>
+                        <ul className="space-y-3 mb-6">
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Toți cei 6 pași</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Toate funcțiile bonus</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Dosarul personal complet</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Ghiduri detaliate</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <X size={16} className="text-red-500" />
+                                <span className="text-sm text-gray-500">Fără suport AI</span>
+                            </li>
+                        </ul>
+                        <button 
+                            onClick={() => onUpgrade('BASIC')}
+                            disabled={currentTier === 'BASIC'}
+                            className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+                                currentTier === 'BASIC' 
+                                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
+                                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                            }`}
+                        >
+                            {currentTier === 'BASIC' ? 'Plan Actual' : 'Upgradeaza'}
+                        </button>
+                    </div>
+
+                    {/* Premium Tier */}
+                    <div className="border-2 border-purple-500 rounded-xl p-6 relative">
+                        {currentTier === 'PREMIUM' && (
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                Plan Actual
+                            </div>
+                        )}
+                        <div className="absolute -top-3 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            RECOMANDAT
+                        </div>
+                        <h3 className="text-xl font-bold text-center mb-2 text-purple-600">Premium</h3>
+                        <div className="text-center mb-4">
+                            <span className="text-3xl font-bold">€30</span>
+                            <span className="text-gray-500">/lună</span>
+                        </div>
+                        <ul className="space-y-3 mb-6">
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Toți cei 6 pași</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Toate funcțiile bonus</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Dosarul personal complet</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Check size={16} className="text-green-500" />
+                                <span className="text-sm">Ghiduri detaliate</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Sparkles size={16} className="text-purple-500" />
+                                <span className="text-sm font-semibold">Suport AI complet</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Sparkles size={16} className="text-purple-500" />
+                                <span className="text-sm font-semibold">Tutor FSP cu AI</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <Sparkles size={16} className="text-purple-500" />
+                                <span className="text-sm font-semibold">Generator emailuri AI</span>
+                            </li>
+                        </ul>
+                        <button 
+                            onClick={() => onUpgrade('PREMIUM')}
+                            disabled={currentTier === 'PREMIUM'}
+                            className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+                                currentTier === 'PREMIUM' 
+                                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
+                                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
+                            }`}
+                        >
+                            {currentTier === 'PREMIUM' ? 'Plan Actual' : 'Upgradeaza'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="mt-8 text-center text-sm text-gray-500">
+                    <p>Poți anula oricând. Fără costuri ascunse.</p>
+                </div>
+            </div>
+        </div>
+    );
+};
 const initialStepsData = [
     { id: 1, title: 'Startul Călătoriei', icon: Rocket, description: 'Bun venit pe drumul către Approbation! Completează primii pași pentru a înțelege procesul și a porni la drum cu dreptul.', tasks: [ 
         { id: 101, text: 'Citește ghidul Approbation.', completed: false, viewed: false, action: { type: 'modal', content: { title: 'Ghid General Approbation', body: ( <div className="space-y-4 text-gray-600"> <p>Acest proces reprezintă recunoașterea completă a diplomei tale de medic în Germania. Călătoria este complexă și necesită multă organizare.</p> <h4 className="font-bold text-lg text-gray-800">Etapele Majore</h4> <ul className="list-disc list-inside space-y-2"> <li>Colectarea și traducerea documentelor.</li> <li>Învățarea limbii germane la nivel avansat (C1 Medicină).</li> <li>Aplicarea la un "Landesamt für Gesundheit" dintr-un land german.</li> <li>Susținerea examenului de limbaj medical (Fachsprachprüfung - FSP).</li> <li>(Dacă este cazul) Susținerea examenului de echivalare (Kenntnisprüfung - KP).</li> </ul> <p>Folosește această hartă pentru a te ghida. Fiecare pas deblocat este o victorie! Mult succes!</p> </div> ) } } },
