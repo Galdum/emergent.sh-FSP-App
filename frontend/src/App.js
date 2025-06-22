@@ -18,6 +18,9 @@ import { conversationManager, ImageOptimizer, CostTracker } from './utils/conver
 import { gamificationManager } from './utils/gamificationManager';
 import { InteractiveQuiz, sampleQuizzes } from './components/InteractiveQuiz';
 import GamificationProgress from './components/GamificationProgress';
+import { gamificationManager } from './utils/gamificationManager';
+import { InteractiveQuiz, sampleQuizzes } from './components/InteractiveQuiz';
+import GamificationProgress from './components/GamificationProgress';
 
 // --- Confetti Component ---
 const Confetti = () => {
