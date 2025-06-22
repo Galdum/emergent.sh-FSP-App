@@ -631,6 +631,25 @@ const BundeslandRecommenderModal = ({ onClose }) => {
     const [customText, setCustomText] = useState('');
     const [result, setResult] = useState('');
     const [loading, setLoading] = useState(false);
+    const modalRef = useRef(null);
+
+    // Handle click outside - go one step back
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                if (view === 'result') {
+                    setView('selection'); // Go back to selection
+                } else {
+                    onClose(); // Close completely
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [view, onClose]);
 
     const toggleCriterion = (id) => {
         setSelectedCriteria(prev => 
