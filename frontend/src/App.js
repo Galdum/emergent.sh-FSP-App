@@ -1231,6 +1231,27 @@ const GeminiEmailModal = ({ onClose }) => {
     const [formData, setFormData] = useState({});
     const [result, setResult] = useState('');
     const [loading, setLoading] = useState(false);
+    const modalRef = useRef(null);
+
+    // Handle click outside - go one step back
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                if (view === 'result') {
+                    setView('form'); // Go back to form
+                } else if (view === 'form') {
+                    setView('menu'); // Go back to menu
+                } else {
+                    onClose(); // Close completely from menu
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [view, onClose]);
 
     const emailTemplates = [
         { id: 'status', title: 'Cerere status dosar', description: 'Întreabă autoritățile despre stadiul procesării dosarului tău de Approbation' },
