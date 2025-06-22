@@ -880,6 +880,27 @@ const GeminiFspTutorModal = ({ onClose }) => {
     const [selectedMedicalCase, setSelectedMedicalCase] = useState(null);
     const fileInputRef = useRef(null);
     const chatEndRef = useRef(null);
+    const modalRef = useRef(null);
+
+    // Handle click outside - go one step back
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                if (view === 'chat') {
+                    handleBackToMenu(); // Go back to appropriate previous view
+                } else if (view === 'case_selection') {
+                    setView('menu'); // Go back to menu
+                } else {
+                    onClose(); // Close completely from menu
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [view, onClose]);
 
     const menuOptions = [
         { id: 'case', title: 'Simulează un Caz', description: 'Exercitiu complet de FSP cu pacient virtual' },
