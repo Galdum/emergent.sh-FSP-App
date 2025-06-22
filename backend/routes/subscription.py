@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from ..models import SubscriptionUpdate, UserResponse, MessageResponse, SubscriptionTier
-from ..auth import get_current_user
-from ..database import get_database
-from ..models import UserInDB
+from backend.models import SubscriptionUpdate, UserResponse, MessageResponse, SubscriptionTier
+from backend.auth import get_current_user
+from backend.database import get_database
+from backend.models import UserInDB
 from datetime import datetime
 
 router = APIRouter(prefix="/subscription", tags=["subscription"])
