@@ -1012,6 +1012,8 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                              <Sparkles className="text-purple-600 mr-2"/> 
                              Asistent Approbation
                              {!hasAIAccess() && <Lock className="h-4 w-4 ml-2 text-gray-500" />}
+                             Asistent Approbation
+                             {!hasAIAccess() && <Lock className="h-4 w-4 ml-2 text-gray-500" />}
                          </h3>
                          
                          {!hasAIAccess() ? (
