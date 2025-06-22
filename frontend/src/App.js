@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Check, Lock, Rocket, FileText, UserPlus, Send, Target, X, Clock, Users, ArrowRight, Info, BookOpen, MessageCircle, Youtube, Star, Sparkles, Clipboard, Mail, RefreshCw, ChevronLeft, FolderKanban, Upload, FileCheck2, PencilRuler, Compass, Link as LinkIcon, StickyNote, Trash2, PlusCircle, User, LogOut, Settings } from 'lucide-react';
+import { Check, Lock, Rocket, FileText, UserPlus, Send, Target, X, Clock, Users, ArrowRight, Info, BookOpen, MessageCircle, Youtube, Star, Sparkles, Clipboard, Mail, RefreshCw, ChevronLeft, FolderKanban, Upload, FileCheck2, PencilRuler, Compass, Link as LinkIcon, StickyNote, Trash2, PlusCircle, User, LogOut, Settings, Image as ImageIcon, FileUp } from 'lucide-react';
 import './App.css';
 
 // Import new authentication and API components
@@ -11,6 +11,10 @@ import SubscriptionUpgrade from './components/SubscriptionUpgrade';
 import FeedbackWidget from './components/FeedbackWidget';
 import AdminPanel from './components/AdminPanel';
 import AuthModal from './components/AuthModal';
+
+// Import new utilities
+import { renderMarkdown } from './utils/markdownRenderer';
+import { conversationManager, ImageOptimizer, CostTracker } from './utils/conversationManager';
 
 // --- Confetti Component ---
 const Confetti = () => {
