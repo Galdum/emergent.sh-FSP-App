@@ -2677,7 +2677,7 @@ const AppContent = () => {
                 </header>
                 
                 {/* Discrete Gamification Panel */}
-                <div className="fixed top-4 right-4 z-30">
+                <div className="fixed top-20 right-4 z-30">
                     <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-xs">
                         <div className="flex items-center gap-2 text-sm">
                             <div className="flex items-center gap-1">
