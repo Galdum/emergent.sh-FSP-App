@@ -2086,4 +2086,13 @@ const AppContent = () => {
             />
         </div>
     );
+};
+
+// Main App Component with AuthProvider
+export default function App() {
+    return (
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
+    );
 }
