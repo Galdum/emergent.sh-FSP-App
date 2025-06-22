@@ -1194,6 +1194,8 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                              <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare sau încarcă o imagine..." />
                              <button onClick={handleSend} disabled={chatLoading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
                          </div>
+                         </>
+                         )}
                     </div>
                 </div>
             </div>
