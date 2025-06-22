@@ -9,6 +9,8 @@ import { usePersonalFiles } from './hooks/usePersonalFiles';
 import { useSubscription } from './hooks/useSubscription';
 import SubscriptionUpgrade from './components/SubscriptionUpgrade';
 import FeedbackWidget from './components/FeedbackWidget';
+import AdminPanel from './components/AdminPanel';
+import AuthModal from './components/AuthModal';
 
 // --- Confetti Component ---
 const Confetti = () => {
