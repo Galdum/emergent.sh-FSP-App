@@ -212,7 +212,7 @@ async def resolve_error(
 @router.patch("/users/{user_id}/subscription", response_model=None)
 async def update_user_subscription(
     user_id: str,
-    subscription_data: Dict[str, any],
+    subscription_data: Dict[str, str],
     admin_user: UserInDB = Depends(verify_admin_user),
     db = Depends(get_database)
 ):
