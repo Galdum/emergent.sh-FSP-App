@@ -2035,7 +2035,7 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
             )}
             {!isAccessible && (
                 <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-400 text-xs font-semibold pointer-events-none">
-                    Premium
+                    {step.title}
                 </text>
             )}
         </g>
