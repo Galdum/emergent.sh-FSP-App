@@ -2732,6 +2732,26 @@ const AppContent = () => {
             {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
             <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
             <LeaderboardModal isOpen={leaderboardModalOpen} onClose={() => setLeaderboardModalOpen(false)} />
+            <EmailVerificationModal 
+                isOpen={emailVerificationOpen} 
+                onClose={() => setEmailVerificationOpen(false)}
+                onVerified={(email) => {
+                    // Mark task as completed when email is verified
+                    setSteps(prevSteps => {
+                        return prevSteps.map(step => {
+                            if (step.id === 1) {
+                                return {
+                                    ...step,
+                                    tasks: step.tasks.map(task => 
+                                        task.id === 102 ? { ...task, completed: true } : task
+                                    )
+                                };
+                            }
+                            return step;
+                        });
+                    });
+                }}
+            />
             <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
             <SubscriptionUpgrade 
                 isOpen={subscriptionUpgradeOpen} 
