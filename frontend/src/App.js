@@ -2555,7 +2555,7 @@ const AppContent = () => {
         }
         
         return currentSteps.map((step, index) => ({...step, icon: initialStepsData[index].icon}));
-    }, [steps]);
+    }, [steps, freeMode]);
 
     const handleTaskToggle = (stepId, taskId) => {
         const oldStep = steps.find(s => s.id === stepId);
