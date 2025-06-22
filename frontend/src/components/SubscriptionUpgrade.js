@@ -82,11 +82,16 @@ const SubscriptionUpgrade = ({ isOpen, onClose, targetPlan = null }) => {
       return;
     }
 
+    setSelectedPlan(planKey);
+    // Don't create checkout session immediately - let user choose payment method
+  };
+
+  const handleStripeCheckout = async (planKey) => {
     setLoading(true);
     setError('');
 
     try {
-      // Create checkout session
+      // Create Stripe checkout session
       const result = await api.post('/billing/checkout', {
         subscription_plan: planKey
       });
@@ -95,10 +100,31 @@ const SubscriptionUpgrade = ({ isOpen, onClose, targetPlan = null }) => {
       window.location.href = result.url;
       
     } catch (error) {
-      console.error('Failed to create checkout session:', error);
-      setError('Failed to start payment process. Please try again.');
+      console.error('Failed to create Stripe checkout session:', error);
+      setError('Failed to start Stripe payment process. Please try again.');
       setLoading(false);
     }
+  };
+
+  const handlePayPalSuccess = (result) => {
+    console.log('PayPal subscription successful:', result);
+    setProcessingPayment(false);
+    setError('');
+    
+    // Show success message and close modal
+    alert(`Subscripția ${result.subscription_tier} a fost activată cu succes prin PayPal!`);
+    window.location.reload(); // Refresh to update user state
+  };
+
+  const handlePayPalError = (error) => {
+    console.error('PayPal subscription error:', error);
+    setError('A apărut o eroare cu PayPal. Te rugăm să încerci din nou.');
+    setProcessingPayment(false);
+  };
+
+  const handlePayPalCancel = () => {
+    console.log('PayPal payment cancelled');
+    setSelectedPlan(null); // Go back to plan selection
   };
 
   const getPlanIcon = (planKey) => {
