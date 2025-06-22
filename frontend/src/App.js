@@ -1861,10 +1861,8 @@ const AppContent = () => {
         const isNowCompleted = newStep.tasks.every(t => t.completed);
 
         if (!wasCompleted && isNowCompleted) {
-            if (completed) {
-                setConfetti(true);
-                setTimeout(() => setConfetti(false), 4000);
-            }
+            setConfetti(true);
+            setTimeout(() => setConfetti(false), 4000);
         }
     };
 
