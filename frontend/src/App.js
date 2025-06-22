@@ -977,10 +977,14 @@ const GeminiEmailModal = ({ onClose }) => {
     const [loading, setLoading] = useState(false);
 
     const emailTemplates = [
-        { id: 'status', title: 'Solicitare Status Cerere', description: 'Întreabă despre stadiul dosarului tău de Approbation' },
-        { id: 'appointment', title: 'Programare FSP', description: 'Solicită o programare pentru examenul FSP' },
-        { id: 'documents', title: 'Întrebări despre Documente', description: 'Clarifică cerințele documentare' },
-        { id: 'correction', title: 'Corectare Date Personale', description: 'Corectează informații din dosar' }
+        { id: 'status', title: 'Cerere status dosar', description: 'Întreabă autoritățile despre stadiul procesării dosarului tău de Approbation' },
+        { id: 'appointment', title: 'Solicitare programare FSP', description: 'Cere o programare pentru examenul de limbaj medical (FSP) la Camera Medicilor' },
+        { id: 'document_response', title: 'Răspuns la o solicitare de document', description: 'Răspunde la o cerere de documente suplimentare de la autorități' },
+        { id: 'kp_info', title: 'Cerere informații despre KP', description: 'Solicită informații detaliate despre structura examenului de echivalare (Kenntnisprüfung)' },
+        { id: 'berufserlaubnis', title: 'Cerere pentru Berufserlaubnis', description: 'Solicită eliberarea permisului temporar de practică medicală după promovarea FSP' },
+        { id: 'document_question', title: 'Întrebare despre un document', description: 'Cere clarificări despre cerințele specifice pentru un anumit document (ex: format, valabilitate)' },
+        { id: 'withdraw_application', title: 'Retragere aplicație', description: 'Retrage-ți în mod oficial aplicația pentru Approbation dintr-un anumit land' },
+        { id: 'ai_correction', title: 'Corectează e-mailul meu (AI)', description: 'Scrie dorința unui e-mail iar asistentul AI îl va corecta și îmbunătăți pentru un ton oficial' }
     ];
 
     const getFormFields = (templateId) => {
