@@ -1802,10 +1802,12 @@ export default function App() {
             });
         }
 
+        // Handle different action types
         if (action.type === 'link') { 
             window.open(action.content, '_blank', 'noopener,noreferrer'); 
         } else if (action.type === 'modal') { 
             setActiveContent(action.content); 
+            // Don't close step modal here - content modal will handle the hierarchy
         } else if (action.type === 'gemini_fsp_tutor') { 
             setActiveGeminiModal('fsp_tutor'); 
         } else if (action.type === 'gemini_email_generator') { 
