@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Dict, List
-from ..auth import get_current_user
-from ..models import UserInDB
+from backend.auth import get_current_user
+from backend.models import UserInDB
 from pydantic import BaseModel
 import os
 import subprocess
