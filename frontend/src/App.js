@@ -2325,7 +2325,7 @@ const ContentModal = ({ content, onClose, onBackToStep }) => {
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">{content.title}</h2>
                 
                 <div className="text-gray-700 leading-relaxed">
-                    {content.body}
+                    {typeof content.body === 'string' ? content.body : React.isValidElement(content.body) ? content.body : <div>{content.body}</div>}
                 </div>
             </div>
         </div>
