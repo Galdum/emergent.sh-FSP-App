@@ -2393,6 +2393,8 @@ const AppContent = () => {
             setInfoHubModalOpen(true); 
         } else if (action.type === 'leaderboard') { 
             setLeaderboardModalOpen(true); 
+        } else if (action.type === 'leaderboard') { 
+            setLeaderboardModalOpen(true); 
         }
     };
 
