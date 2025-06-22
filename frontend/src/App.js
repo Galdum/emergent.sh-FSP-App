@@ -134,16 +134,26 @@ const infoDocs = [
     }
 ];
 
-// Subscription tiers
-const SUBSCRIPTION_TIERS = {
-    FREE: { name: 'Free', price: 0, maxSteps: 2, maxOrangeNodes: 1, hasAI: false },
-    BASIC: { name: 'Basic', price: 10, maxSteps: 6, maxOrangeNodes: 4, hasAI: false },
-    PREMIUM: { name: 'Premium', price: 30, maxSteps: 6, maxOrangeNodes: 4, hasAI: true }
-};
+// Remove old subscription tiers definition - now handled by useSubscription hook
 
-// Subscription Modal Component
-const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
+// Subscription Modal Component - Updated to use new hooks
+const SubscriptionModal = ({ isOpen, onClose }) => {
+    const { subscriptionTier, upgradeSubscription, SUBSCRIPTION_TIERS } = useSubscription();
+
     if (!isOpen) return null;
+
+    const handleUpgrade = async (tier) => {
+        const result = await upgradeSubscription(tier);
+        if (result.success) {
+            onClose();
+            // In a real app, you'd redirect to payment processor
+            if (tier !== 'FREE') {
+                alert(`Redirection către procesarea plății pentru planul ${SUBSCRIPTION_TIERS[tier].name} (€${SUBSCRIPTION_TIERS[tier].price}/lună)`);
+            }
+        } else {
+            alert(`Eroare: ${result.error}`);
+        }
+    };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[70] p-4 animate-fade-in-fast">
@@ -158,7 +168,7 @@ const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Free Tier */}
                     <div className="border-2 border-gray-200 rounded-xl p-6 relative">
-                        {currentTier === 'FREE' && (
+                        {subscriptionTier === 'FREE' && (
                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
                                 Plan Actual
                             </div>
@@ -187,7 +197,7 @@ const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
                             </li>
                         </ul>
                         <button 
-                            disabled={currentTier === 'FREE'}
+                            disabled={subscriptionTier === 'FREE'}
                             className="w-full py-3 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed"
                         >
                             Plan Curent
@@ -196,7 +206,7 @@ const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
 
                     {/* Basic Tier */}
                     <div className="border-2 border-blue-500 rounded-xl p-6 relative">
-                        {currentTier === 'BASIC' && (
+                        {subscriptionTier === 'BASIC' && (
                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
                                 Plan Actual
                             </div>
@@ -229,21 +239,21 @@ const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
                             </li>
                         </ul>
                         <button 
-                            onClick={() => onUpgrade('BASIC')}
-                            disabled={currentTier === 'BASIC'}
+                            onClick={() => handleUpgrade('BASIC')}
+                            disabled={subscriptionTier === 'BASIC'}
                             className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-                                currentTier === 'BASIC' 
+                                subscriptionTier === 'BASIC' 
                                     ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
                                     : 'bg-blue-500 text-white hover:bg-blue-600'
                             }`}
                         >
-                            {currentTier === 'BASIC' ? 'Plan Actual' : 'Upgradeaza'}
+                            {subscriptionTier === 'BASIC' ? 'Plan Actual' : 'Upgradeaza'}
                         </button>
                     </div>
 
                     {/* Premium Tier */}
                     <div className="border-2 border-purple-500 rounded-xl p-6 relative">
-                        {currentTier === 'PREMIUM' && (
+                        {subscriptionTier === 'PREMIUM' && (
                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
                                 Plan Actual
                             </div>
@@ -287,15 +297,15 @@ const SubscriptionModal = ({ isOpen, onClose, currentTier, onUpgrade }) => {
                             </li>
                         </ul>
                         <button 
-                            onClick={() => onUpgrade('PREMIUM')}
-                            disabled={currentTier === 'PREMIUM'}
+                            onClick={() => handleUpgrade('PREMIUM')}
+                            disabled={subscriptionTier === 'PREMIUM'}
                             className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-                                currentTier === 'PREMIUM' 
+                                subscriptionTier === 'PREMIUM' 
                                     ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
                                     : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
                             }`}
                         >
-                            {currentTier === 'PREMIUM' ? 'Plan Actual' : 'Upgradeaza'}
+                            {subscriptionTier === 'PREMIUM' ? 'Plan Actual' : 'Upgradeaza'}
                         </button>
                     </div>
                 </div>
