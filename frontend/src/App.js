@@ -1274,11 +1274,28 @@ const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
 
 // --- Content Modal Component ---
 const ContentModal = ({ content, onClose }) => {
+    const modalRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                onClose();
+            }
+        };
+
+        if (content) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [content, onClose]);
+
     if (!content) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-fast">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
+            <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
                     <X size={28} />
                 </button>
