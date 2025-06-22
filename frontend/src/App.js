@@ -1369,10 +1369,20 @@ Bitte erstelle die komplette E-Mail inklusive Betreff.`;
         }
     };
 
+    const handleClose = () => {
+        if (view === 'result') {
+            setView('form');
+        } else if (view === 'form') {
+            setView('menu');
+        } else {
+            onClose();
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+            <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
+                <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
                 
                 <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
                     <Mail className="text-green-600"/> Generator Email AI
