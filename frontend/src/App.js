@@ -8,7 +8,7 @@ import { useProgress } from './hooks/useProgress';
 import { usePersonalFiles } from './hooks/usePersonalFiles';
 import { useSubscription } from './hooks/useSubscription';
 import SubscriptionUpgrade from './components/SubscriptionUpgrade';
-import AdminPanel from './components/AdminPanel';
+import FeedbackWidget from './components/FeedbackWidget';
 
 // --- Confetti Component ---
 const Confetti = () => {
