@@ -2481,28 +2481,19 @@ const AppContent = () => {
                     <div className="text-gray-500">Test Mode:</div>
                     <div className="flex gap-1">
                         <button 
-                            onClick={() => {
-                                const { upgradeSubscription } = useSubscription();
-                                upgradeSubscription('FREE');
-                            }}
+                            onClick={() => handleTestModeSubscription('FREE')}
                             className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'FREE' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Free
                         </button>
                         <button 
-                            onClick={() => {
-                                const { upgradeSubscription } = useSubscription();
-                                upgradeSubscription('BASIC');
-                            }}
+                            onClick={() => handleTestModeSubscription('BASIC')}
                             className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'BASIC' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Basic
                         </button>
                         <button 
-                            onClick={() => {
-                                const { upgradeSubscription } = useSubscription();
-                                upgradeSubscription('PREMIUM');
-                            }}
+                            onClick={() => handleTestModeSubscription('PREMIUM')}
                             className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'PREMIUM' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Premium
