@@ -1178,6 +1178,23 @@ const BonusNode = ({ node, onClick }) => {
 
 // --- Step Modal Component ---
 const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
+    const modalRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                onClose();
+            }
+        };
+
+        if (step) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [step, onClose]);
+
     if (!step) return null;
 
     const allTasksCompleted = step.tasks.every(task => task.completed);
@@ -1185,7 +1202,7 @@ const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-fast">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
+            <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
                     <X size={28} />
                 </button>
@@ -1234,7 +1251,7 @@ const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
                                         className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                                     >
                                         <Info size={16} />
-                                        {task.viewed ? 'Vezi din nou' : 'Vezi detalii'}
+                                        {task.viewed ? 'Revizuiește' : 'Detalii'}
                                     </button>
                                 )}
                             </div>
