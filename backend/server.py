@@ -42,7 +42,7 @@ async def get_database():
     return db
 
 # Create custom dependency for authentication
-from auth import get_current_user, verify_token, get_user_by_id
+from backend.auth import get_current_user, verify_token, get_user_by_id
 
 async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Depends(get_database)):
     try:
@@ -59,16 +59,16 @@ async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Dep
     return user
 
 # Import routes
-from routes.auth import router as auth_router
-from routes.progress import router as progress_router
-from routes.files import router as files_router
-from routes.subscription import router as subscription_router
+from backend.routes.auth import router as auth_router
+from backend.routes.progress import router as progress_router
+from backend.routes.files import router as files_router
+from backend.routes.subscription import router as subscription_router
 
 # Override the auth dependency in routes
-import routes.auth as auth_module
-import routes.progress as progress_module
-import routes.files as files_module
-import routes.subscription as subscription_module
+import backend.routes.auth as auth_module
+import backend.routes.progress as progress_module
+import backend.routes.files as files_module
+import backend.routes.subscription as subscription_module
 
 # Patch the dependencies
 auth_module.get_current_user = lambda: Depends(get_current_user_with_db)
