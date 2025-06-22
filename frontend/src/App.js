@@ -15,6 +15,9 @@ import AuthModal from './components/AuthModal';
 // Import new utilities
 import { renderMarkdown } from './utils/markdownRenderer';
 import { conversationManager, ImageOptimizer, CostTracker } from './utils/conversationManager';
+import { gamificationManager } from './utils/gamificationManager';
+import { InteractiveQuiz, sampleQuizzes } from './components/InteractiveQuiz';
+import GamificationProgress from './components/GamificationProgress';
 
 // --- Confetti Component ---
 const Confetti = () => {
