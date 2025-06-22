@@ -275,7 +275,10 @@ async def get_paypal_subscription_status(
     db = Depends(get_database)
 ):
     try:
-        user = await db.users.find_one({"id": current_user["id"]})
+        # Convert current_user to dict if it's not already
+        user_id = current_user.id if hasattr(current_user, 'id') else current_user["id"]
+        
+        user = await db.users.find_one({"id": user_id})
         
         if not user or user.get("subscription_provider") != "paypal":
             return {
