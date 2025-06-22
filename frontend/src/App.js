@@ -1962,7 +1962,7 @@ export default function App() {
             </div>
             
             <StepModal step={selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
-            <ContentModal content={activeContent} onClose={closeContentModal} />
+            <ContentModal content={activeContent} onClose={closeContentModal} onBackToStep={closeContentModal} />
             {activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
             {activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
             {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
