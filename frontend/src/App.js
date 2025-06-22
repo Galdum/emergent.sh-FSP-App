@@ -1791,23 +1791,12 @@ const AppContent = () => {
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
     useEffect(() => {
-        // Load subscription tier from localStorage
-        const savedTier = localStorage.getItem('subscriptionTier') || 'FREE';
-        setCurrentTier(savedTier);
-
         let loadedSteps = initialStepsData.map(step => {
             const savedStep = JSON.parse(localStorage.getItem(`step_${step.id}`) || 'null');
             return savedStep ? { ...step, ...savedStep } : { ...step, tasks: step.tasks.map(t => ({...t, completed: false, viewed: false})) };
         });
         setSteps(loadedSteps);
     }, []);
-
-    const getCurrentSubscription = () => SUBSCRIPTION_TIERS[currentTier];
-
-    const isStepAccessible = (stepIndex) => {
-        const subscription = getCurrentSubscription();
-        return stepIndex < subscription.maxSteps;
-    };
 
     const isBonusNodeAccessible = (nodeIndex) => {
         const subscription = getCurrentSubscription();
