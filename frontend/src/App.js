@@ -7,7 +7,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useProgress } from './hooks/useProgress';
 import { usePersonalFiles } from './hooks/usePersonalFiles';
 import { useSubscription } from './hooks/useSubscription';
-import AuthModal from './components/AuthModal';
+import SubscriptionUpgrade from './components/SubscriptionUpgrade';
+import AdminPanel from './components/AdminPanel';
 
 // --- Confetti Component ---
 const Confetti = () => {
