@@ -502,6 +502,19 @@ def test_admin_errors():
         return False
     
     try:
+        # First create an error report to ensure there's data
+        error_response = requests.post(
+            f"{API_URL}/monitoring/report-error",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            json={
+                "error_type": "admin_test_error",
+                "error_message": "Test error from admin test",
+                "stack_trace": "Test stack trace",
+                "url": "/admin-test"
+            }
+        )
+        
+        # Now get the errors
         response = requests.get(
             f"{API_URL}/admin/errors",
             headers={"Authorization": f"Bearer {admin_auth_token}"}
