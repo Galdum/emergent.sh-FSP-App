@@ -209,7 +209,7 @@ async def resolve_error(
     
     return {"message": "Error marked as resolved"}
 
-@router.patch("/users/{user_id}/subscription")
+@router.patch("/users/{user_id}/subscription", response_model=None)
 async def update_user_subscription(
     user_id: str,
     subscription_data: Dict[str, any],
