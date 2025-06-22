@@ -1790,6 +1790,8 @@ const AppContent = () => {
     const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
     const [confetti, setConfetti] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
+    const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
+    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
