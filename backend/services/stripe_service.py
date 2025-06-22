@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Optional
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
-from ..models_billing import PaymentTransaction, SubscriptionPlan, SubscriptionPlanDetails, PaymentStatus
+from backend.models_billing import PaymentTransaction, SubscriptionPlan, SubscriptionPlanDetails, PaymentStatus
 from ..database import get_database
 from datetime import datetime, timedelta
 import logging
