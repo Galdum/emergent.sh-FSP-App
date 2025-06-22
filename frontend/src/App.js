@@ -12,6 +12,7 @@ import FeedbackWidget from './components/FeedbackWidget';
 import AdminPanel from './components/AdminPanel';
 import AuthModal from './components/AuthModal';
 import GDPRConsentModal from './components/GDPRConsentModal';
+import GDPRConsentModal from './components/GDPRConsentModal';
 
 // Import new utilities
 import { renderMarkdown } from './utils/markdownRenderer';
