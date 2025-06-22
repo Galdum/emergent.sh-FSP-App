@@ -1366,6 +1366,7 @@ const GeminiFspTutorModal = ({ onClose }) => {
     }, [view, onClose]);
 
     const menuOptions = [
+        { id: 'structure', title: '📚 Învață-mă structura FSP', description: 'Ghid complet pentru examenul FSP - structură, timp, strategii' },
         { id: 'case', title: 'Simulează un Caz', description: 'Exercitiu complet de FSP cu pacient virtual' },
         { id: 'upload_case', title: 'Încarcă Cazul Tău', description: 'Încarcă propriul caz pentru evaluare și feedback' },
         { id: 'grammar', title: 'Discută Gramatica', description: 'Ajutor cu structurile gramaticale medicale' },
