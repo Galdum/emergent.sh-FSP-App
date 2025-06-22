@@ -771,6 +771,8 @@ def test_paypal_create_subscription():
             }
         )
         
+        print(f"PayPal Create Subscription Response: {response.status_code} {response.text}")
+        
         # We expect a valid response with approval URL
         success = response.status_code == 200 and "approval_url" in response.json()
         
