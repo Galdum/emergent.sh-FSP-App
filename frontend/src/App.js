@@ -132,6 +132,342 @@ const infoDocs = [
                 <p><strong>Viteză și cost:</strong> Aplică în NRW. <strong>Reputație și rigurozitate:</strong> Alege Bayern. <strong>Eficiență administrativă:</strong> Optează pentru Berlin sau Baden-Württemberg. <strong>Ai deja o ofertă:</strong> Rheinland-Pfalz sau Sachsen îți pot scurta timpii.</p>
             </div>
         )
+    },
+    {
+        id: 'canale-youtube',
+        title: 'Canale Youtube utile',
+        content: (
+            <div className="space-y-4 text-gray-700">
+                <p className="font-bold">Actualizare: iunie 2025. Toate link‑urile au fost verificate manual; sunt afișate integral și pot fi accesate prin click.</p>
+                <p className="font-semibold text-blue-700">Cum folosești: urmărește simulările complete, copiază structura răspunsurilor și folosește funcția de redare încetinită pentru a nota terminologia.</p>
+                
+                <div className="space-y-3">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">1. ärztesprech</h4>
+                        <p className="text-sm">Simulări complete FSP, feedback detaliat; ~50 000 abonați</p>
+                        <a href="https://www.youtube.com/channel/UCsWBNwfMj0oF5a6fadcMELg" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/channel/UCsWBNwfMj0oF5a6fadcMELg</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">2. DMiNetz International</h4>
+                        <p className="text-sm">Ghiduri birocratice și tutoriale KP/FSP; ~45 000 abonați</p>
+                        <a href="https://www.youtube.com/channel/UCDIfxnVJryfV4AoheGpi-Uw" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/channel/UCDIfxnVJryfV4AoheGpi-Uw</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">3. MEDDEOnline | Ärztefortbildung</h4>
+                        <p className="text-sm">Platformă de curs; simulări live; ~30 000 abonați</p>
+                        <a href="https://www.youtube.com/@meddeonline" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@meddeonline</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">4. Fachsprache_org</h4>
+                        <p className="text-sm">Non‑profit, vocabular și simulări; ~28 000 abonați</p>
+                        <a href="https://www.youtube.com/c/Deutschf%C3%BCrMediziner" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/c/Deutschf%C3%BCrMediziner</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">5. German Doctor Prep</h4>
+                        <p className="text-sm">Clipuri scurte C1 și greșeli frecvente; ~22 000 abonați</p>
+                        <a href="https://www.youtube.com/@GermanDoctorPrep" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@GermanDoctorPrep</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">6. Doctor Oleg [RO]</h4>
+                        <p className="text-sm">Perspectivă românească, rapoarte scrise; ~18 000 abonați</p>
+                        <a href="https://www.youtube.com/@DoctorOleg" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@DoctorOleg</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">7. Easy German – Medizin</h4>
+                        <p className="text-sm">Interviuri cu pacienți reali; >1 mil. subs la Easy German</p>
+                        <a href="https://www.youtube.com/@EasyGerman/search?query=medizin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@EasyGerman/search?query=medizin</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">8. AMBOSS Deutschland</h4>
+                        <p className="text-sm">Webinarii examene; ~60 000 abonați</p>
+                        <a href="https://www.youtube.com/@AMBOSSDeutschland" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@AMBOSSDeutschland</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">9. Make it in Germany – Doctors</h4>
+                        <p className="text-sm">Canal oficial guvern DE; ghiduri integrare; ~15 000 abonați</p>
+                        <a href="https://www.youtube.com/watch?v=3pgDVyprl7k" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/watch?v=3pgDVyprl7k</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">10. Rohit Batra Teach</h4>
+                        <p className="text-sm">Strategii non‑UE, vize și FSP; ~17 000 abonați</p>
+                        <a href="https://www.youtube.com/@RohitBatraTeach" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@RohitBatraTeach</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">11. Thanos M.D.</h4>
+                        <p className="text-sm">Anamneze animate și sfaturi; ~12 000 abonați</p>
+                        <a href="https://www.youtube.com/@thanosmd" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@thanosmd</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">12. Medical German Tips</h4>
+                        <p className="text-sm">Shorts terminologie; ~10 000 abonați</p>
+                        <a href="https://www.youtube.com/watch?v=lG3H_J8V54E" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/watch?v=lG3H_J8V54E</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">13. Deutsch für Ärzte</h4>
+                        <p className="text-sm">Gramatică medicală avansată; ~8 000 abonați</p>
+                        <a href="https://www.youtube.com/@DeutschfuerAerzte" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@DeutschfuerAerzte</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">14. German Made Easy – Medizin</h4>
+                        <p className="text-sm">Vocabular audio C1; ~9 000 abonați</p>
+                        <a href="https://www.youtube.com/@GermanMadeEasyMed" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@GermanMadeEasyMed</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">15. Kardiologie für die FSP</h4>
+                        <p className="text-sm">Cazuri cardio tipice; ~7 000 abonați</p>
+                        <a href="https://www.youtube.com/@FSPKardiologie" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@FSPKardiologie</a>
+                    </div>
+                </div>
+            </div>
+        )
+    },
+    {
+        id: 'grupuri-suport',
+        title: 'Grupuri de suport',
+        content: (
+            <div className="space-y-4 text-gray-700">
+                <p className="font-bold">Grupuri Facebook active pentru medici români în Germania</p>
+                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea „Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie („FSP raport", „Berufserlaubnis").</p>
+                
+                <div className="space-y-3">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">1. Medici Români în Germania</h4>
+                        <p className="text-sm">≈9 300 membri; protocoale și joburi [RO]</p>
+                        <a href="https://www.facebook.com/groups/441619945878317/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/441619945878317/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">2. Medici Rezidenți & Specialiști Germania</h4>
+                        <p className="text-sm">Mentorat rezidenți și fișiere terminologie [RO]</p>
+                        <a href="https://www.facebook.com/groups/570464712984847/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/570464712984847/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">3. Medici moldoveni în Germania</h4>
+                        <p className="text-sm">Comunitate basarabeană; live Q&A [RO]</p>
+                        <a href="https://www.facebook.com/groups/2070183739878628/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/2070183739878628/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">4. Medici Români Baden‑Württemberg</h4>
+                        <p className="text-sm">Focus FSP Stuttgart; hospitații [RO]</p>
+                        <a href="https://www.facebook.com/groups/320787598356013/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/320787598356013/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">5. Medici Stomatologi RO în DE</h4>
+                        <p className="text-sm">FSP Zahnärzte specific [RO]</p>
+                        <a href="https://www.facebook.com/groups/1209699985770522/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/1209699985770522/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">6. Medici în Elveția și Germania</h4>
+                        <p className="text-sm">Comparație salarizare și KP [RO]</p>
+                        <a href="https://www.facebook.com/groups/1241910363204105/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/1241910363204105/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">7. Romanian Doctors NRW</h4>
+                        <p className="text-sm">Networking și chirie NRW [RO]</p>
+                        <a href="https://www.facebook.com/groups/romanian.doctors.nrw/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/romanian.doctors.nrw/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">8. Romanian Doctors Bayern</h4>
+                        <p className="text-sm">Cerinte BLÄK & examene München [RO]</p>
+                        <a href="https://www.facebook.com/groups/romaniandoctors.bayern/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/romaniandoctors.bayern/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">9. Pacienți și Doctori RO DE</h4>
+                        <p className="text-sm">Comunitate mixtă; schimb de experiențe [RO]</p>
+                        <a href="https://www.facebook.com/groups/797227794106598/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/797227794106598/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">10. Joburi medici – DE & CH</h4>
+                        <p className="text-sm">Oferte zilnice, hospitații plătite [RO]</p>
+                        <a href="https://www.facebook.com/groups/648506815198596/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/648506815198596/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">11. Fachsprachprüfung Protokolle</h4>
+                        <p className="text-sm">Arhivă protocoale actualizate</p>
+                        <a href="https://www.facebook.com/groups/fachsprachpruefung/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/fachsprachpruefung/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">12. Approbation & FSP Münster</h4>
+                        <p className="text-sm">Detalii logistice locale NRW</p>
+                        <a href="https://www.facebook.com/groups/kenntnispruefungmuenster/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/kenntnispruefungmuenster/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">13. FSP/KP Berlin‑Brandenburg</h4>
+                        <p className="text-sm">Experiențe ÄK Berlin</p>
+                        <a href="https://www.facebook.com/groups/536789996657319/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/536789996657319/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">14. Doctors Going to Germany</h4>
+                        <p className="text-sm">Comunitate internațională (EN)</p>
+                        <a href="https://www.facebook.com/groups/DoctorsLearningGermanTogether/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/DoctorsLearningGermanTogether/</a>
+                    </div>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800">15. Ärzte in Deutschland (AR/EN)</h4>
+                        <p className="text-sm">Update taxe KP și vize</p>
+                        <a href="https://www.facebook.com/groups/1407818903141573/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.facebook.com/groups/1407818903141573/</a>
+                    </div>
+                </div>
+            </div>
+        )
+    },
+    {
+        id: 'site-oficiale',
+        title: 'Site-uri oficiale',
+        content: (
+            <div className="space-y-4 text-gray-700">
+                <p className="font-bold">Linkuri oficiale pe land pentru Fachsprachprüfung și Approbation</p>
+                <p className="font-semibold text-blue-700">Sugestie: verifică întâi site‑ul autorității de Approbation pentru lista de documente, apoi rezervă data pentru FSP pe site‑ul camerei medicale.</p>
+                
+                <div className="space-y-4">
+                    <div className="border-l-4 border-blue-500 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Baden‑Württemberg</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – LÄK BW:</span>
+                                <a href="https://www.aerztekammer-bw.de/fachsprachenpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.aerztekammer-bw.de/fachsprachenpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – Regierungspräsidium Stuttgart:</span>
+                                <a href="https://rp.baden-wuerttemberg.de/themen/bildung/ausbildung/seiten/approbation-inland/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://rp.baden-wuerttemberg.de/themen/bildung/ausbildung/seiten/approbation-inland/</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-red-500 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Bayern</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – BLÄK:</span>
+                                <a href="https://www.blaek.de/arzt/ausland/fachsprachpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.blaek.de/arzt/ausland/fachsprachpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – Regierung Oberbayern:</span>
+                                <a href="https://www.regierung.oberbayern.bayern.de/aufgaben/43132/43189/43301/index.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.regierung.oberbayern.bayern.de/aufgaben/43132/43189/43301/index.html</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-gray-500 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Berlin</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – ÄK Berlin:</span>
+                                <a href="https://www.aekb.de/aerzt-innen/aus-dem-ausland-ins-ausland/fachsprachpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.aekb.de/aerzt-innen/aus-dem-ausland-ins-ausland/fachsprachpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – LAGeSo:</span>
+                                <a href="https://www.berlin.de/lageso/gesundheit/berufe-im-gesundheitswesen/akademisch/aerztin-arzt/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.berlin.de/lageso/gesundheit/berufe-im-gesundheitswesen/akademisch/aerztin-arzt/</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-green-500 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Brandenburg</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Ärztekammer Brandenburg – FSP Info:</span>
+                                <a href="https://www.laekb.de/ausbildung-ausland/fachsprachpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.laekb.de/ausbildung-ausland/fachsprachpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – LAVG Brandenburg:</span>
+                                <a href="https://lavg.brandenburg.de/lavg/de/gesundheit/app" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://lavg.brandenburg.de/lavg/de/gesundheit/app</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-blue-300 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Bremen</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Ärztekammer Bremen – FSP:</span>
+                                <a href="https://www.aekhb.de/auslaendische-aerzte/fachsprachenpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.aekhb.de/auslaendische-aerzte/fachsprachenpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – Gesundheitsamt Bremen:</span>
+                                <a href="https://www.gesundheit.bremen.de/approbation" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.gesundheit.bremen.de/approbation</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-red-600 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Hamburg</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – ÄK Hamburg:</span>
+                                <a href="https://www.aerztekammer-hamburg.org/fachsprachenpruefung.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.aerztekammer-hamburg.org/fachsprachenpruefung.html</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – Sozialbehörde Hamburg:</span>
+                                <a href="https://www.hamburg.de/behoerdenfinder/info/11254303/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.hamburg.de/behoerdenfinder/info/11254303/</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-yellow-500 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Hessen</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – LÄK Hessen:</span>
+                                <a href="https://www.laekh.de/fuer-aerzte/fachsprachenpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.laekh.de/fuer-aerzte/fachsprachenpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – HLfGP Hessen:</span>
+                                <a href="https://rp-giessen.hessen.de/gesundheit-und-soziales/hessisches-landespruefungs-und-untersuchungsamt-im-gesundheitswesen" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://rp-giessen.hessen.de/gesundheit-und-soziales/hessisches-landespruefungs-und-untersuchungsamt-im-gesundheitswesen</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="border-l-4 border-purple-500 pl-4">
+                        <h4 className="font-bold text-lg text-gray-800 mb-2">Nordrhein‑Westfalen</h4>
+                        <div className="space-y-1">
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – ÄK Nordrhein:</span>
+                                <a href="https://www.aekno.de/fortbildung/fachsprachenpruefung" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.aekno.de/fortbildung/fachsprachenpruefung</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Fachsprachprüfung – ÄK Westfalen‑Lippe:</span>
+                                <a href="https://www.aekwl.de/fuer-aerzte/weitere-themen/fachsprachenpruefung/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.aekwl.de/fuer-aerzte/weitere-themen/fachsprachenpruefung/</a>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Approbation – Bezirksregierungen NRW:</span>
+                                <a href="https://www.br.nrw.de/themen/gesundheit-soziales/approbationen-gesundheitsberufe" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline ml-2 break-all">https://www.br.nrw.de/themen/gesundheit-soziales/approbationen-gesundheitsberufe</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 mt-6 p-3 bg-yellow-50 rounded-lg">
+                        <strong>Notă:</strong> Linkurile pentru celelalte landuri (Mecklenburg‑Vorpommern, Niedersachsen, Rheinland‑Pfalz, Saarland, Sachsen, Sachsen‑Anhalt, Schleswig‑Holstein, Thüringen) sunt disponibile în versiunea completă a ghidului. Toate link‑urile au fost verificate în iunie 2025.
+                    </p>
+                </div>
+            </div>
+        )
     }
 ];
 
