@@ -63,6 +63,9 @@ from backend.routes.auth import router as auth_router
 from backend.routes.progress import router as progress_router
 from backend.routes.files import router as files_router
 from backend.routes.subscription import router as subscription_router
+from backend.routes.billing import router as billing_router
+from backend.routes.admin import router as admin_router
+from backend.routes.monitoring import router as monitoring_router
 
 # Override the auth dependency in routes
 import backend.routes.auth as auth_module
