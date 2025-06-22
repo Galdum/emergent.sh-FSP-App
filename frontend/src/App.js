@@ -2188,7 +2188,7 @@ const BonusNode = ({ node, isAccessible, onClick }) => {
                 style={{ pointerEvents: 'none' }}
             />
             <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
-                <div className={`flex items-center justify-center w-full h-full ${isAccessible ? 'text-white' : 'text-gray-400'}`}>
+                <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
                     <node.icon size={20} />
                 </div>
             </foreignObject>
