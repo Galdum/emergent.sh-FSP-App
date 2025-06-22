@@ -748,6 +748,83 @@ def test_feature_flags():
         print_test_result("Get Feature Flags", False, error=str(e))
         return False
 
+def test_paypal_create_subscription():
+    """Test the POST /paypal/create-subscription endpoint."""
+    global auth_token, paypal_approval_url
+    
+    if not auth_token:
+        print_test_result("Create PayPal Subscription", False, error="No auth token available. Login first.")
+        return False
+    
+    try:
+        response = requests.post(
+            f"{API_URL}/paypal/create-subscription",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json={
+                "plan_type": "BASIC",
+                "return_url": f"{BACKEND_URL}/payment-success",
+                "cancel_url": f"{BACKEND_URL}/payment-cancel"
+            }
+        )
+        
+        # We expect a valid response with approval URL
+        success = response.status_code == 200 and "approval_url" in response.json()
+        
+        if success:
+            paypal_approval_url = response.json().get("approval_url")
+            
+        print_test_result("Create PayPal Subscription", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Create PayPal Subscription", False, error=str(e))
+        return False
+
+def test_paypal_subscription_status():
+    """Test the GET /paypal/subscription-status endpoint."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("Get PayPal Subscription Status", False, error="No auth token available. Login first.")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/paypal/subscription-status",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        # We expect a valid response with subscription status
+        success = response.status_code == 200 and "has_paypal_subscription" in response.json()
+        print_test_result("Get PayPal Subscription Status", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get PayPal Subscription Status", False, error=str(e))
+        return False
+
+def test_paypal_cancel_subscription():
+    """Test the POST /paypal/cancel-subscription endpoint."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("Cancel PayPal Subscription", False, error="No auth token available. Login first.")
+        return False
+    
+    try:
+        # This test might fail if there's no active subscription
+        # We'll consider 404 as a "success" for testing purposes
+        response = requests.post(
+            f"{API_URL}/paypal/cancel-subscription",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        # Either we successfully cancel or get a 404 because there's no subscription
+        success = response.status_code in [200, 404]
+        print_test_result("Cancel PayPal Subscription", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Cancel PayPal Subscription", False, error=str(e))
+        return False
+
 def run_all_tests():
     """Run all tests and return a summary."""
     print("\n" + "=" * 80)
@@ -818,6 +895,11 @@ def run_all_tests():
     results["deployment_version"] = test_deployment_version()
     results["deployment_status"] = test_deployment_status()
     results["feature_flags"] = test_feature_flags()
+    
+    # 13. PayPal Integration Endpoints
+    results["paypal_create_subscription"] = test_paypal_create_subscription()
+    results["paypal_subscription_status"] = test_paypal_subscription_status()
+    results["paypal_cancel_subscription"] = test_paypal_cancel_subscription()
     
     # Print summary
     print("\n" + "=" * 80)
