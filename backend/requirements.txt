@@ -28,3 +28,4 @@ python-jose[cryptography]>=3.3.0
 emergentintegrations>=0.1.0
 sentry-sdk[fastapi]>=1.40.0
 apscheduler>=3.10.0
+paypalcheckoutsdk>=1.0.1
