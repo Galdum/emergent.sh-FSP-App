@@ -2183,11 +2183,7 @@ const BonusNode = ({ node, isAccessible, onClick }) => {
                 cx={node.position.x}
                 cy={node.position.y}
                 r="25"
-                className={`transition-all duration-300 ${
-                    isAccessible 
-                        ? 'fill-orange-500 hover:fill-orange-600' 
-                        : 'fill-gray-300'
-                }`}
+                className={`transition-all duration-300 ${getNodeColor()}`}
                 style={{ pointerEvents: 'none' }}
             />
             <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
