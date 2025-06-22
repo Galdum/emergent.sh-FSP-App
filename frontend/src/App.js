@@ -1005,14 +1005,35 @@ const GeminiEmailModal = ({ onClose }) => {
                     { key: 'examType', label: 'Tipul examenului (FSP/KP)', type: 'text', required: true },
                     { key: 'preferredDates', label: 'Perioada preferată', type: 'text', required: false }
                 ];
-            case 'documents':
+            case 'document_response':
                 return [...commonFields,
+                    { key: 'requestedDocument', label: 'Documentul solicitat', type: 'text', required: true },
+                    { key: 'responseAction', label: 'Acțiunea ta (ex: trimit documentul, solicit clarificări)', type: 'textarea', required: true }
+                ];
+            case 'kp_info':
+                return [...commonFields,
+                    { key: 'specificQuestions', label: 'Întrebări specifice despre KP', type: 'textarea', required: true }
+                ];
+            case 'berufserlaubnis':
+                return [...commonFields,
+                    { key: 'fspDate', label: 'Data promovării FSP', type: 'date', required: true },
+                    { key: 'workPlace', label: 'Locul de muncă dorit/contractat', type: 'text', required: false }
+                ];
+            case 'document_question':
+                return [...commonFields,
+                    { key: 'documentName', label: 'Numele documentului', type: 'text', required: true },
                     { key: 'specificQuestion', label: 'Întrebarea ta specifică', type: 'textarea', required: true }
                 ];
-            case 'correction':
+            case 'withdraw_application':
                 return [...commonFields,
-                    { key: 'errorDescription', label: 'Descrierea erorii', type: 'textarea', required: true },
-                    { key: 'correctInformation', label: 'Informația corectă', type: 'textarea', required: true }
+                    { key: 'applicationNumber', label: 'Numărul dosarului', type: 'text', required: true },
+                    { key: 'reason', label: 'Motivul retragerii (opțional)', type: 'textarea', required: false }
+                ];
+            case 'ai_correction':
+                return [
+                    { key: 'emailDraft', label: 'Schița e-mailului tău (scrie în română sau germană)', type: 'textarea', required: true },
+                    { key: 'recipientType', label: 'Tipul destinatarului (ex: Landesärztekammer, Approbationsbehörde)', type: 'text', required: true },
+                    { key: 'purpose', label: 'Scopul e-mailului', type: 'text', required: true }
                 ];
             default:
                 return commonFields;
