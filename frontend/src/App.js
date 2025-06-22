@@ -2463,19 +2463,28 @@ const AppContent = () => {
                     <div className="text-gray-500">Test Mode:</div>
                     <div className="flex gap-1">
                         <button 
-                            onClick={() => setSubscriptionModalOpen(true)}
+                            onClick={() => {
+                                const { upgradeSubscription } = useSubscription();
+                                upgradeSubscription('FREE');
+                            }}
                             className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'FREE' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Free
                         </button>
                         <button 
-                            onClick={() => setSubscriptionModalOpen(true)}
+                            onClick={() => {
+                                const { upgradeSubscription } = useSubscription();
+                                upgradeSubscription('BASIC');
+                            }}
                             className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'BASIC' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Basic
                         </button>
                         <button 
-                            onClick={() => setSubscriptionModalOpen(true)}
+                            onClick={() => {
+                                const { upgradeSubscription } = useSubscription();
+                                upgradeSubscription('PREMIUM');
+                            }}
                             className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'PREMIUM' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}
                         >
                             Premium
