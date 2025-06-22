@@ -147,12 +147,12 @@ const nodePositions = [
     { x: 140, y: 644 }
 ];
 
-// Bonus floating action buttons
+// Static bonus nodes positioned within the journey map
 const bonusNodes = [
-    { id: 'fsp_tutor', icon: MessageCircle, title: 'Simulator FSP', position: { top: '15%', left: '75%' }, action: { type: 'gemini_fsp_tutor' } },
-    { id: 'email_gen', icon: Mail, title: 'Generator Email', position: { top: '45%', right: '10%' }, action: { type: 'gemini_email_generator' } },
-    { id: 'land_rec', icon: Compass, title: 'Recomandare Land', position: { bottom: '20%', left: '10%' }, action: { type: 'gemini_land_recommender' } },
-    { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { bottom: '15%', right: '20%' }, action: { type: 'info_hub' } }
+    { id: 'fsp_tutor', icon: MessageCircle, title: 'Simulator FSP', position: { x: 320, y: 150 }, action: { type: 'gemini_fsp_tutor' } },
+    { id: 'email_gen', icon: Mail, title: 'Generator Email', position: { x: 50, y: 320 }, action: { type: 'gemini_email_generator' } },
+    { id: 'land_rec', icon: Compass, title: 'Recomandare Land', position: { x: 320, y: 480 }, action: { type: 'gemini_land_recommender' } },
+    { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { x: 60, y: 580 }, action: { type: 'info_hub' } }
 ];
 
 // --- Personal File Modal Component ---
