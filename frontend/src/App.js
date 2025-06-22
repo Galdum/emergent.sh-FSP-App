@@ -1387,7 +1387,7 @@ export default function App() {
     const progressPercentage = (steps.filter(s => s.tasks.every(t => t.completed)).length / steps.length) * 100;
 
     return (
-        <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen p-4 sm:p-6 lg:p-8 overflow-hidden">
+        <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
             {confettiKey && <Confetti key={confettiKey} />}
             
             <button 
@@ -1406,7 +1406,7 @@ export default function App() {
                 <span className={`text-sm font-bold ${freeMode ? 'text-green-600' : 'text-gray-500'}`}>Liber</span>
             </div>
 
-            <div className="max-w-md mx-auto relative">
+            <div className="w-full max-w-md mx-auto">
                 <header className="text-center mb-6 bg-white/70 backdrop-blur-sm p-4 rounded-xl shadow-md">
                     <h1 className="text-3xl md:text-4xl font-black text-gray-800">Approbation în Germania</h1>
                     <p className="text-gray-500 mt-1">Ghidul tău interactiv pas cu pas.</p>
@@ -1415,20 +1415,20 @@ export default function App() {
                     </div>
                 </header>
                 
-                <main className="relative w-full aspect-[9/16] md:aspect-[3/4]">
-                    <Cloud style={{ top: '5%', left: '10%', width: '100px', height: '100px' }} />
-                    <Cloud style={{ top: '60%', right: '5%', width: '80px', height: '80px' }} />
+                <main className="relative w-full h-[600px]">
+                    <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
+                    <Cloud style={{ top: '60%', right: '5%', width: '60px', height: '60px' }} />
                     
-                    <svg width="100%" height="100%" viewBox="0 0 400 700" preserveAspectRatio="xMidYMin meet" className="absolute top-0 left-0">
-                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 440 335, 160 385 T 240 525 Q 320 595, 140 644" stroke="#d6a770" strokeWidth="12" fill="none" strokeLinecap="round" />
-                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 440 335, 160 385 T 240 525 Q 320 595, 140 644" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" strokeDasharray="1 15" />
+                    <svg width="100%" height="100%" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" className="absolute top-0 left-0">
+                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 340 335, 160 385 T 240 475 Q 280 520, 140 550" stroke="#d6a770" strokeWidth="8" fill="none" strokeLinecap="round" />
+                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 340 335, 160 385 T 240 475 Q 280 520, 140 550" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="1 10" />
+                        
+                        {displayedSteps.map((step, index) => ( 
+                            <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} /> 
+                        ))}
+                        
+                        {bonusNodes.map(node => <BonusNode key={node.id} node={node} onClick={handleActionClick} />)}
                     </svg>
-                    
-                    {displayedSteps.map((step, index) => ( 
-                        <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} /> 
-                    ))}
-                    
-                    {bonusNodes.map(node => <BonusNode key={node.id} node={node} onClick={handleActionClick} />)}
                 </main>
             </div>
             
