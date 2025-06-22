@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
-from ..models import UserProgress, ProgressUpdate, MessageResponse, StepProgress, TaskProgress
-from ..auth import get_current_user
-from ..database import get_database
-from ..models import UserInDB
+from backend.models import UserProgress, ProgressUpdate, MessageResponse, StepProgress, TaskProgress
+from backend.auth import get_current_user
+from backend.database import get_database
+from backend.models import UserInDB
 from datetime import datetime
 
 router = APIRouter(prefix="/progress", tags=["progress"])
