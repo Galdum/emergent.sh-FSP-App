@@ -2509,7 +2509,6 @@ const AppContent = () => {
     const [achievements, setAchievements] = useState([]);
     const [pointsAnimation, setPointsAnimation] = useState(null);
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
-    const [showProgressOptions, setShowProgressOptions] = useState(false);
     const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
 
     useEffect(() => {
