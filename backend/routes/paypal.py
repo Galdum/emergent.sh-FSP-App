@@ -121,7 +121,7 @@ async def create_paypal_subscription(
                 # Store subscription attempt in database
                 subscription_data = {
                     "id": str(uuid.uuid4()),
-                    "user_id": current_user["id"],
+                    "user_id": user_id,
                     "plan_type": request.plan_type,
                     "provider": "paypal",
                     "agreement_id": None,  # Will be set after approval
