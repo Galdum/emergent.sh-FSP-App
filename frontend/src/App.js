@@ -1817,6 +1817,12 @@ export default function App() {
     };
 
     const handleStepClick = (step) => {
+        const stepIndex = displayedSteps.findIndex(s => s.id === step.id);
+        if (!isStepAccessible(stepIndex)) {
+            setSubscriptionModalOpen(true);
+            return;
+        }
+
         if (step.status !== 'locked') {
             const originalStepData = initialStepsData.find(s => s.id === step.id);
             const stepWithIcons = {...step, icon: originalStepData.icon };
