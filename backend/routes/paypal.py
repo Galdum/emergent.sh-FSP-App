@@ -195,7 +195,7 @@ async def approve_subscription(
                 # Update user subscription tier
                 new_tier = subscription["plan_type"]
                 await db.users.update_one(
-                    {"id": current_user["id"]},
+                    {"id": user_id},
                     {"$set": {
                         "subscription_tier": new_tier,
                         "subscription_status": "ACTIVE",
