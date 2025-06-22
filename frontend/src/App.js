@@ -2343,30 +2343,31 @@ const AppContent = () => {
 
     const displayedSteps = useMemo(() => {
         let currentSteps = steps.map(s => ({ ...s }));
-        let lockNext = false;
-        currentSteps.forEach((step, index) => {
-            const allTasksCompleted = step.tasks.every(t => t.completed);
-            
-            if (index === 0) {
+        
+        if (progressMode === 'free') {
+            // In free mode, all steps are unlocked
+            currentSteps.forEach((step) => {
+                const allTasksCompleted = step.tasks.every(t => t.completed);
                 step.status = allTasksCompleted ? 'completed' : 'unlocked';
-            } else {
-                const prevStep = currentSteps[index - 1];
-                if (prevStep.status === 'completed') {
+            });
+        } else {
+            // Progressive mode - original logic
+            currentSteps.forEach((step, index) => {
+                const allTasksCompleted = step.tasks.every(t => t.completed);
+                
+                if (index === 0) {
                     step.status = allTasksCompleted ? 'completed' : 'unlocked';
                 } else {
-                    step.status = 'locked';
+                    const prevStep = currentSteps[index - 1];
+                    if (prevStep.status === 'completed') {
+                        step.status = allTasksCompleted ? 'completed' : 'unlocked';
+                    } else {
+                        step.status = 'locked';
+                    }
                 }
-            }
-            if (step.status !== 'completed' && !lockNext) {
-                lockNext = true;
-            }
-            if (lockNext) {
-                 for(let j = index + 1; j < currentSteps.length; j++) {
-                    currentSteps[j].status = 'locked';
-                }
-            }
-        });
-
+            });
+        }
+        
         return currentSteps.map((step, index) => ({...step, icon: initialStepsData[index].icon}));
     }, [steps]);
 
