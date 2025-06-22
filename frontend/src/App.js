@@ -2525,7 +2525,17 @@ const AppContent = () => {
             setGdprConsentOpen(true);
         }
     }, []);
-    }, []);
+
+    const handleGDPRAccept = (consentData) => {
+        console.log('GDPR consent accepted:', consentData);
+        setGdprConsentOpen(false);
+    };
+
+    const handleGDPRDecline = () => {
+        // Redirect user away or show alternative message
+        alert('Pentru a utiliza FSP Navigator, trebuie să acceptați termenii și condițiile de utilizare.');
+        window.location.href = 'https://google.com';
+    };
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
