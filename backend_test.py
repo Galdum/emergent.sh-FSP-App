@@ -166,7 +166,7 @@ def test_progress_get():
     
     try:
         response = requests.get(
-            f"{API_URL}/progress",
+            f"{API_URL}/progress/",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
         
@@ -188,7 +188,7 @@ def test_progress_update():
     try:
         # Update progress for step 1, task 1
         response = requests.put(
-            f"{API_URL}/progress",
+            f"{API_URL}/progress/",
             headers={"Authorization": f"Bearer {auth_token}"},
             json={
                 "step_id": 1,
@@ -215,7 +215,7 @@ def test_files_get():
     
     try:
         response = requests.get(
-            f"{API_URL}/files",
+            f"{API_URL}/files/",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
         
@@ -237,7 +237,7 @@ def test_files_create():
     try:
         # Create a note
         response = requests.post(
-            f"{API_URL}/files",
+            f"{API_URL}/files/",
             headers={"Authorization": f"Bearer {auth_token}"},
             json={
                 "type": "note",
@@ -263,7 +263,7 @@ def test_subscription_get():
     
     try:
         response = requests.get(
-            f"{API_URL}/subscription",
+            f"{API_URL}/subscription/",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
         
