@@ -2530,7 +2530,7 @@ const AppContent = () => {
     const displayedSteps = useMemo(() => {
         let currentSteps = steps.map(s => ({ ...s }));
         
-        if (progressMode === 'free') {
+        if (freeMode) {
             // In free mode, all steps are unlocked
             currentSteps.forEach((step) => {
                 const allTasksCompleted = step.tasks.every(t => t.completed);
