@@ -642,6 +642,7 @@ const GeminiFspTutorModal = ({ onClose }) => {
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
     const [uploadedCase, setUploadedCase] = useState(null);
+    const [selectedMedicalCase, setSelectedMedicalCase] = useState(null);
     const fileInputRef = useRef(null);
     const chatEndRef = useRef(null);
 
@@ -651,6 +652,21 @@ const GeminiFspTutorModal = ({ onClose }) => {
         { id: 'grammar', title: 'Discută Gramatica', description: 'Ajutor cu structurile gramaticale medicale' },
         { id: 'terms', title: 'Învață Termeni Medicali', description: 'Explicații pentru vocabularul medical german' },
         { id: 'correction', title: 'Corectează Textul Meu', description: 'Revizuiește și îmbunătățește scrisorile medicale' }
+    ];
+
+    const medicalCases = [
+        // Kardiologie
+        { category: 'Kardiologie', cases: ['KHK', 'Herzinsuffizienz', 'pAVK', 'TVT', 'Akute arterielle Thrombose', 'Myokardinfarkt', 'Vorhofflimmern', 'Aortenaneurysma'] },
+        // Pneumologie  
+        { category: 'Pneumologie', cases: ['COPD', 'Asthma bronchiale', 'Pneumonie', 'Lungentumor', 'Pleuraerguss', 'Pneumothorax'] },
+        // Gastroenterologie
+        { category: 'Gastroenterologie', cases: ['Gastritis', 'Ulcus ventriculi', 'Cholezystitis', 'Pankreatitis', 'Hepatitis', 'Zirrhose'] },
+        // Neurologie
+        { category: 'Neurologie', cases: ['Schlaganfall', 'Migräne', 'Epilepsie', 'Multiple Sklerose', 'Parkinson', 'Demenz'] },
+        // Endokrinologie
+        { category: 'Endokrinologie', cases: ['Diabetes mellitus', 'Hyperthyreose', 'Hypothyreose', 'Adipositas'] },
+        // Orthopädie
+        { category: 'Orthopädie', cases: ['Fraktur', 'Arthrose', 'Bandscheibenvorfall', 'Osteoporose'] }
     ];
 
     useEffect(() => {
@@ -684,14 +700,16 @@ const GeminiFspTutorModal = ({ onClose }) => {
             fileInputRef.current?.click();
             return;
         }
+        
+        if (option === 'case') {
+            setView('case_selection');
+            return;
+        }
 
         setView('chat');
         let systemMessage;
         
         switch(option) {
-            case 'case':
-                systemMessage = "Bună! Sunt simulatorul tău FSP. Voi juca rolul unui pacient german și apoi îți voi da feedback ca examinator. Să începem cu un caz medical. Ce întrebări ai pentru pacient?";
-                break;
             case 'grammar':
                 systemMessage = "Salut! Sunt aici să te ajut cu gramatica medicală germană. Întreabă-mă despre structuri gramaticale, conjugări sau construcții specifice limbajului medical.";
                 break;
@@ -704,6 +722,25 @@ const GeminiFspTutorModal = ({ onClose }) => {
             default:
                 systemMessage = "Bună! Cu ce te pot ajuta astăzi la pregătirea FSP?";
         }
+        
+        setHistory([{ role: 'model', parts: [{ text: systemMessage }] }]);
+    };
+
+    const handleCaseSelection = (caseType) => {
+        if (caseType === 'random') {
+            const allCases = medicalCases.flatMap(cat => cat.cases);
+            const randomCase = allCases[Math.floor(Math.random() * allCases.length)];
+            setSelectedMedicalCase(randomCase);
+        } else if (caseType === 'custom') {
+            setSelectedMedicalCase('custom');
+        } else {
+            setSelectedMedicalCase(caseType);
+        }
+        
+        setView('chat');
+        const systemMessage = caseType === 'custom' 
+            ? "Perfect! Descrie-mi cazul medical pe care vrei să-l exersăm. Îți voi juca rolul pacientului și apoi îți voi oferi feedback detaliat."
+            : `Excelent! Am ales cazul: "${caseType === 'random' ? selectedMedicalCase || 'caz aleatoriu' : caseType}". Sunt pacientul tău - începe anamneza! Întreabă-mă ce simptome am și de când.`;
         
         setHistory([{ role: 'model', parts: [{ text: systemMessage }] }]);
     };
@@ -730,10 +767,10 @@ Deine Aufgabe:
    - Bewertung nach FSP-Kriterien (60% Mindestanforderung)
 
 Antworte strukturiert und konstruktiv auf Rumänisch.`;
-        } else {
-            switch(mode || 'case') {
-                case 'case':
-                    systemPrompt = `Du bist ein FSP-Simulator und -Tutor. Du spielst sowohl die Rolle eines deutschen Patienten als auch eines Examinators.
+        } else if (selectedMedicalCase) {
+            systemPrompt = `Du bist ein FSP-Simulator und -Tutor. Du spielst sowohl die Rolle eines deutschen Patienten als auch eines Examinators.
+
+${selectedMedicalCase !== 'custom' ? `Aktueller Fall: ${selectedMedicalCase}` : 'Der Nutzer wird einen eigenen Fall beschreiben.'}
 
 Struktur deiner Antworten:
 1. [PATIENT]: Antworte als Patient auf die Frage des Arztes (auf Deutsch, natürlich und realistisch)
@@ -742,9 +779,10 @@ Struktur deiner Antworten:
 Regeln:
 - Als Patient: Sei realistisch, verwende alltägliche Sprache, nicht zu medizinisch
 - Als Examinator: Bewerte die Fragetechnik, schlage bessere Formulierungen vor
-- Bleibe im medizinischen Kontext
+- Bleibe im medizinischen Kontext des gewählten Falls
 - Sei ermutigend aber konstruktiv kritisch`;
-                    break;
+        } else {
+            switch(mode || 'case') {
                 case 'grammar':
                     systemPrompt = `Du bist ein Experte für deutsche Medizinsprache. Beantworte Fragen zur Grammatik, zu Satzstrukturen und sprachlichen Besonderheiten im medizinischen Deutsch. Antworte auf Rumänisch und gib klare Beispiele.`;
                     break;
@@ -792,6 +830,13 @@ Regeln:
         }
     };
 
+    const handleBackToMenu = () => {
+        setView('menu');
+        setUploadedCase(null);
+        setSelectedMedicalCase(null);
+        setHistory([]);
+    };
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
@@ -833,14 +878,60 @@ Regeln:
                     </div>
                 )}
 
+                {view === 'case_selection' && (
+                    <div className="flex-grow overflow-y-auto">
+                        <div className="flex items-center mb-4">
+                            <button onClick={handleBackToMenu} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                                <ChevronLeft size={24} />
+                            </button>
+                            <h3 className="text-lg font-semibold">Alege un Caz Medical</h3>
+                        </div>
+                        
+                        <div className="space-y-4 mb-6">
+                            <button
+                                onClick={() => handleCaseSelection('random')}
+                                className="w-full p-4 bg-gray-200 hover:bg-gray-300 rounded-lg text-center font-semibold transition-colors"
+                            >
+                                Caz Aleatoriu Necunoscut
+                            </button>
+                            <button
+                                onClick={() => handleCaseSelection('custom')}
+                                className="w-full p-4 bg-gray-200 hover:bg-gray-300 rounded-lg text-center font-semibold transition-colors"
+                            >
+                                Propune Tu un Caz
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            {medicalCases.map(category => (
+                                <div key={category.category}>
+                                    <h4 className="font-bold text-gray-800 mb-2">{category.category}</h4>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {category.cases.map(caseItem => (
+                                            <button
+                                                key={caseItem}
+                                                onClick={() => handleCaseSelection(caseItem)}
+                                                className="p-2 bg-gray-100 hover:bg-blue-100 rounded text-sm transition-colors"
+                                            >
+                                                {caseItem}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {view === 'chat' && (
                     <div className="flex flex-col flex-grow min-h-0">
                         <div className="flex items-center mb-4">
-                            <button onClick={() => { setView('menu'); setUploadedCase(null); }} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                            <button onClick={handleBackToMenu} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
                                 <ChevronLeft size={24} />
                             </button>
                             <h3 className="text-lg font-semibold">
-                                {uploadedCase ? `Evaluare Caz: ${uploadedCase.name}` : 'Sesiune de Pregătire FSP'}
+                                {uploadedCase ? `Evaluare Caz: ${uploadedCase.name}` : 
+                                 selectedMedicalCase ? `Caz Medical: ${selectedMedicalCase}` : 'Sesiune de Pregătire FSP'}
                             </h3>
                         </div>
                         
@@ -863,7 +954,8 @@ Regeln:
                                 onChange={(e) => setPrompt(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
                                 className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder={uploadedCase ? "Întreabă despre cazul tău..." : "Scrie mesajul tău aici..."}
+                                placeholder={uploadedCase ? "Întreabă despre cazul tău..." : 
+                                           selectedMedicalCase ? "Pune întrebări pacientului..." : "Scrie mesajul tău aici..."}
                             />
                             <button onClick={handleSend} disabled={loading} className="bg-blue-600 text-white p-3 rounded-r-lg hover:bg-blue-700 disabled:bg-blue-400">
                                 <Send />
