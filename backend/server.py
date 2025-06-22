@@ -10,8 +10,11 @@ from pydantic import BaseModel, Field
 from typing import List
 import uuid
 from datetime import datetime
+import sys
 
+# Add the parent directory to sys.path
 ROOT_DIR = Path(__file__).parent
+sys.path.append(str(ROOT_DIR))
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
@@ -38,43 +41,40 @@ class StatusCheckCreate(BaseModel):
 async def get_database():
     return db
 
-# Import and setup auth routes with proper dependencies
-from .routes.auth import router as auth_router
-from .routes.progress import router as progress_router  
-from .routes.files import router as files_router
-from .routes.subscription import router as subscription_router
+# Create custom dependency for authentication
+from auth import get_current_user, verify_token, get_user_by_id
 
-# Create custom dependencies that inject our database
-def make_auth_dependency():
-    from .auth import get_current_user
-    async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Depends(get_database)):
-        from .auth import verify_token, get_user_by_id
-        try:
-            payload = verify_token(credentials.credentials)
-            user_id = payload.get("sub")
-            if user_id is None:
-                raise HTTPException(status_code=401, detail="Invalid token")
-        except Exception:
+async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Depends(get_database)):
+    try:
+        payload = verify_token(credentials.credentials)
+        user_id = payload.get("sub")
+        if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        
-        user = await get_user_by_id(db, user_id)
-        if user is None:
-            raise HTTPException(status_code=401, detail="User not found")
-        return user
-    return get_current_user_with_db
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+    
+    user = await get_user_by_id(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+# Import routes
+from routes.auth import router as auth_router
+from routes.progress import router as progress_router
+from routes.files import router as files_router
+from routes.subscription import router as subscription_router
 
 # Override the auth dependency in routes
-from .routes import auth as auth_module
-from .routes import progress as progress_module
-from .routes import files as files_module
-from .routes import subscription as subscription_module
+import routes.auth as auth_module
+import routes.progress as progress_module
+import routes.files as files_module
+import routes.subscription as subscription_module
 
 # Patch the dependencies
-auth_current_user = make_auth_dependency()
-auth_module.get_current_user = lambda: Depends(auth_current_user)
-progress_module.get_current_user = lambda: Depends(auth_current_user)
-files_module.get_current_user = lambda: Depends(auth_current_user)
-subscription_module.get_current_user = lambda: Depends(auth_current_user)
+auth_module.get_current_user = lambda: Depends(get_current_user_with_db)
+progress_module.get_current_user = lambda: Depends(get_current_user_with_db)
+files_module.get_current_user = lambda: Depends(get_current_user_with_db)
+subscription_module.get_current_user = lambda: Depends(get_current_user_with_db)
 
 # Include routes
 api_router.include_router(auth_router)
