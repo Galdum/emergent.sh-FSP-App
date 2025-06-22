@@ -1673,6 +1673,10 @@ export default function App() {
     const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
     const [freeMode, setFreeMode] = useState(false);
     const [confettiKey, setConfettiKey] = useState(null);
+    
+    // Subscription state
+    const [currentTier, setCurrentTier] = useState('FREE'); // FREE, BASIC, PREMIUM
+    const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
