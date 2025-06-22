@@ -2311,7 +2311,7 @@ const AppContent = () => {
             <div className="fixed top-4 left-4 z-40 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
                 <div className="text-sm font-semibold text-gray-700">
                     Plan: <span className={`${subscriptionTier === 'FREE' ? 'text-gray-600' : subscriptionTier === 'BASIC' ? 'text-blue-600' : 'text-purple-600'}`}>
-                        {SUBSCRIPTION_TIERS[subscriptionTier].name}
+                        {subscriptionTier === 'FREE' ? 'Free' : subscriptionTier === 'BASIC' ? 'Basic' : 'Premium'}
                     </span>
                 </div>
                 {subscriptionTier !== 'PREMIUM' && (
