@@ -1839,6 +1839,18 @@ export default function App() {
 
         handleActionClick(action);
     };
+
+    const closeModal = () => setSelectedStep(null);
+
+    const handleBonusNodeClick = (action) => {
+        const nodeIndex = bonusNodes.findIndex(node => node.action.type === action.type);
+        if (!isBonusNodeAccessible(nodeIndex)) {
+            setSubscriptionModalOpen(true);
+            return;
+        }
+
+        handleActionClick(action);
+    };
     const closeContentModal = () => setActiveContent(null);
     const closeGeminiModal = () => setActiveGeminiModal(null);
     const closeRecommenderModal = () => setRecommenderModalOpen(false);
