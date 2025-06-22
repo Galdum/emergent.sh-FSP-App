@@ -116,7 +116,14 @@ def test_login():
     """Test user login."""
     global auth_token
     
+    # First register a user with the fixed TEST_EMAIL
     try:
+        register_response = requests.post(
+            f"{API_URL}/auth/register",
+            json={"email": TEST_EMAIL, "password": TEST_PASSWORD}
+        )
+        
+        # Now try to login
         response = requests.post(
             f"{API_URL}/auth/login",
             json={"email": TEST_EMAIL, "password": TEST_PASSWORD}
