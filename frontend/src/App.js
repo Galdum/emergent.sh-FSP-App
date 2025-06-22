@@ -1814,7 +1814,7 @@ const AppContent = () => {
         return nodeIndex < subscription.maxOrangeNodes;
     };
 
-    const hasAIAccess = () => getCurrentSubscription().hasAI;
+
 
     const displayedSteps = useMemo(() => {
         let currentSteps = steps.map(s => ({ ...s }));
