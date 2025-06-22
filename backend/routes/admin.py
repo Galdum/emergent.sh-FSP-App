@@ -4,9 +4,9 @@ from backend.models_billing import (
     AdminUserResponse, AdminStatsResponse, AuditLog, ErrorReport,
     PaymentTransaction, SubscriptionPlan
 )
-from ..auth import get_current_user
-from ..database import get_database
-from ..models import UserInDB
+from backend.auth import get_current_user
+from backend.database import get_database
+from backend.models import UserInDB
 from datetime import datetime, timedelta
 import logging
 
