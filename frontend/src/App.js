@@ -2079,7 +2079,7 @@ const BonusNode = ({ node, onClick, isAccessible }) => {
                 </div>
             </foreignObject>
             <text x={node.position.x} y={node.position.y + 40} textAnchor="middle" className={`text-xs font-semibold pointer-events-none ${isAccessible ? 'fill-gray-700' : 'fill-gray-400'}`}>
-                {isAccessible ? node.title : 'Premium'}
+                {node.title}
             </text>
             {!isAccessible && (
                 <Lock 
