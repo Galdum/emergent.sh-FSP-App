@@ -28,6 +28,9 @@ ADMIN_PASSWORD = "admin123secure"
 auth_token = None
 admin_auth_token = None
 
+# Store PayPal test data
+paypal_approval_url = None
+
 def random_string(length=8):
     """Generate a random string for testing."""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
