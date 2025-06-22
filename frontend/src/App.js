@@ -829,6 +829,7 @@ const bonusNodes = [
 // --- Personal File Modal Component - Updated to use new API integration ---
 const PersonalFileModal = ({ isOpen, onClose }) => {
     const { files, loading, addFile, uploadFile, deleteFile, handleFileClick } = usePersonalFiles();
+    const { hasAIAccess } = useSubscription();
     const [newItemType, setNewItemType] = useState(null);
     const [noteContent, setNoteContent] = useState('');
     const [linkUrl, setLinkUrl] = useState('');
