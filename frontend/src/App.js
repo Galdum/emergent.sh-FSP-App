@@ -754,7 +754,8 @@ const bonusNodes = [
     { id: 'fsp_tutor', icon: MessageCircle, title: 'Simulator FSP', position: { x: 340, y: 130 }, action: { type: 'gemini_fsp_tutor' } },
     { id: 'email_gen', icon: Mail, title: 'Generator Email', position: { x: 50, y: 270 }, action: { type: 'gemini_email_generator' } },
     { id: 'land_rec', icon: Compass, title: 'Recomandare Land', position: { x: 350, y: 370 }, action: { type: 'gemini_land_recommender' } },
-    { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { x: 50, y: 440 }, action: { type: 'info_hub' } }
+    { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { x: 50, y: 440 }, action: { type: 'info_hub' } },
+    { id: 'leaderboard', icon: Trophy, title: 'Clasament', position: { x: 350, y: 500 }, action: { type: 'leaderboard' } }
 ];
 
 // --- Personal File Modal Component - Updated to use new API integration ---
