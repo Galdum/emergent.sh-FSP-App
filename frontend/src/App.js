@@ -2533,11 +2533,11 @@ const AppContent = () => {
                     </div>
                 </header>
                 
-                <main className="relative w-full h-[520px]">
+                <main className="relative w-full h-[600px]">
                     <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
                     <Cloud style={{ top: '60%', right: '5%', width: '60px', height: '60px' }} />
                     
-                    <svg width="100%" height="100%" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid meet" className="absolute top-0 left-0">
+                    <svg width="100%" height="100%" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" className="absolute top-0 left-0">
                         <path d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" stroke="#d6a770" strokeWidth="8" fill="none" strokeLinecap="round" />
                         <path d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="1 10" />
                         
