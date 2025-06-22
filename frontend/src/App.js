@@ -1731,49 +1731,64 @@ const GeminiEmailModal = ({ onClose }) => {
         const commonFields = [
             { key: 'name', label: 'Numele tău complet', type: 'text', required: true },
             { key: 'email', label: 'Adresa ta de email', type: 'email', required: true },
-            { key: 'authority', label: 'Numele autorității (ex: Landesärztekammer Bayern)', type: 'text', required: true }
+            { key: 'authority', label: 'Numele autorității (ex: Landesärztekammer Bayern)', type: 'text', required: true },
+            { key: 'currentLocation', label: 'Locația ta actuală (oraș, țară)', type: 'text', required: false, placeholder: 'ex: București, România' },
+            { key: 'additionalInfo', label: 'Informații suplimentare relevante', type: 'textarea', required: false, placeholder: 'Orice detalii care ar putea fi utile pentru context...' }
         ];
 
         switch(templateId) {
             case 'status':
                 return [...commonFields, 
                     { key: 'applicationNumber', label: 'Numărul dosarului (dacă îl ai)', type: 'text', required: false },
-                    { key: 'applicationDate', label: 'Data depunerii cererii', type: 'date', required: true }
+                    { key: 'applicationDate', label: 'Data depunerii cererii', type: 'date', required: true },
+                    { key: 'lastContact', label: 'Ultima interacțiune cu autoritatea', type: 'date', required: false },
+                    { key: 'urgencyReason', label: 'Motivul urgentei (opțional)', type: 'textarea', required: false, placeholder: 'ex: contract de muncă în așteptare, termen limită...' }
                 ];
             case 'appointment':
                 return [...commonFields,
-                    { key: 'examType', label: 'Tipul examenului (FSP/KP)', type: 'text', required: true },
-                    { key: 'preferredDates', label: 'Perioada preferată', type: 'text', required: false }
+                    { key: 'examType', label: 'Tipul examenului (FSP/KP)', type: 'select', options: ['FSP (Fachsprachprüfung)', 'KP (Kenntnisprüfung)', 'Altul'], required: true },
+                    { key: 'germanLevel', label: 'Nivelul tău de germană', type: 'select', options: ['B2', 'C1', 'C2'], required: false },
+                    { key: 'preferredDates', label: 'Perioada preferată', type: 'text', required: false, placeholder: 'ex: martie-aprilie 2024' },
+                    { key: 'specialNotes', label: 'Cerințe speciale (opțional)', type: 'textarea', required: false, placeholder: 'ex: probleme de sănătate, preferințe de orar...' }
                 ];
             case 'document_response':
                 return [...commonFields,
                     { key: 'requestedDocument', label: 'Documentul solicitat', type: 'text', required: true },
-                    { key: 'responseAction', label: 'Acțiunea ta (ex: trimit documentul, solicit clarificări)', type: 'textarea', required: true }
+                    { key: 'responseAction', label: 'Acțiunea ta', type: 'select', options: ['Trimit documentul anexat', 'Am întrebări despre cerință', 'Solicit prelungirea termenului', 'Nu pot furniza documentul'], required: true },
+                    { key: 'timeline', label: 'Când poți furniza documentul', type: 'text', required: false, placeholder: 'ex: în 2 săptămâni' },
+                    { key: 'explanation', label: 'Explicații suplimentare', type: 'textarea', required: false }
                 ];
             case 'kp_info':
                 return [...commonFields,
-                    { key: 'specificQuestions', label: 'Întrebări specifice despre KP', type: 'textarea', required: true }
+                    { key: 'specialization', label: 'Specializarea ta medicală', type: 'text', required: false, placeholder: 'ex: Medicină Internă, Chirurgie Generală...' },
+                    { key: 'germanExperience', label: 'Experiența ta cu sistemul medical german', type: 'textarea', required: false, placeholder: 'ex: stagii, cursuri urmate...' },
+                    { key: 'specificQuestions', label: 'Întrebări specifice despre KP', type: 'textarea', required: true, placeholder: 'ex: durata examenului, materii, modalitatea de evaluare...' }
                 ];
             case 'berufserlaubnis':
                 return [...commonFields,
                     { key: 'fspDate', label: 'Data promovării FSP', type: 'date', required: true },
-                    { key: 'workPlace', label: 'Locul de muncă dorit/contractat', type: 'text', required: false }
+                    { key: 'workPlace', label: 'Locul de muncă contractat', type: 'text', required: false, placeholder: 'Numele spitalului/clinicii' },
+                    { key: 'startDate', label: 'Data dorită de începere', type: 'date', required: false },
+                    { key: 'workLocation', label: 'Orașul de lucru', type: 'text', required: false }
                 ];
             case 'document_question':
                 return [...commonFields,
                     { key: 'documentName', label: 'Numele documentului', type: 'text', required: true },
-                    { key: 'specificQuestion', label: 'Întrebarea ta specifică', type: 'textarea', required: true }
+                    { key: 'specificQuestion', label: 'Întrebarea ta specifică', type: 'textarea', required: true, placeholder: 'ex: Ce format trebuie să aibă? Este necesar apostilat?' },
+                    { key: 'currentDocument', label: 'Ce document ai deja', type: 'text', required: false, placeholder: 'ex: diploma originală în română' }
                 ];
             case 'withdraw_application':
                 return [...commonFields,
                     { key: 'applicationNumber', label: 'Numărul dosarului', type: 'text', required: true },
-                    { key: 'reason', label: 'Motivul retragerii (opțional)', type: 'textarea', required: false }
+                    { key: 'reason', label: 'Motivul retragerii', type: 'select', options: ['Aplicare în alt land', 'Renunțare la Approbation', 'Probleme personale', 'Altul'], required: false },
+                    { key: 'additionalReason', label: 'Detalii suplimentare', type: 'textarea', required: false }
                 ];
             case 'ai_correction':
                 return [
-                    { key: 'emailDraft', label: 'Schița e-mailului tău (scrie în română sau germană)', type: 'textarea', required: true },
-                    { key: 'recipientType', label: 'Tipul destinatarului (ex: Landesärztekammer, Approbationsbehörde)', type: 'text', required: true },
-                    { key: 'purpose', label: 'Scopul e-mailului', type: 'text', required: true }
+                    { key: 'emailDraft', label: 'Schița e-mailului tău', type: 'textarea', required: true, placeholder: 'Scrie aici ce vrei să comunici - în română sau germană...' },
+                    { key: 'recipientType', label: 'Tipul destinatarului', type: 'select', options: ['Landesärztekammer', 'Approbationsbehörde', 'Landesprüfungsamt', 'Bezirksregierung', 'Altul'], required: true },
+                    { key: 'purpose', label: 'Scopul e-mailului', type: 'select', options: ['Cerere informații', 'Răspuns la solicitare', 'Programare', 'Plângere/Reclamație', 'Altul'], required: true },
+                    { key: 'tone', label: 'Tonul dorit', type: 'select', options: ['Formal și respectuos', 'Prietenos dar profesional', 'Urgent dar politicos', 'Diplomatic'], required: false }
                 ];
             default:
                 return commonFields;
