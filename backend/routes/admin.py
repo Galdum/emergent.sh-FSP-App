@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List, Dict, Optional
-from ..models_billing import (
+from backend.models_billing import (
     AdminUserResponse, AdminStatsResponse, AuditLog, ErrorReport,
     PaymentTransaction, SubscriptionPlan
 )
