@@ -731,6 +731,11 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadingImage, setUploadingImage] = useState(false);
     const imageInputRef = useRef(null);
+    
+    // Image upload state
+    const [uploadedImages, setUploadedImages] = useState([]);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const imageInputRef = useRef(null);
 
     // Handle click outside - close completely since this is a top-level modal
     useEffect(() => {
