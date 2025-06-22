@@ -8,7 +8,7 @@ import uuid
 from backend.auth import get_current_user
 from backend.database import get_database
 
-router = APIRouter(prefix="/api/paypal", tags=["paypal"])
+router = APIRouter(prefix="/paypal", tags=["paypal"])
 
 # Configure PayPal SDK
 paypalrestsdk.configure({
