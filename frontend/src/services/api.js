@@ -137,9 +137,141 @@ class ApiService {
     return response.data;
   }
 
-  // Health check
-  async healthCheck() {
-    const response = await this.client.get('/health/');
+  // Billing endpoints
+  async createCheckoutSession(subscriptionPlan) {
+    const response = await this.client.post('/billing/checkout', {
+      subscription_plan: subscriptionPlan
+    });
+    return response.data;
+  }
+
+  async getPaymentStatus(sessionId) {
+    const response = await this.client.get(`/billing/payment-status/${sessionId}`);
+    return response.data;
+  }
+
+  async getBillingPlans() {
+    const response = await this.client.get('/billing/plans');
+    return response.data;
+  }
+
+  async getUserTransactions() {
+    const response = await this.client.get('/billing/transactions');
+    return response.data;
+  }
+
+  // Admin endpoints
+  async getAdminStats() {
+    const response = await this.client.get('/admin/stats');
+    return response.data;
+  }
+
+  async getAdminUsers(skip = 0, limit = 50, search = null) {
+    const params = { skip, limit };
+    if (search) params.search = search;
+    const response = await this.client.get('/admin/users', { params });
+    return response.data;
+  }
+
+  async getAdminTransactions(skip = 0, limit = 100, statusFilter = null) {
+    const params = { skip, limit };
+    if (statusFilter) params.status_filter = statusFilter;
+    const response = await this.client.get('/admin/transactions', { params });
+    return response.data;
+  }
+
+  async getAdminErrors(skip = 0, limit = 100, resolved = null) {
+    const params = { skip, limit };
+    if (resolved !== null) params.resolved = resolved;
+    const response = await this.client.get('/admin/errors', { params });
+    return response.data;
+  }
+
+  async resolveError(errorId) {
+    const response = await this.client.patch(`/admin/errors/${errorId}/resolve`);
+    return response.data;
+  }
+
+  async deleteUser(userId) {
+    const response = await this.client.delete(`/admin/users/${userId}`);
+    return response.data;
+  }
+
+  async updateUserSubscription(userId, subscriptionData) {
+    const response = await this.client.patch(`/admin/users/${userId}/subscription`, subscriptionData);
+    return response.data;
+  }
+
+  // Monitoring endpoints
+  async reportError(errorData) {
+    const response = await this.client.post('/monitoring/report-error', errorData);
+    return response.data;
+  }
+
+  async submitFeedback(feedbackData) {
+    const response = await this.client.post('/monitoring/feedback', feedbackData);
+    return response.data;
+  }
+
+  async getAppHealth() {
+    const response = await this.client.get('/monitoring/health');
+    return response.data;
+  }
+
+  async getUserMetrics() {
+    const response = await this.client.get('/monitoring/metrics');
+    return response.data;
+  }
+
+  async logUserAction(actionData) {
+    const response = await this.client.post('/monitoring/log-action', actionData);
+    return response.data;
+  }
+
+  async getUserNotifications() {
+    const response = await this.client.get('/monitoring/notifications');
+    return response.data;
+  }
+
+  // Deployment endpoints
+  async getVersionInfo() {
+    const response = await this.client.get('/deployment/version');
+    return response.data;
+  }
+
+  async getDeploymentStatus() {
+    const response = await this.client.get('/deployment/status');
+    return response.data;
+  }
+
+  async getFeatureFlags() {
+    const response = await this.client.get('/deployment/feature-flags');
+    return response.data;
+  }
+
+  async exportUserData() {
+    const response = await this.client.get('/deployment/export-data');
+    return response.data;
+  }
+
+  async deleteUserAccount() {
+    const response = await this.client.delete('/deployment/delete-account');
+    return response.data;
+  }
+
+  // Backup endpoints (admin only)
+  async getBackupStatus() {
+    const response = await this.client.get('/backup/status');
+    return response.data;
+  }
+
+  async createDatabaseBackup() {
+    const response = await this.client.post('/backup/database');
+    return response.data;
+  }
+
+  async createFilesBackup() {
+    const response = await this.client.post('/backup/files');
     return response.data;
   }
 }
