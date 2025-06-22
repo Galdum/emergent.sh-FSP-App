@@ -498,6 +498,49 @@ const SubscriptionModal = ({ isOpen, onClose }) => {
         }
     };
 
+    // Handle image upload
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            // Validate file
+            ImageOptimizer.validateFile(file);
+            
+            setUploadingImage(true);
+            
+            // Compress and convert to base64
+            const base64Image = await ImageOptimizer.fileToBase64(file);
+            
+            const newImage = {
+                id: Date.now(),
+                name: file.name,
+                data: base64Image,
+                size: file.size,
+                type: file.type
+            };
+            
+            setUploadedImages(prev => [...prev, newImage]);
+            
+            // Add to conversation context
+            const imageMessage = `📷 Am încărcat imaginea: ${file.name}. Poți să o analizezi și să-mi dai sfaturi specifice bazate pe documentul din imagine.`;
+            conversationManager.addMessage('user', imageMessage);
+            setHistory(prev => [...prev, { role: "user", parts: [{ text: imageMessage }] }]);
+            
+        } catch (error) {
+            alert(error.message || 'Eroare la încărcarea imaginii.');
+        } finally {
+            setUploadingImage(false);
+            if (imageInputRef.current) {
+                imageInputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleImageRemove = (imageId) => {
+        setUploadedImages(prev => prev.filter(img => img.id !== imageId));
+    };
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[70] p-4 animate-fade-in-fast">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in">
