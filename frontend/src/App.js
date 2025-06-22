@@ -1430,6 +1430,43 @@ const GeminiFspTutorModal = ({ onClose }) => {
         let systemMessage;
         
         switch(option) {
+            case 'structure':
+                systemMessage = `# 📚 Ghidul Complet FSP (Fachsprachprüfung)
+
+Bună! Iată ghidul complet pentru examenul FSP, bazat pe informații oficiale și experiențe reale:
+
+## 🏗️ **Structura Examenului FSP**
+
+Examenul FSP durează **60 de minute** și are **3 părți egale**:
+
+### **Partea 1: Anamneza (20 min)**
+- 🗣️ **Comunicare cu pacientul**
+- 📋 Colectezi informații despre simptome, istoric medical
+- ⚕️ Conduci o conversație medicală structurată
+- 💡 **Sfat:** Începe cu întrebări deschise, apoi specifice
+
+### **Partea 2: Prezentarea Cazului (20 min)**  
+- 📊 **Prezinți cazul medicului senior**
+- 🏥 Raportezi findings-urile din anamneza
+- 🔍 Propui plan diagnostic și terapeutic
+- 💡 **Sfat:** Folosește terminologie medicală precisă
+
+### **Partea 3: Discuția cu Medicul (20 min)**
+- 👨‍⚕️ **Dialog profesional medic-medic**
+- ❓ Răspunzi la întrebări despre caz
+- 🎯 Justifici deciziile medicale
+- 💡 **Sfat:** Fii sigur pe tine, dar recunoaște limitele
+
+## ⏰ **Timeline Exact al Examenului**
+
+**9:00-9:20** - Anamneza cu pacientul
+**9:20-9:25** - Pauză (5 min pentru pregătire)  
+**9:25-9:45** - Prezentarea cazului
+**9:45-10:05** - Discuția cu medicul
+**10:05-10:15** - Feedback și rezultat
+
+Vrei să afli mai multe detalii despre vreo parte specifică? 🤔`;
+                break;
             case 'grammar':
                 systemMessage = "Salut! Sunt aici să te ajut cu gramatica medicală germană. Întreabă-mă despre structuri gramaticale, conjugări sau construcții specifice limbajului medical.";
                 break;
