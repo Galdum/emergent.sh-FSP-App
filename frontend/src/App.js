@@ -1850,7 +1850,7 @@ Bitte erstelle die komplette E-Mail inklusive Betreff.`;
                         </div>
                         
                         <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4 border">
-                            <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">{result}</pre>
+                            <div className="prose max-w-none">{renderMarkdown(result)}</div>
                         </div>
                         
                         <div className="flex gap-2">
