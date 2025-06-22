@@ -617,10 +617,13 @@ const GeminiFspTutorModal = ({ onClose }) => {
     const [history, setHistory] = useState([]);
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
+    const [uploadedCase, setUploadedCase] = useState(null);
+    const fileInputRef = useRef(null);
     const chatEndRef = useRef(null);
 
     const menuOptions = [
         { id: 'case', title: 'Simulează un Caz', description: 'Exercitiu complet de FSP cu pacient virtual' },
+        { id: 'upload_case', title: 'Încarcă Cazul Tău', description: 'Încarcă propriul caz pentru evaluare și feedback' },
         { id: 'grammar', title: 'Discută Gramatica', description: 'Ajutor cu structurile gramaticale medicale' },
         { id: 'terms', title: 'Învață Termeni Medicali', description: 'Explicații pentru vocabularul medical german' },
         { id: 'correction', title: 'Corectează Textul Meu', description: 'Revizuiește și îmbunătățește scrisorile medicale' }
@@ -630,7 +633,34 @@ const GeminiFspTutorModal = ({ onClose }) => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [history]);
 
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setUploadedCase({
+                    name: file.name,
+                    content: e.target.result,
+                    type: file.type
+                });
+                setView('chat');
+                setHistory([{ 
+                    role: 'model', 
+                    parts: [{ 
+                        text: `Perfect! Am primit cazul tău: "${file.name}". Acum îl voi analiza conform criteriilor FSP și îți voi oferi feedback detaliat. Te rog să-mi spui pentru ce land german vrei evaluarea (ex: Bayern, NRW, Berlin) pentru a folosi criteriile specifice de evaluare.` 
+                    }] 
+                }]);
+            };
+            reader.readAsText(file);
+        }
+    };
+
     const handleMenuSelect = (option) => {
+        if (option === 'upload_case') {
+            fileInputRef.current?.click();
+            return;
+        }
+
         setView('chat');
         let systemMessage;
         
@@ -658,9 +688,28 @@ const GeminiFspTutorModal = ({ onClose }) => {
         setLoading(true);
         
         let systemPrompt;
-        switch(mode || 'case') {
-            case 'case':
-                systemPrompt = `Du bist ein FSP-Simulator und -Tutor. Du spielst sowohl die Rolle eines deutschen Patienten als auch eines Examinators.
+        
+        if (uploadedCase) {
+            systemPrompt = `Du bist ein FSP-Experte und -Examinator für deutsche Fachsprachprüfungen in der Medizin. Du bewertest medizinische Fälle nach den offiziellen FSP-Kriterien.
+
+Der Nutzer hat einen medizinischen Fall hochgeladen: "${uploadedCase.name}"
+Fallinhalt: ${uploadedCase.content}
+
+Deine Aufgabe:
+1. Analysiere den Fall nach FSP-Standards (Anamnese, Arztbrief, Präsentation)
+2. Bewerte nach den Kriterien des angegebenen Bundeslandes
+3. Gib detailliertes Feedback auf Rumänisch mit:
+   - Stärken des Falls
+   - Verbesserungsvorschläge
+   - Sprachliche Korrekturen
+   - Strukturelle Empfehlungen
+   - Bewertung nach FSP-Kriterien (60% Mindestanforderung)
+
+Antworte strukturiert und konstruktiv auf Rumänisch.`;
+        } else {
+            switch(mode || 'case') {
+                case 'case':
+                    systemPrompt = `Du bist ein FSP-Simulator und -Tutor. Du spielst sowohl die Rolle eines deutschen Patienten als auch eines Examinators.
 
 Struktur deiner Antworten:
 1. [PATIENT]: Antworte als Patient auf die Frage des Arztes (auf Deutsch, natürlich und realistisch)
@@ -671,16 +720,17 @@ Regeln:
 - Als Examinator: Bewerte die Fragetechnik, schlage bessere Formulierungen vor
 - Bleibe im medizinischen Kontext
 - Sei ermutigend aber konstruktiv kritisch`;
-                break;
-            case 'grammar':
-                systemPrompt = `Du bist ein Experte für deutsche Medizinsprache. Beantworte Fragen zur Grammatik, zu Satzstrukturen und sprachlichen Besonderheiten im medizinischen Deutsch. Antworte auf Rumänisch und gib klare Beispiele.`;
-                break;
-            case 'terms':
-                systemPrompt = `Du bist ein medizinisches Wörterbuch und Terminologie-Experte. Erkläre medizinische Begriffe, gib Synonyme und übersetze zwischen Rumänisch und Deutsch. Antworte auf Rumänisch mit klaren Definitionen und Beispielen.`;
-                break;
-            case 'correction': 
-                systemPrompt = `Du bist ein Korrektor für medizinische Texte. Korrigiere deutsche medizinische Texte, verbessere den Stil und erkläre die Änderungen auf Rumänisch. Gib sowohl die korrigierte Version als auch Erklärungen für die Verbesserungen.`;
-                break;
+                    break;
+                case 'grammar':
+                    systemPrompt = `Du bist ein Experte für deutsche Medizinsprache. Beantworte Fragen zur Grammatik, zu Satzstrukturen und sprachlichen Besonderheiten im medizinischen Deutsch. Antworte auf Rumänisch und gib klare Beispiele.`;
+                    break;
+                case 'terms':
+                    systemPrompt = `Du bist ein medizinisches Wörterbuch und Terminologie-Experte. Erkläre medizinische Begriffe, gib Synonyme und übersetze zwischen Rumänisch und Deutsch. Antworte auf Rumänisch mit klaren Definitionen und Beispielen.`;
+                    break;
+                case 'correction': 
+                    systemPrompt = `Du bist ein Korrektor für medizinische Texte. Korrigiere deutsche medizinische Texte, verbessere den Stil und erkläre die Änderungen auf Rumänisch. Gib sowohl die korrigierte Version als auch Erklärungen für die Verbesserungen.`;
+                    break;
+            }
         }
 
         const fullHistory = [...history, { role: "user", parts: [{ text: currentPrompt }] }];
@@ -727,6 +777,14 @@ Regeln:
                     <MessageCircle className="text-blue-600"/> Tutor FSP AI
                 </h2>
 
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={handleFileUpload}
+                    accept=".txt,.doc,.docx,.pdf"
+                />
+
                 {view === 'menu' && (
                     <div className="flex-grow overflow-y-auto">
                         <p className="text-gray-600 text-center mb-6">Alege modul de pregătire pentru examenul Fachsprachprüfung:</p>
@@ -739,6 +797,12 @@ Regeln:
                                 >
                                     <h3 className="font-bold text-blue-800 mb-2">{option.title}</h3>
                                     <p className="text-blue-600 text-sm">{option.description}</p>
+                                    {option.id === 'upload_case' && (
+                                        <div className="mt-2 flex items-center gap-2 text-blue-700">
+                                            <Upload size={16} />
+                                            <span className="text-xs">Suportă: TXT, DOC, DOCX, PDF</span>
+                                        </div>
+                                    )}
                                 </button>
                             ))}
                         </div>
@@ -748,10 +812,12 @@ Regeln:
                 {view === 'chat' && (
                     <div className="flex flex-col flex-grow min-h-0">
                         <div className="flex items-center mb-4">
-                            <button onClick={() => setView('menu')} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                            <button onClick={() => { setView('menu'); setUploadedCase(null); }} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
                                 <ChevronLeft size={24} />
                             </button>
-                            <h3 className="text-lg font-semibold">Sesiune de Pregătire FSP</h3>
+                            <h3 className="text-lg font-semibold">
+                                {uploadedCase ? `Evaluare Caz: ${uploadedCase.name}` : 'Sesiune de Pregătire FSP'}
+                            </h3>
                         </div>
                         
                         <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4 border">
@@ -773,7 +839,7 @@ Regeln:
                                 onChange={(e) => setPrompt(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
                                 className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Scrie mesajul tău aici..."
+                                placeholder={uploadedCase ? "Întreabă despre cazul tău..." : "Scrie mesajul tău aici..."}
                             />
                             <button onClick={handleSend} disabled={loading} className="bg-blue-600 text-white p-3 rounded-r-lg hover:bg-blue-700 disabled:bg-blue-400">
                                 <Send />
