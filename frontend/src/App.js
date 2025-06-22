@@ -2071,14 +2071,21 @@ const AppContent = () => {
             {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
             <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
             <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
-            <SubscriptionModal 
-                isOpen={subscriptionModalOpen} 
-                onClose={() => setSubscriptionModalOpen(false)}
+            <SubscriptionUpgrade 
+                isOpen={subscriptionUpgradeOpen} 
+                onClose={() => setSubscriptionUpgradeOpen(false)}
+            />
+            <AdminPanel 
+                isOpen={adminPanelOpen} 
+                onClose={() => setAdminPanelOpen(false)}
             />
             <AuthModal 
                 isOpen={authModalOpen} 
                 onClose={() => setAuthModalOpen(false)}
             />
+            
+            {/* Feedback Widget */}
+            <FeedbackWidget />
         </div>
     );
 };
