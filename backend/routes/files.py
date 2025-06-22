@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from typing import List
-from ..models import PersonalFileCreate, PersonalFileResponse, MessageResponse, PersonalFile
-from ..auth import get_current_user
-from ..database import get_database
-from ..models import UserInDB
+from backend.models import PersonalFileCreate, PersonalFileResponse, MessageResponse, PersonalFile
+from backend.auth import get_current_user
+from backend.database import get_database
+from backend.models import UserInDB
 import os
 import uuid
 from pathlib import Path
