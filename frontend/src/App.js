@@ -132,7 +132,7 @@ const infoDocs = [
                 <p><strong>Viteză și cost:</strong> Aplică în NRW. <strong>Reputație și rigurozitate:</strong> Alege Bayern. <strong>Eficiență administrativă:</strong> Optează pentru Berlin sau Baden-Württemberg. <strong>Ai deja o ofertă:</strong> Rheinland-Pfalz sau Sachsen îți pot scurta timpii.</p>
             </div>
         )
-    },,
+    },
     {
         id: 'canale-youtube',
         title: 'Canale Youtube utile',
