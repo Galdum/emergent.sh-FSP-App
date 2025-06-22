@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List, Dict
-from ..models_billing import AuditLog
+from backend.models_billing import AuditLog
 from ..auth import get_current_user
 from ..database import get_database
 from ..models import UserInDB
