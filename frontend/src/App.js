@@ -1567,7 +1567,7 @@ Regeln:
                             {history.map((msg, index) => (
                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                                     <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'}`}>
-                                        <div className="whitespace-pre-wrap">{msg.parts[0].text}</div>
+                                        <div>{msg.role === 'user' ? <div className="whitespace-pre-wrap">{msg.parts[0].text}</div> : renderMarkdown(msg.parts[0].text)}</div>
                                     </div>
                                 </div>
                             ))}
