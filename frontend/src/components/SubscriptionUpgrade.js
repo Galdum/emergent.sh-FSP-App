@@ -252,8 +252,82 @@ const SubscriptionUpgrade = ({ isOpen, onClose, targetPlan = null }) => {
           ))}
         </div>
 
+        {/* Payment Method Selection Modal */}
+        {selectedPlan && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-center mb-4">
+                Alege Metoda de Plată
+              </h3>
+              <p className="text-gray-600 text-center mb-6">
+                Plan selectat: <strong>{plans[selectedPlan]?.name}</strong> - €{plans[selectedPlan]?.price}/lună
+              </p>
+
+              {paymentMethod === 'stripe' && (
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <CreditCard className="h-6 w-6 text-blue-600" />
+                      <h4 className="font-semibold">Stripe - Card de Credit/Debit</h4>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Procesare securizată prin Stripe. Acceptă Visa, Mastercard, American Express.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleStripeCheckout(selectedPlan)}
+                        disabled={loading}
+                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      >
+                        {loading ? 'Se procesează...' : 'Continuă cu Stripe'}
+                      </button>
+                      <button
+                        onClick={() => setPaymentMethod('paypal')}
+                        className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50"
+                      >
+                        PayPal
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === 'paypal' && (
+                <div className="space-y-4">
+                  <PayPalSubscription
+                    planType={selectedPlan}
+                    planDetails={plans[selectedPlan]}
+                    onSuccess={handlePayPalSuccess}
+                    onError={handlePayPalError}
+                    onCancel={handlePayPalCancel}
+                  />
+                  <button
+                    onClick={() => setPaymentMethod('stripe')}
+                    className="w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 mt-4"
+                  >
+                    ← Înapoi la Stripe
+                  </button>
+                </div>
+              )}
+
+              <div className="flex gap-2 mt-6">
+                <button
+                  onClick={() => {
+                    setSelectedPlan(null);
+                    setPaymentMethod('stripe');
+                    setError('');
+                  }}
+                  className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Anulează
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>✓ Secure payment with Stripe • ✓ Cancel anytime • ✓ 30-day money back guarantee</p>
+          <p>✓ Plată securizată cu Stripe & PayPal • ✓ Anulează oricând • ✓ Garanție 30 zile</p>
         </div>
       </div>
     </div>
