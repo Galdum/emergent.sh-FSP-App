@@ -1807,10 +1807,6 @@ const AppContent = () => {
 
     const displayedSteps = useMemo(() => {
         let currentSteps = steps.map(s => ({ ...s }));
-        if (freeMode) {
-            return currentSteps.map((s, i) => ({ ...s, status: 'unlocked', icon: initialStepsData[i].icon }));
-        }
-        
         let lockNext = false;
         currentSteps.forEach((step, index) => {
             const allTasksCompleted = step.tasks.every(t => t.completed);
@@ -1836,7 +1832,7 @@ const AppContent = () => {
         });
 
         return currentSteps.map((step, index) => ({...step, icon: initialStepsData[index].icon}));
-    }, [freeMode, steps]);
+    }, [steps]);
 
     const handleTaskToggle = (stepId, taskId) => {
         const oldStep = steps.find(s => s.id === stepId);
