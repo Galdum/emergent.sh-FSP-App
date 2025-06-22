@@ -1966,7 +1966,7 @@ const AppContent = () => {
 
     return (
         <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            {confettiKey && <Confetti key={confettiKey} />}
+            {confetti && <Confetti />}
             
             {/* Subscription info and upgrade button */}
             <div className="fixed top-4 left-4 z-40 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
