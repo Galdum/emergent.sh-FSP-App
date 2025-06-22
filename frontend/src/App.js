@@ -1943,9 +1943,6 @@ const AppContent = () => {
             alert('Failed to upgrade subscription. Please try again.');
         }
     };
-        // In a real app, you'd redirect to payment processor
-        alert(`Redirection către procesarea plății pentru planul ${SUBSCRIPTION_TIERS[tier].name} (€${SUBSCRIPTION_TIERS[tier].price}/lună)`);
-    };
 
     const closeModal = () => setSelectedStep(null);
 
