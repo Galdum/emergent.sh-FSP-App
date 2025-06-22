@@ -2191,7 +2191,7 @@ const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
 
                 <div className="flex items-center gap-4 mb-6">
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center ${allTasksCompleted ? 'bg-green-500' : 'bg-blue-500'} text-white`}>
-                        {allTasksCompleted ? <Check size={28} /> : <step.icon size={28} />}
+                        {allTasksCompleted ? <Check size={28} /> : React.createElement(step.icon, { size: 28 })}
                     </div>
                     <div>
                         <h2 className="text-2xl md:text-3xl font-bold">{step.title}</h2>
