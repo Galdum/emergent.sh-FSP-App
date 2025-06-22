@@ -807,7 +807,12 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
         **Deine Aufgabe:**
         1.  **Antworte auf die Fragen des Nutzers auf Rumänisch:** Beantworte Fragen zum Approbationsprozess, zur Reihenfolge der Dokumente, zu deren Gültigkeit, zu den nächsten Schritten usw.
         2.  **Sei kontextbewusst:** Beziehe dich auf die vom Nutzer in der linken Spalte gespeicherten Notizen und Dateien, um personalisierte Ratschläge zu geben.
-        3.  **Gib klare, strukturierte Antworten:** Verwende Listen, Fettformatierungen und klare Formulierungen.
+        3.  **Gib klare, strukturierte Antworten:** Verwende Listen, Fettformatierungen und klare Formulierungen mit Markdown:
+           - **Text îngroșat**: **text**
+           - *Text italic*: *text*
+           - Liste numerotate: 1. punct, 2. punct
+           - Liste cu puncte: • punct sau - punct
+           - Emoji-uri pentru a face răspunsul mai prietenos
         4.  **Gib Links und Referenzen:** Wenn möglich, gib Links zu offiziellen Quellen (z.B. Landesprüfungsämter, Bundesärztekammer) oder verweise auf relevante Abschnitte in den vom Nutzer bereitgestellten Vorbereitungsdokumenten.
         5.  **Sei ermutigend und professionell.**
         
@@ -816,8 +821,21 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
         
         Antworte jetzt auf die folgende Frage des Nutzers auf Rumänisch:`;
 
-        const fullHistory = [ ...history, { role: "user", parts: [{ text: currentPrompt }] } ];
-        const apiHistory = [ { role: "user", parts: [{ text: systemPrompt }] }, { role: "model", parts: [{ text: "Înțeles. Cum vă pot ajuta?" }] }, ...fullHistory ];
+        // Start conversation if needed
+        if (!conversationManager.currentConversationId) {
+            conversationManager.startNewConversation('assistant');
+        }
+
+        // Add user message to conversation manager
+        conversationManager.addMessage('user', currentPrompt);
+
+        // Get optimized history from conversation manager
+        const optimizedHistory = conversationManager.getOptimizedHistory();
+        const apiHistory = [ 
+            { role: "user", parts: [{ text: systemPrompt }] }, 
+            { role: "model", parts: [{ text: "Înțeles. Cum vă pot ajuta? 😊" }] }, 
+            ...optimizedHistory 
+        ];
 
         try { 
             const payload = { contents: apiHistory }; 
@@ -825,15 +843,31 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; 
             const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
             const result = await response.json(); 
+            
+            let responseText = "Scuze, nu pot răspunde acum. 😅";
+            
             if (result.candidates && result.candidates.length > 0) { 
                 const newResponse = result.candidates[0].content; 
+                responseText = newResponse.parts[0].text;
+                
+                // Add AI response to conversation manager
+                conversationManager.addMessage('model', responseText);
+                
+                // Track cost
+                const totalTokens = conversationManager.estimateTokens(JSON.stringify(payload)) + 
+                                  conversationManager.estimateTokens(responseText);
+                CostTracker.updateCost(totalTokens);
+                
                 setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, newResponse]); 
             } else { 
-                setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "Scuze, nu pot răspunde acum."}] }]); 
+                conversationManager.addMessage('model', responseText);
+                setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: responseText}] }]); 
             } 
         } catch (error) { 
             console.error("Error calling Gemini API:", error); 
-            setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "A apărut o eroare. Vă rog să încercați din nou."}] }]); 
+            const errorResponse = "A apărut o eroare. Vă rog să încercați din nou. 🔧";
+            conversationManager.addMessage('model', errorResponse);
+            setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: errorResponse}] }]); 
         } finally { 
             setChatLoading(false); 
             setPrompt(''); 
