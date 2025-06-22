@@ -1929,15 +1929,17 @@ const AppContent = () => {
         }
     };
 
-    const handleSubscriptionUpgrade = (tier) => {
-        // Here you would integrate with a payment processor (Stripe, PayPal, etc.)
-        console.log(`Upgrading to ${tier}`);
-        
-        // For demo purposes, just update the tier
-        setCurrentTier(tier);
-        localStorage.setItem('subscriptionTier', tier);
-        setSubscriptionModalOpen(false);
-        
+    const handleSubscriptionUpgrade = async (tier) => {
+        try {
+            await upgradeSubscription(tier);
+            setSubscriptionModalOpen(false);
+            // In a real app, you'd redirect to payment processor
+            alert(`Redirection către procesarea plății pentru planul ${SUBSCRIPTION_TIERS[tier].name} (€${SUBSCRIPTION_TIERS[tier].price}/lună)`);
+        } catch (error) {
+            console.error('Failed to upgrade subscription:', error);
+            alert('Failed to upgrade subscription. Please try again.');
+        }
+    };
         // In a real app, you'd redirect to payment processor
         alert(`Redirection către procesarea plății pentru planul ${SUBSCRIPTION_TIERS[tier].name} (€${SUBSCRIPTION_TIERS[tier].price}/lună)`);
     };
