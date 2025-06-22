@@ -1799,8 +1799,7 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
-        const subscription = getCurrentSubscription();
-        return nodeIndex < subscription.maxOrangeNodes;
+        return canAccessOrangeNode(nodeIndex);
     };
 
 
