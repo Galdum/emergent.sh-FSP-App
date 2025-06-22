@@ -42,7 +42,7 @@ async def get_database():
     return db
 
 # Create custom dependency for authentication
-from backend.auth import get_current_user, verify_token, get_user_by_id
+from backend.auth import verify_token, get_user_by_id
 
 async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Depends(get_database)):
     try:
