@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List, Dict
-from ..models_billing import (
+from backend.models_billing import (
     CheckoutSessionCreate, CheckoutSessionResponse, PaymentTransaction,
     SubscriptionPlan, AuditLog
 )
