@@ -1,54 +1,1360 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Check, Lock, Rocket, FileText, UserPlus, Send, Target, X, Clock, Users, ArrowRight, Info, BookOpen, MessageCircle, Youtube, Star, Sparkles, Clipboard, Mail, RefreshCw, ChevronLeft, FolderKanban, Upload, FileCheck2, PencilRuler, Compass, Link as LinkIcon, StickyNote, Trash2, PlusCircle } from 'lucide-react';
+import './App.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// --- Confetti Component ---
+const Confetti = () => {
+    const confettiCount = 100;
+    const colors = ['#fde196', '#fdb497', '#F7941D', '#27AAE1', '#a3d4f4', '#81c784'];
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Component will unmount itself after 4 seconds
+        }, 4000);
+        return () => clearTimeout(timer);
+    }, []);
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
+    return (
+        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
+            {Array.from({ length: confettiCount }).map((_, i) => (
+                <div 
+                    key={i} 
+                    className="absolute rounded-full animate-confetti-fall"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${-20 + Math.random() * -80}px`,
+                        width: `${Math.random() * 8 + 6}px`,
+                        height: `${Math.random() * 8 + 6}px`,
+                        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+                        animationDelay: `${Math.random() * 2}s`,
+                        animationDuration: `${Math.random() * 2 + 3}s`,
+                    }}
+                ></div>
+            ))}
+        </div>
+    );
 };
 
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
-}
+// --- Info Documents Data ---
+const infoDocs = [
+    { 
+        id: 'alt-fsp', 
+        title: 'Alternative la FSP (telc, FaMed, PKT)',
+        content: (
+            <div className="space-y-4 text-gray-700">
+                <p className="font-bold">Ideea-cheie: Există trei examene alternative la Fachsprachprüfung-ul camerelor medicale: telc Deutsch B2·C1 Medizin, FaMed C1 (LMU München) şi Patientenkommunikationstest (PKT) C1 (Freiburg International Academy).</p>
+                <p>Acceptarea lor depinde de land. Detaliile complete sunt mai jos.</p>
 
-export default App;
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2">1. Examene alternative – format, cost, timpi de aşteptare</h4>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="p-2 font-semibold">Examen</th>
+                                <th className="p-2 font-semibold">Conţinut & durată</th>
+                                <th className="p-2 font-semibold">Cost tipic</th>
+                                <th className="p-2 font-semibold">Rezultat</th>
+                                <th className="p-2 font-semibold">Centre România / UE</th>
+                                <th className="p-2 font-semibold">Observaţii</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="border-b"><td className="p-2 font-semibold">telc Deutsch B2·C1 Medizin</td><td className="p-2">Scris 80 min (citit, ascultat, gramatică) + oral 65 min (anamneză 20 min · Arztbrief 20 min · prezentare 20 min)</td><td className="p-2">300–360 €</td><td className="p-2">4-6 săpt.</td><td className="p-2">Bucureşti, Iaşi</td><td className="p-2">Înscriere min. 14 zile înainte</td></tr>
+                            <tr className="border-b"><td className="p-2 font-semibold">FaMed C1</td><td className="p-2">Identic FSP (20-20-20); barem ≥ 60 %/probă</td><td className="p-2">490 € (Mainz)</td><td className="p-2">≈ 4 săpt. prin e-mail</td><td className="p-2">doar Mainz (LMU)</td><td className="p-2">Din 08/2024 format unic Bayern & RLP</td></tr>
+                            <tr><td className="p-2 font-semibold">PKT C1 (FIA)</td><td className="p-2">3×20 min (doc scrisă · prezentare colegială · informare pacient)</td><td className="p-2">450-480 €</td><td className="p-2">&lt; 4 săpt.</td><td className="p-2">Frankfurt (lunar)</td><td className="p-2">Acceptat explicit în HH, HE, SL</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2 mt-6">2. Landuri care acceptă telc B2·C1 Medizin</h4>
+                <ul className="list-disc list-inside space-y-1">
+                    <li><strong>Acceptare oficială:</strong> Hamburg, Hessen (candidaţi UE/SEE), Saarland, Schleswig-Holstein.</li>
+                    <li><strong>Acceptare la cerere (caz-cu-caz):</strong> Nordrhein-Westfalen, Sachsen, Sachsen-Anhalt, Brandenburg.</li>
+                    <li><strong>Refuz explicit (cer FSP propriu):</strong> Berlin, Bayern, Baden-Württemberg, Mecklenburg-Vorpommern.</li>
+                </ul>
+
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2 mt-6">3. Landuri care acceptă FaMed C1</h4>
+                 <ul className="list-disc list-inside space-y-1">
+                    <li><strong>Acceptare directă:</strong> Bayern, Rheinland-Pfalz.</li>
+                    <li><strong>Acceptare condiționată:</strong> Baden-Württemberg (dacă a fost recunoscut deja în BY/RLP).</li>
+                </ul>
+
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2 mt-6">4. Checklist pentru înscriere la telc în România</h4>
+                 <ul className="list-disc list-inside space-y-1">
+                    <li>Alege centru (B.Smart Bucureşti / Lektor Iaşi) şi data (min. 14 zile în avans).</li>
+                    <li>Plăteşte on-site (300–360 €) şi adu CI/paşaport.</li>
+                    <li>Pregăteşte-te pe modelul oficial telc.</li>
+                    <li>În paralel, trimite dosarul de Approbation – certificatul telc ajunge la timp pentru landurile care îl acceptă.</li>
+                </ul>
+            </div>
+        )
+    },
+    { 
+        id: 'cel-mai', 
+        title: 'Analiza Comparativă a Landurilor',
+        content: (
+            <div className="space-y-4 text-gray-700">
+                <p className="font-bold">Pe scurt: Cele mai multe FSP-uri sunt în Nordrhein-Westfalen (cele mai mari șanse de programare rapidă). Cel mai sever barem este în Bayern. Pentru viteză administrativă, Berlin și Baden-Württemberg ies în faţă.</p>
+
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2">1. Unde prinzi loc cel mai rapid la FSP?</h4>
+                <ul className="list-disc list-inside">
+                    <li><strong>Nordrhein-Westfalen (NRW):</strong> Cel mai mare volum (2040 examene în 2023), taxe reduse (350-400€).</li>
+                    <li><strong>Bayern:</strong> Sesiuni aproape săptămânale la München.</li>
+                    <li><strong>Baden-Württemberg:</strong> Patru centre de examen (distribuție bună).</li>
+                    <li><strong>Rheinland-Pfalz:</strong> Prioritate dacă ai contract/hospitație în land.</li>
+                </ul>
+                
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2 mt-6">2. Unde este FSP-ul considerat cel mai dificil?</h4>
+                 <ul className="list-disc list-inside">
+                    <li><strong>Bayern:</strong> Doar ~48% rată de promovare.</li>
+                    <li><strong>Nordrhein (parte din NRW):</strong> 35.8% rată de eșec în 2023.</li>
+                    <li><strong>Sachsen:</strong> Taxă mare (590€), listă de termeni foarte tehnică.</li>
+                    <li><strong>Thüringen:</strong> Așteptare lungă (4-5 luni) și listă obligatorie de termeni.</li>
+                </ul>
+
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2 mt-6">3. Unde finalizezi cel mai rapid Approbation-ul?</h4>
+                 <ul className="list-disc list-inside">
+                    <li><strong>Berlin:</strong> Certificat trimis la autoritate în ≤ 10 zile.</li>
+                    <li><strong>Baden-Württemberg:</strong> Approbation finalizată în ~35 de zile.</li>
+                    <li><strong>NRW:</strong> Procesare în paralel cu FSP.</li>
+                    <li><strong>Hamburg:</strong> Rezultat pe loc, dosar digital.</li>
+                </ul>
+
+                <h4 className="font-bold text-lg text-gray-800 border-b pb-2 mt-6">4. Cum să alegi în practică?</h4>
+                <p><strong>Viteză și cost:</strong> Aplică în NRW. <strong>Reputație și rigurozitate:</strong> Alege Bayern. <strong>Eficiență administrativă:</strong> Optează pentru Berlin sau Baden-Württemberg. <strong>Ai deja o ofertă:</strong> Rheinland-Pfalz sau Sachsen îți pot scurta timpii.</p>
+            </div>
+        )
+    }
+];
+
+// --- Step data structure ---
+const initialStepsData = [
+    { id: 1, title: 'Startul Călătoriei', icon: Rocket, description: 'Bun venit pe drumul către Approbation! Completează primii pași pentru a înțelege procesul și a porni la drum cu dreptul.', tasks: [ { id: 101, text: 'Citește ghidul Approbation.', completed: false, viewed: false, action: { type: 'modal', content: { title: 'Ghid General Approbation', body: ( <div className="space-y-4 text-gray-600"> <p>Acest proces reprezintă recunoașterea completă a diplomei tale de medic în Germania. Călătoria este complexă și necesită multă organizare.</p> <h4 className="font-bold text-lg text-gray-800">Etapele Majore</h4> <ul className="list-disc list-inside space-y-2"> <li>Colectarea și traducerea documentelor.</li> <li>Învățarea limbii germane la nivel avansat (C1 Medicină).</li> <li>Aplicarea la un "Landesamt für Gesundheit" dintr-un land german.</li> <li>Susținerea examenului de limbaj medical (Fachsprachprüfung - FSP).</li> <li>(Dacă este cazul) Susținerea examenului de echivalare (Kenntnisprüfung - KP).</li> </ul> <p>Folosește această hartă pentru a te ghida. Fiecare pas deblocat este o victorie! Mult succes!</p> </div> ) } } } ] },
+    { id: 2, title: 'Documente din România', icon: FileText, description: 'Primul set de documente. Acestea trebuie obținute din România înainte de a putea aplica.', tasks: [ { id: 201, text: 'Obține Diploma de Licență și Suplimentul.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Diplomă și Supliment', body: <div className="space-y-3 text-gray-600"><p><b>Ce sunt?</b> Documentele care atestă absolvirea facultății de medicină.</p><p><b>De ce sunt necesare?</b> Stau la baza întregului dosar. Fără ele, nu se poate începe procesul.</p><p><b>Atenție:</b> Asigură-te că ai ambele documente, în original. Unele autorități germane pot cere copii legalizate, care se fac la notar.</p></div>}} }, { id: 202, text: 'Obține Certificatul de Conformitate.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Certificat de Conformitate', body: <div className="space-y-3 text-gray-600"><p><b>Ce este?</b> Un document eliberat de Ministerul Sănătății care atestă că formarea ta ca medic este conformă cu directivele UE.</p><p><b>De ce este necesar?</b> Este esențial pentru recunoașterea automată a diplomei în spațiul UE.</p><p><b>Cum se obține?</b> Se depune o cerere la Ministerul Sănătății. Procesul poate dura câteva săptămâni. Caută pe Google "Certificat de conformitate Ministerul Sănătății medici" pentru a găsi lista de acte și formulare.</p><a href="https://www.ms.ro/ro/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Link către Ministerul Sănătății</a></div>}} } ] },
+    { id: 3, title: 'Limba Germană și FSP', icon: BookOpen, description: 'Una dintre cele mai importante etape. Fără un nivel avansat de limbă, procesul nu poate avansa.', status: 'locked', tasks: [ { id: 301, text: 'Atinge nivelul B2 General.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Nivel B2 General', body: <p>Majoritatea landurilor cer un certificat de limbă B2 (ex: Goethe, Telc) ca pre-condiție pentru a te putea înscrie la examenul de limbaj medical (FSP).</p>}} } ] },
+    { id: 4, title: 'Traduceri și Aplicare', icon: Send, description: 'Cu documentele și limba germană pregătite, este timpul să aplici oficial.', status: 'locked', tasks: [ { id: 401, text: 'Tradu documentele la un traducător autorizat.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Traducători autorizați', body: <div className="space-y-3 text-gray-600"><p>Toate documentele în limba română trebuie traduse în germană. Traducerea trebuie făcută de un traducător autorizat de o instanță din Germania ("vereidigter Übersetzer").</p><p><b>Costuri:</b> În Germania, costurile sunt mai mari (20-50€/pagină standard), dar traducerile sunt acceptate fără probleme. În România, costurile sunt mai mici, dar există riscul ca unele landuri să nu le accepte. Majoritatea candidaților aleg traducători autorizați din Germania pentru siguranță.</p><p><b>Cum găsești?</b> Caută pe Google "vereidigter Übersetzer Rumänisch" sau pe platforma oficială: <a href="https://www.justiz-dolmetscher.de/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">justiz-dolmetscher.de</a>.</p></div>}} } ] },
+    { id: 5, title: 'Examene de Echivalare', icon: Users, description: 'Dacă diploma ta nu este considerată echivalentă, vei primi un "Defizitbescheid" și va trebui să susții examene.', status: 'locked', tasks: [ { id: 501, text: 'Analizează "Defizitbescheid"-ul.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Defizitbescheid', body: <p>Este documentul oficial prin care autoritatea germană îți comunică dacă diploma ta este considerată echivalentă ("gleichwertig") sau nu. Dacă nu este, acest document va specifica materiile la care ai deficiențe și te va informa despre necesitatea susținerii examenului de echivalare (Kenntnisprüfung).</p>}} } ] },
+    { id: 6, title: 'Approbation Obținut!', icon: Target, description: 'Felicitări, Doktortitel! Ai parcurs tot drumul și ai obținut dreptul de liberă practică în Germania. ', status: 'locked', tasks: [ { id: 601, text: 'Primește Approbationsurkunde.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Approbationsurkunde', body: <div className="space-y-4 text-gray-600"><p><b>Ce este?</b> Este documentul final, "Sfântul Graal" al acestui proces. Atestă dreptul tău deplin și nelimitat de a profesa ca medic pe teritoriul Germaniei.</p><p><b>Când îl primesc?</b> De obicei, la câteva săptămâni după promovarea ultimului examen necesar (FSP sau KP). Taxa pentru eliberarea documentului (~200-400€) se achită în acest interval.</p><p><b>Sfat Important:</b> Când ridici documentul personal, solicită pe loc eliberarea a 1-2 copii legalizate ("beglaubigte Kopien"). Le vei avea nevoie pentru angajare și înscrierea la Camera Medicilor și te scutește de un drum ulterior la notar.</p></div>}} } ] },
+];
+
+// Node positions for the SVG path
+const nodePositions = [
+    { x: 200, y: 70 },
+    { x: 120, y: 175 },
+    { x: 280, y: 280 },
+    { x: 160, y: 385 },
+    { x: 240, y: 525 },
+    { x: 140, y: 644 }
+];
+
+// Bonus floating action buttons
+const bonusNodes = [
+    { id: 'fsp_tutor', icon: MessageCircle, title: 'Simulator FSP', position: { top: '15%', left: '75%' }, action: { type: 'gemini_fsp_tutor' } },
+    { id: 'email_gen', icon: Mail, title: 'Generator Email', position: { top: '45%', right: '10%' }, action: { type: 'gemini_email_generator' } },
+    { id: 'land_rec', icon: Compass, title: 'Recomandare Land', position: { bottom: '20%', left: '10%' }, action: { type: 'gemini_land_recommender' } },
+    { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { bottom: '15%', right: '20%' }, action: { type: 'info_hub' } }
+];
+
+// --- Personal File Modal Component ---
+const PersonalFileModal = ({ isOpen, onClose }) => {
+    const [items, setItems] = useState([]);
+    const [newItemType, setNewItemType] = useState(null);
+    const [noteContent, setNoteContent] = useState('');
+    const [linkUrl, setLinkUrl] = useState('');
+    const [linkTitle, setLinkTitle] = useState('');
+    const fileInputRef = useRef(null);
+    const [fileObjects, setFileObjects] = useState({});
+
+    // Chatbot state
+    const [history, setHistory] = useState([]);
+    const [prompt, setPrompt] = useState('');
+    const [loading, setLoading] = useState(false);
+    const chatEndRef = useRef(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            try {
+                const savedItems = localStorage.getItem('personalFileItems');
+                setItems(savedItems ? JSON.parse(savedItems) : []);
+            } catch (e) {
+                console.error("Failed to parse personal items from localStorage", e);
+                setItems([]);
+            }
+            setHistory([{role: 'model', parts: [{ text: 'Salut! Sunt asistentul tău personal. Mă poți întreba despre pașii următori, valabilitatea documentelor sau orice altceva legat de procesul de Approbation.'}]}]);
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (isOpen) {
+            try {
+                const itemsToSave = items.map(({ file, ...rest }) => rest);
+                localStorage.setItem('personalFileItems', JSON.stringify(itemsToSave));
+            } catch (e) {
+                console.error("Failed to save personal items to localStorage", e);
+            }
+        }
+    }, [items, isOpen]);
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [history]);
+
+    const handleAddItem = () => {
+        let newItem = null;
+        if (newItemType === 'note' && noteContent.trim()) {
+            newItem = { id: Date.now(), type: 'note', content: noteContent.trim() };
+        } else if (newItemType === 'link' && linkUrl.trim()) {
+            let formattedUrl = linkUrl.trim();
+            if (!/^https?:\/\//i.test(formattedUrl)) {
+                formattedUrl = 'https://' + formattedUrl;
+            }
+            newItem = { id: Date.now(), type: 'link', url: formattedUrl, title: linkTitle.trim() || linkUrl.trim() };
+        }
+        
+        if (newItem) {
+            setItems(prevItems => [newItem, ...prevItems]);
+            setNewItemType(null);
+            setNoteContent('');
+            setLinkUrl('');
+            setLinkTitle('');
+        }
+    };
+    
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const id = Date.now();
+            const newItem = { id, type: 'file', name: file.name, size: file.size };
+            setItems(prevItems => [newItem, ...prevItems]);
+            setFileObjects(prev => ({...prev, [id]: file }));
+        }
+    };
+    
+    const handleDeleteItem = (id) => {
+        setItems(prevItems => prevItems.filter(item => item.id !== id));
+        setFileObjects(prev => {
+            const newFileObjects = {...prev};
+            delete newFileObjects[id];
+            return newFileObjects;
+        });
+    };
+    
+    const handleItemClick = (item) => {
+        if (item.type === 'file') {
+            const file = fileObjects[item.id];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                window.open(url, '_blank');
+            } else {
+                alert('Fișierul nu este disponibil pentru vizualizare. Te rog, reîncarcă-l.');
+            }
+        }
+    };
+
+    const callGeminiAssistantAPI = async (currentPrompt) => {
+        setLoading(true);
+        const systemPrompt = `Du bist ein hochqualifizierter Berater für ausländische Ärzte, die ihre Approbation in Deutschland anstreben. Du bist auf den Prozess für rumänische Ärzte spezialisiert. Deine Antworten müssen präzise, hilfreich und auf den bereitgestellten Dokumenten basieren.
+        
+        **Deine Aufgabe:**
+        1.  **Antworte auf die Fragen des Nutzers auf Rumänisch:** Beantworte Fragen zum Approbationsprozess, zur Reihenfolge der Dokumente, zu deren Gültigkeit, zu den nächsten Schritten usw.
+        2.  **Sei kontextbewusst:** Beziehe dich auf die vom Nutzer in der linken Spalte gespeicherten Notizen und Dateien, um personalisierte Ratschläge zu geben.
+        3.  **Gib klare, strukturierte Antworten:** Verwende Listen, Fettformatierungen und klare Formulierungen.
+        4.  **Gib Links und Referenzen:** Wenn möglich, gib Links zu offiziellen Quellen (z.B. Landesprüfungsämter, Bundesärztekammer) oder verweise auf relevante Abschnitte in den vom Nutzer bereitgestellten Vorbereitungsdokumenten.
+        5.  **Sei ermutigend und professionell.**
+        
+        **Aktueller Status der gespeicherten Elemente des Nutzers:**
+        ${items.length > 0 ? items.map(it => `- ${it.type.toUpperCase()}: ${it.name || it.title || it.content.substring(0, 40) + '...'}`).join('\n') : "Niciun element salvat."}
+        
+        Antworte jetzt auf die folgende Frage des Nutzers auf Rumänisch:`;
+
+        const fullHistory = [ ...history, { role: "user", parts: [{ text: currentPrompt }] } ];
+        const apiHistory = [ { role: "user", parts: [{ text: systemPrompt }] }, { role: "model", parts: [{ text: "Înțeles. Cum vă pot ajuta?" }] }, ...fullHistory ];
+
+        try { 
+            const payload = { contents: apiHistory }; 
+            const apiKey = process.env.REACT_APP_GEMINI_API_KEY; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; 
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
+            const result = await response.json(); 
+            if (result.candidates && result.candidates.length > 0) { 
+                const newResponse = result.candidates[0].content; 
+                setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, newResponse]); 
+            } else { 
+                setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "Scuze, nu pot răspunde acum."}] }]); 
+            } 
+        } catch (error) { 
+            console.error("Error calling Gemini API:", error); 
+            setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "A apărut o eroare. Vă rog să încercați din nou."}] }]); 
+        } finally { 
+            setLoading(false); 
+            setPrompt(''); 
+        } 
+    };
+
+    const handleSend = () => { if (prompt.trim() && !loading) { callGeminiAssistantAPI(prompt.trim()); } };
+
+    const renderItem = (item) => {
+        const itemIcon = {
+            note: <StickyNote className="h-5 w-5 text-yellow-600 flex-shrink-0" />,
+            link: <LinkIcon className="h-5 w-5 text-blue-600 flex-shrink-0" />,
+            file: <FileText className="h-5 w-5 text-purple-600 flex-shrink-0" />,
+        };
+        const isClickable = item.type === 'file';
+
+        return (
+            <div 
+                key={item.id} 
+                className={`bg-white p-3 rounded-lg shadow-sm flex items-start gap-3 transition-all ${isClickable ? 'cursor-pointer hover:shadow-md hover:bg-gray-50' : ''}`}
+                onClick={() => handleItemClick(item)}
+            >
+                <div className="mt-1">{itemIcon[item.type]}</div>
+                <div className="flex-grow min-w-0">
+                    {item.type === 'note' && <p className="text-gray-700 whitespace-pre-wrap break-words">{item.content}</p>}
+                    {item.type === 'link' && <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-blue-600 hover:underline break-all" title={item.url}>{item.title}</a>}
+                    {item.type === 'file' && <p className="text-gray-700 truncate" title={item.name}>{item.name}</p>}
+                </div>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.id); }} 
+                    className="text-gray-400 hover:text-red-500 flex-shrink-0 p-1"
+                >
+                    <Trash2 size={18} />
+                </button>
+            </div>
+        );
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
+            <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[90vh] overflow-hidden">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-20"><X size={28} /></button>
+                <h2 className="text-2xl md:text-3xl font-bold p-6 pb-2 text-center md:text-left flex-shrink-0">Dosarul Meu & Asistent Personal</h2>
+                
+                <div className="grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2">
+                    {/* Left Column: File Management */}
+                    <div className="flex flex-col bg-gray-200 p-4 rounded-lg min-h-0">
+                        <h3 className="text-lg font-bold mb-3 flex-shrink-0 text-gray-700">Resurse Personale</h3>
+                         <div className="flex-shrink-0 flex flex-wrap justify-center gap-2 mb-3 p-2 bg-gray-300 rounded-lg">
+                            <button onClick={() => setNewItemType('note')} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-yellow-100 text-yellow-800 shadow-sm transition-colors">
+                                <StickyNote size={18}/> Notiță
+                            </button>
+                            <button onClick={() => setNewItemType('link')} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-blue-100 text-blue-800 shadow-sm transition-colors">
+                                <LinkIcon size={18}/> Link
+                            </button>
+                            <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-purple-100 text-purple-800 shadow-sm transition-colors">
+                               <Upload size={18}/> Fișier
+                            </button>
+                            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
+                        </div>
+                        {newItemType && (
+                             <div className="bg-white p-3 rounded-lg mb-3 border border-gray-300 flex-shrink-0">
+                                {newItemType === 'note' && <textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Scrie notița aici..." className="w-full p-2 border rounded-md" rows="3"/>}
+                                {newItemType === 'link' && (<div className="space-y-2"><input type="text" value={linkTitle} onChange={e => setLinkTitle(e.target.value)} placeholder="Titlu (opțional)" className="w-full p-2 border rounded-md" /><input type="url" value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder="https://exemplu.com" className="w-full p-2 border rounded-md" /></div>)}
+                                <div className="flex justify-end gap-2 mt-2">
+                                    <button onClick={() => setNewItemType(null)} className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Anulează</button>
+                                    <button onClick={handleAddItem} className="px-3 py-1 text-sm rounded-md bg-green-500 text-white hover:bg-green-600">Salvează</button>
+                                </div>
+                            </div>
+                        )}
+                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2">
+                             {items.length > 0 ? items.map(renderItem) : (
+                                <div className="text-center text-gray-500 pt-10">
+                                    <p>Dosarul tău este gol.</p>
+                                    <p className="text-sm">Folosește butoanele de mai sus pentru a adăuga elemente.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Right Column: Chatbot */}
+                    <div className="flex flex-col bg-gray-200 p-4 rounded-lg min-h-0">
+                         <h3 className="text-lg font-bold mb-3 flex items-center flex-shrink-0 text-gray-700"><Sparkles className="text-purple-600 mr-2"/> Asistent Approbation</h3>
+                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300">
+                            {history.map((msg, index) => (
+                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
+                                     <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
+                                         {msg.parts[0].text}
+                                     </div>
+                                 </div>
+                             ))}
+                             {loading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-gray-100 text-gray-800">...</div></div>}
+                             <div ref={chatEndRef} />
+                         </div>
+                         <div className="flex items-center flex-shrink-0">
+                             <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()} className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare..." />
+                             <button onClick={handleSend} disabled={loading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Bundesland Recommender Modal ---
+const BundeslandRecommenderModal = ({ onClose }) => {
+    const criteriaOptions = [
+      { id: 'cost', label: 'Cost de Trai & Chirii Scăzute' },
+      { id: 'jobs', label: 'Oportunități de Angajare Bune' },
+      { id: 'social', label: 'Viață Socială & Culturală Activă' },
+      { id: 'integration', label: 'Comunitate Mare de Expați' },
+      { id: 'nature', label: 'Aproape de Natură & Aer Liber' },
+      { id: 'family', label: 'Potrivit pentru Familii' },
+      { id: 'process', label: 'Proces de Approbation Rapid' },
+      { id: 'accent', label: 'Accent Lingvistic Ușor' },
+      { id: 'travel', label: 'Conexiuni Bune de Călătorie' }
+    ];
+
+    const germanStates = [
+      'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen', 
+      'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz', 
+      'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen'
+    ];
+    
+    const [view, setView] = useState('selection');
+    const [selectedCriteria, setSelectedCriteria] = useState([]);
+    const [interestedLands, setInterestedLands] = useState([]);
+    const [customText, setCustomText] = useState('');
+    const [result, setResult] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const toggleCriterion = (id) => {
+        setSelectedCriteria(prev => 
+            prev.includes(id) ? prev.filter(cId => cId !== id) : [...prev, id]
+        );
+    };
+
+    const toggleInterestedLand = (land) => {
+        setInterestedLands(prev =>
+            prev.includes(land) ? prev.filter(l => l !== land) : [...prev, land]
+        );
+    };
+
+    const createPrompt = () => {
+        const criteriaText = selectedCriteria.map(id => criteriaOptions.find(c => c.id === id)?.label).join(', ');
+        const interestedLandsText = interestedLands.join(', ');
+
+        let taskInstruction;
+        if (interestedLandsText) {
+            taskInstruction = `Analizează și compară **doar** următoarele landuri pre-selectate de utilizator: **${interestedLandsText}**. Clasifică-le în funcție de prioritățile utilizatorului și oferă o analiză detaliată pentru fiecare.`;
+        } else {
+            taskInstruction = `Basierend auf diesen Prioritäten, erstelle eine Top-3-Liste der am besten geeigneten Bundesländer.`;
+        }
+        
+        return `Du bist ein Experte für das Leben und Arbeiten in Deutschland, spezialisiert auf die Beratung von ausländischen Ärzten. Ein Arzt aus Rumänien sucht nach dem idealen Bundesland für sich und bittet um deine Hilfe.
+
+**Prioritäten des Arztes:**
+${criteriaText ? `- Wichtige Kriterien: ${criteriaText}` : '- Keine spezifischen Kriterien ausgewählt.'}
+${customText ? `- Persönliche Anmerkungen: "${customText}"` : ''}
+${interestedLandsText ? `- Landuri de interes specific: ${interestedLandsText}` : ''}
+
+**Deine Aufgabe:**
+${taskInstruction}
+
+Präsentiere deine Antwort **auf Rumänisch** und formatiere sie mit Markdown für gute Lesbarkeit.
+
+Für jedes Bundesland in deiner Analyse, gib bitte die folgenden Informationen an:
+1.  **De ce este o alegere bună?** O scurtă descriere a motivelor pentru care acest land se potrivește profilului.
+2.  **Analiza Criteriilor:** Explică detaliat cum se aliniază landul cu fiecare dintre prioritățile selectate.
+3.  **Pro & Contra:** O listă echilibrată de avantaje și dezavantaje specifice pentru un medic din România.
+4.  **Plan de Acțiune:** Pași concreți și practici pentru a începe (ex. autoritatea relevantă pentru Approbation, portaluri de joburi recomandate în regiune, sfaturi pentru integrare).
+
+Strukturiere deine Antwort klar und beginne direkt mit der Empfehlung für Platz 1. Sei ermutigend und professionell.`;
+    };
+
+    const getRecommendation = async () => {
+        setLoading(true);
+        setView('loading');
+        const prompt = createPrompt();
+        try {
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = process.env.REACT_APP_GEMINI_API_KEY; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const apiResult = await response.json();
+            if (apiResult.candidates && apiResult.candidates.length > 0) {
+                setResult(apiResult.candidates[0].content.parts[0].text);
+            } else {
+                setResult("Nu am putut genera o recomandare. Vă rugăm să încercați din nou.");
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API for land recommendation:", error);
+            setResult("A apărut o eroare de rețea. Vă rugăm verificați conexiunea și încercați din nou.");
+        } finally {
+            setLoading(false);
+            setView('result');
+        }
+    };
+
+    // Simple Markdown renderer
+    const SimpleMarkdownRenderer = ({ text }) => {
+        const lines = text.split('\n').map(line => line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+        return (
+            <div className="space-y-2 text-gray-700">
+                {lines.map((line, index) => {
+                    if (line.startsWith('### ')) return <h4 key={index} className="text-lg font-bold mt-3 text-gray-800">{line.substring(4)}</h4>;
+                    if (line.startsWith('## ')) return <h3 key={index} className="text-xl font-bold mt-4 border-b pb-1 text-gray-900">{line.substring(3)}</h3>;
+                    if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) return <p key={index} className="ml-5 relative before:content-['•'] before:absolute before:-left-4 before:text-blue-500" dangerouslySetInnerHTML={{ __html: line.trim().substring(2) }} />;
+                    if (line.trim() === "") return <div key={index} className="h-2"></div>;
+                    return <p key={index} dangerouslySetInnerHTML={{ __html: line }} />;
+                })}
+            </div>
+        );
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
+            <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+             <div className="flex-shrink-0 mb-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-center flex items-center justify-center gap-2"><Compass className="text-blue-600"/> Consilier Federal</h2>
+                <p className="text-gray-600 text-center mt-2">Găsește landul perfect pentru tine pe baza priorităților tale.</p>
+            </div>
+            {view === 'loading' && <div className="flex-grow flex items-center justify-center"><p className="text-lg font-semibold animate-pulse">AI-ul analizează preferințele tale...</p></div>}
+            {view === 'result' && (
+                <div className="flex-grow overflow-y-auto pr-4 -mr-4">
+                    <SimpleMarkdownRenderer text={result} />
+                    <button onClick={() => setView('selection')} className="w-full mt-6 bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700">Modifică preferințele</button>
+                </div>
+            )}
+            {view === 'selection' && (
+                <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-6">
+                    <div>
+                        <h3 className="font-bold text-lg mb-3">1. Selectează ce este cel mai important pentru tine:</h3>
+                        <div className="flex flex-wrap gap-3">
+                            {criteriaOptions.map(c => (
+                                <button key={c.id} onClick={() => toggleCriterion(c.id)} className={`px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${selectedCriteria.includes(c.id) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'}`}>
+                                    {c.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold text-lg mb-3">2. (Opțional) Ai deja câteva landuri în minte?</h3>
+                        <p className="text-sm text-gray-500 mb-3">Selectează-le aici, iar AI-ul se va concentra pe analiza lor comparativă. Dacă nu selectezi niciunul, AI-ul îți va sugera top 3 din toată Germania.</p>
+                        <div className="flex flex-wrap gap-2">
+                            {germanStates.map(land => (
+                                <button key={land} onClick={() => toggleInterestedLand(land)} className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all duration-200 ${interestedLands.includes(land) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-500'}`}>
+                                    {land}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold text-lg mb-3">3. Adaugă orice alt detaliu relevant:</h3>
+                        <textarea value={customText} onChange={e => setCustomText(e.target.value)} rows="4" placeholder="Ex: Vreau un oraș mare, dar nu foarte aglomerat; este important să am acces la un aeroport internațional; prefer o zonă unde se vorbește germana standard etc." className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                     <button onClick={getRecommendation} className="w-full mt-6 bg-green-600 text-white font-bold p-3 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2">
+                        <Sparkles size={20}/> Obține Recomandare Personalizată
+                    </button>
+                </div>
+            )}
+        </div>
+      </div>
+    );
+};
+
+// --- Info Hub Modal ---
+const InfoHubModal = ({ isOpen, onClose }) => {
+    const [view, setView] = useState('list');
+    const [selectedDoc, setSelectedDoc] = useState(null);
+
+    const handleSelectDoc = (doc) => {
+        setSelectedDoc(doc);
+        setView('detail');
+    };
+
+    const handleBack = () => {
+        setView('list');
+        setSelectedDoc(null);
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                
+                {view === 'list' && (
+                    <>
+                        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Informații Utile</h2>
+                        <div className="flex-grow overflow-y-auto pr-2 -mr-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {infoDocs.map(doc => (
+                                    <button key={doc.id} onClick={() => handleSelectDoc(doc)} className="text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 p-4 rounded-lg transition-all duration-200 hover:shadow-md">
+                                        <h3 className="font-bold text-blue-700">{doc.title}</h3>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {view === 'detail' && selectedDoc && (
+                       <div className="flex flex-col h-full min-h-0">
+                            <div className="flex items-center mb-4 flex-shrink-0">
+                               <button onClick={handleBack} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors"><ChevronLeft size={24} /></button>
+                               <h2 className="text-xl md:text-2xl font-bold">{selectedDoc.title}</h2>
+                            </div>
+                            <div className="flex-grow overflow-y-auto pr-4 -mr-4 bg-gray-50 p-4 rounded-lg border">
+                                {selectedDoc.content}
+                            </div>
+                       </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- FSP Tutor Modal ---
+const GeminiFspTutorModal = ({ onClose }) => {
+    const [view, setView] = useState('menu');
+    const [history, setHistory] = useState([]);
+    const [prompt, setPrompt] = useState('');
+    const [loading, setLoading] = useState(false);
+    const chatEndRef = useRef(null);
+
+    const menuOptions = [
+        { id: 'case', title: 'Simulează un Caz', description: 'Exercitiu complet de FSP cu pacient virtual' },
+        { id: 'grammar', title: 'Discută Gramatica', description: 'Ajutor cu structurile gramaticale medicale' },
+        { id: 'terms', title: 'Învață Termeni Medicali', description: 'Explicații pentru vocabularul medical german' },
+        { id: 'correction', title: 'Corectează Textul Meu', description: 'Revizuiește și îmbunătățește scrisorile medicale' }
+    ];
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [history]);
+
+    const handleMenuSelect = (option) => {
+        setView('chat');
+        let systemMessage;
+        
+        switch(option) {
+            case 'case':
+                systemMessage = "Bună! Sunt simulatorul tău FSP. Voi juca rolul unui pacient german și apoi îți voi da feedback ca examinator. Să începem cu un caz medical. Ce întrebări ai pentru pacient?";
+                break;
+            case 'grammar':
+                systemMessage = "Salut! Sunt aici să te ajut cu gramatica medicală germană. Întreabă-mă despre structuri gramaticale, conjugări sau construcții specifice limbajului medical.";
+                break;
+            case 'terms':
+                systemMessage = "Bună! Sunt dicționarul tău medical german. Poți să-mi ceri explicații pentru termeni medicali, sinonime sau traduceri româno-germane.";
+                break;
+            case 'correction':
+                systemMessage = "Salut! Sunt corectorul tău de texte medicale. Trimite-mi orice text medical în germană și îl voi corecta și îmbunătăți.";
+                break;
+            default:
+                systemMessage = "Bună! Cu ce te pot ajuta astăzi la pregătirea FSP?";
+        }
+        
+        setHistory([{ role: 'model', parts: [{ text: systemMessage }] }]);
+    };
+
+    const callGeminiAPI = async (currentPrompt, mode) => {
+        setLoading(true);
+        
+        let systemPrompt;
+        switch(mode || 'case') {
+            case 'case':
+                systemPrompt = `Du bist ein FSP-Simulator und -Tutor. Du spielst sowohl die Rolle eines deutschen Patienten als auch eines Examinators.
+
+Struktur deiner Antworten:
+1. [PATIENT]: Antworte als Patient auf die Frage des Arztes (auf Deutsch, natürlich und realistisch)
+2. [FEEDBACK]: Gib konstruktives Feedback zur Frage des Arztes (auf Rumänisch)
+
+Regeln:
+- Als Patient: Sei realistisch, verwende alltägliche Sprache, nicht zu medizinisch
+- Als Examinator: Bewerte die Fragetechnik, schlage bessere Formulierungen vor
+- Bleibe im medizinischen Kontext
+- Sei ermutigend aber konstruktiv kritisch`;
+                break;
+            case 'grammar':
+                systemPrompt = `Du bist ein Experte für deutsche Medizinsprache. Beantworte Fragen zur Grammatik, zu Satzstrukturen und sprachlichen Besonderheiten im medizinischen Deutsch. Antworte auf Rumänisch und gib klare Beispiele.`;
+                break;
+            case 'terms':
+                systemPrompt = `Du bist ein medizinisches Wörterbuch und Terminologie-Experte. Erkläre medizinische Begriffe, gib Synonyme und übersetze zwischen Rumänisch und Deutsch. Antworte auf Rumänisch mit klaren Definitionen und Beispielen.`;
+                break;
+            case 'correction': 
+                systemPrompt = `Du bist ein Korrektor für medizinische Texte. Korrigiere deutsche medizinische Texte, verbessere den Stil und erkläre die Änderungen auf Rumänisch. Gib sowohl die korrigierte Version als auch Erklärungen für die Verbesserungen.`;
+                break;
+        }
+
+        const fullHistory = [...history, { role: "user", parts: [{ text: currentPrompt }] }];
+        const apiHistory = [
+            { role: "user", parts: [{ text: systemPrompt }] },
+            { role: "model", parts: [{ text: "Verstanden. Wie kann ich dir helfen?" }] },
+            ...fullHistory
+        ];
+
+        try {
+            const payload = { contents: apiHistory };
+            const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates.length > 0) {
+                const newResponse = result.candidates[0].content;
+                setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, newResponse]);
+            } else {
+                setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "Scuze, nu pot răspunde acum." }] }]);
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            setHistory(prev => [...prev, { role: "user", parts: [{ text: currentPrompt }] }, { role: 'model', parts: [{ text: "A apărut o eroare. Vă rog să încercați din nou." }] }]);
+        } finally {
+            setLoading(false);
+            setPrompt('');
+        }
+    };
+
+    const handleSend = () => {
+        if (prompt.trim() && !loading) {
+            callGeminiAPI(prompt.trim(), 'case');
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                
+                <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
+                    <MessageCircle className="text-blue-600"/> Tutor FSP AI
+                </h2>
+
+                {view === 'menu' && (
+                    <div className="flex-grow overflow-y-auto">
+                        <p className="text-gray-600 text-center mb-6">Alege modul de pregătire pentru examenul Fachsprachprüfung:</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {menuOptions.map(option => (
+                                <button
+                                    key={option.id}
+                                    onClick={() => handleMenuSelect(option.id)}
+                                    className="text-left bg-blue-50 hover:bg-blue-100 border border-blue-200 p-4 rounded-lg transition-all duration-200 hover:shadow-md"
+                                >
+                                    <h3 className="font-bold text-blue-800 mb-2">{option.title}</h3>
+                                    <p className="text-blue-600 text-sm">{option.description}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {view === 'chat' && (
+                    <div className="flex flex-col flex-grow min-h-0">
+                        <div className="flex items-center mb-4">
+                            <button onClick={() => setView('menu')} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                                <ChevronLeft size={24} />
+                            </button>
+                            <h3 className="text-lg font-semibold">Sesiune de Pregătire FSP</h3>
+                        </div>
+                        
+                        <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4 border">
+                            {history.map((msg, index) => (
+                                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
+                                    <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'}`}>
+                                        <div className="whitespace-pre-wrap">{msg.parts[0].text}</div>
+                                    </div>
+                                </div>
+                            ))}
+                            {loading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-white text-gray-800 border">Se gândește...</div></div>}
+                            <div ref={chatEndRef} />
+                        </div>
+                        
+                        <div className="flex items-center">
+                            <input
+                                type="text"
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
+                                className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Scrie mesajul tău aici..."
+                            />
+                            <button onClick={handleSend} disabled={loading} className="bg-blue-600 text-white p-3 rounded-r-lg hover:bg-blue-700 disabled:bg-blue-400">
+                                <Send />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- Email Generator Modal ---
+const GeminiEmailModal = ({ onClose }) => {
+    const [view, setView] = useState('menu');
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [result, setResult] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const emailTemplates = [
+        { id: 'status', title: 'Solicitare Status Cerere', description: 'Întreabă despre stadiul dosarului tău de Approbation' },
+        { id: 'appointment', title: 'Programare FSP', description: 'Solicită o programare pentru examenul FSP' },
+        { id: 'documents', title: 'Întrebări despre Documente', description: 'Clarifică cerințele documentare' },
+        { id: 'correction', title: 'Corectare Date Personale', description: 'Corectează informații din dosar' }
+    ];
+
+    const getFormFields = (templateId) => {
+        const commonFields = [
+            { key: 'name', label: 'Numele tău complet', type: 'text', required: true },
+            { key: 'email', label: 'Adresa ta de email', type: 'email', required: true },
+            { key: 'authority', label: 'Numele autorității (ex: Landesärztekammer Bayern)', type: 'text', required: true }
+        ];
+
+        switch(templateId) {
+            case 'status':
+                return [...commonFields, 
+                    { key: 'applicationNumber', label: 'Numărul dosarului (dacă îl ai)', type: 'text', required: false },
+                    { key: 'applicationDate', label: 'Data depunerii cererii', type: 'date', required: true }
+                ];
+            case 'appointment':
+                return [...commonFields,
+                    { key: 'examType', label: 'Tipul examenului (FSP/KP)', type: 'text', required: true },
+                    { key: 'preferredDates', label: 'Perioada preferată', type: 'text', required: false }
+                ];
+            case 'documents':
+                return [...commonFields,
+                    { key: 'specificQuestion', label: 'Întrebarea ta specifică', type: 'textarea', required: true }
+                ];
+            case 'correction':
+                return [...commonFields,
+                    { key: 'errorDescription', label: 'Descrierea erorii', type: 'textarea', required: true },
+                    { key: 'correctInformation', label: 'Informația corectă', type: 'textarea', required: true }
+                ];
+            default:
+                return commonFields;
+        }
+    };
+
+    const handleTemplateSelect = (template) => {
+        setSelectedTemplate(template);
+        setView('form');
+        setFormData({});
+    };
+
+    const handleInputChange = (key, value) => {
+        setFormData(prev => ({ ...prev, [key]: value }));
+    };
+
+    const generateEmail = async () => {
+        setLoading(true);
+        
+        const prompt = `Du bist ein Experte für offizielle Korrespondenz mit deutschen Behörden im Gesundheitswesen. Erstelle einen professionellen, höflichen und präzisen E-Mail-Text auf Deutsch.
+
+Template-Typ: ${selectedTemplate.title}
+Empfänger: ${formData.authority || 'Deutsche Behörde'}
+Absender: ${formData.name || 'Antragsteller'}
+
+Weitere Informationen:
+${Object.entries(formData).map(([key, value]) => `${key}: ${value}`).join('\n')}
+
+Anforderungen:
+1. Formeller, respektvoller Ton
+2. Klare Struktur mit Betreff, Anrede, Inhalt, Schluss
+3. Korrekte deutsche Grammatik und Rechtschreibung
+4. Präzise und konkrete Formulierungen
+5. Angemessene Höflichkeitsformen
+
+Bitte erstelle die komplette E-Mail inklusive Betreff.`;
+
+        try {
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const apiResult = await response.json();
+            
+            if (apiResult.candidates && apiResult.candidates.length > 0) {
+                setResult(apiResult.candidates[0].content.parts[0].text);
+                setView('result');
+            } else {
+                alert("Nu am putut genera emailul. Încercați din nou.");
+            }
+        } catch (error) {
+            console.error("Error generating email:", error);
+            alert("A apărut o eroare. Verificați conexiunea și încercați din nou.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                
+                <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
+                    <Mail className="text-green-600"/> Generator Email AI
+                </h2>
+
+                {view === 'menu' && (
+                    <div className="flex-grow overflow-y-auto">
+                        <p className="text-gray-600 text-center mb-6">Alege tipul de email pe care vrei să-l generez:</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {emailTemplates.map(template => (
+                                <button
+                                    key={template.id}
+                                    onClick={() => handleTemplateSelect(template)}
+                                    className="text-left bg-green-50 hover:bg-green-100 border border-green-200 p-4 rounded-lg transition-all duration-200 hover:shadow-md"
+                                >
+                                    <h3 className="font-bold text-green-800 mb-2">{template.title}</h3>
+                                    <p className="text-green-600 text-sm">{template.description}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {view === 'form' && selectedTemplate && (
+                    <div className="flex flex-col flex-grow min-h-0">
+                        <div className="flex items-center mb-4">
+                            <button onClick={() => setView('menu')} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                                <ChevronLeft size={24} />
+                            </button>
+                            <h3 className="text-lg font-semibold">{selectedTemplate.title}</h3>
+                        </div>
+                        
+                        <div className="flex-grow overflow-y-auto mb-4">
+                            <div className="space-y-4">
+                                {getFormFields(selectedTemplate.id).map(field => (
+                                    <div key={field.key}>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {field.label} {field.required && <span className="text-red-500">*</span>}
+                                        </label>
+                                        {field.type === 'textarea' ? (
+                                            <textarea
+                                                value={formData[field.key] || ''}
+                                                onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                                rows="3"
+                                            />
+                                        ) : (
+                                            <input
+                                                type={field.type}
+                                                value={formData[field.key] || ''}
+                                                onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <button 
+                            onClick={generateEmail} 
+                            disabled={loading}
+                            className="w-full bg-green-600 text-white font-bold p-3 rounded-lg hover:bg-green-700 disabled:bg-green-400 flex items-center justify-center gap-2"
+                        >
+                            {loading ? <RefreshCw className="animate-spin" size={20} /> : <Sparkles size={20} />}
+                            {loading ? 'Generez emailul...' : 'Generează Email'}
+                        </button>
+                    </div>
+                )}
+
+                {view === 'result' && (
+                    <div className="flex flex-col flex-grow min-h-0">
+                        <div className="flex items-center mb-4">
+                            <button onClick={() => setView('form')} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                                <ChevronLeft size={24} />
+                            </button>
+                            <h3 className="text-lg font-semibold">Email Generat</h3>
+                        </div>
+                        
+                        <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4 border">
+                            <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">{result}</pre>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => navigator.clipboard.writeText(result)}
+                                className="flex-1 bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                            >
+                                <Clipboard size={20} /> Copiază
+                            </button>
+                            <button 
+                                onClick={() => setView('menu')}
+                                className="flex-1 bg-gray-600 text-white font-bold p-3 rounded-lg hover:bg-gray-700"
+                            >
+                                Email Nou
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- Step Node Component ---
+const StepNode = ({ step, position, onStepClick, isCurrent }) => {
+    const getStatusStyles = () => {
+        switch (step.status) {
+            case 'completed':
+                return 'bg-green-500 text-white hover:bg-green-600 cursor-pointer';
+            case 'unlocked':
+                return `bg-blue-500 text-white hover:bg-blue-600 cursor-pointer ${isCurrent ? 'animate-pulse-strong' : ''}`;
+            case 'locked':
+            default:
+                return 'bg-gray-400 text-gray-200 cursor-not-allowed';
+        }
+    };
+
+    const getIcon = () => {
+        if (step.status === 'completed') return <Check size={24} />;
+        if (step.status === 'locked') return <Lock size={20} />;
+        return <step.icon size={20} />;
+    };
+
+    return (
+        <g>
+            <circle
+                cx={position.x}
+                cy={position.y}
+                r="30"
+                className={`transition-all duration-300 hover:r-32 ${getStatusStyles()}`}
+                onClick={() => onStepClick(step)}
+                style={{ cursor: step.status !== 'locked' ? 'pointer' : 'not-allowed' }}
+            />
+            <foreignObject x={position.x - 12} y={position.y - 12} width="24" height="24">
+                <div className="flex items-center justify-center w-full h-full">
+                    {getIcon()}
+                </div>
+            </foreignObject>
+            {(step.status === 'unlocked' || step.status === 'completed') && (
+                <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-700 text-sm font-semibold">
+                    {step.title}
+                </text>
+            )}
+        </g>
+    );
+};
+
+// --- Bonus Node Component ---
+const BonusNode = ({ node, onClick }) => {
+    return (
+        <button
+            onClick={() => onClick(node.action)}
+            className="fixed w-14 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+            style={node.position}
+            title={node.title}
+        >
+            <node.icon size={24} />
+            <span className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                {node.title}
+            </span>
+        </button>
+    );
+};
+
+// --- Step Modal Component ---
+const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
+    if (!step) return null;
+
+    const allTasksCompleted = step.tasks.every(task => task.completed);
+    const completedTasks = step.tasks.filter(task => task.completed).length;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-fast">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
+                    <X size={28} />
+                </button>
+
+                <div className="flex items-center gap-4 mb-6">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center ${allTasksCompleted ? 'bg-green-500' : 'bg-blue-500'} text-white`}>
+                        {allTasksCompleted ? <Check size={28} /> : <step.icon size={28} />}
+                    </div>
+                    <div>
+                        <h2 className="text-2xl md:text-3xl font-bold">{step.title}</h2>
+                        <p className="text-gray-600 mt-1">{step.description}</p>
+                    </div>
+                </div>
+
+                <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-semibold text-gray-600">Progres</span>
+                        <span className="text-sm font-semibold text-gray-600">{completedTasks}/{step.tasks.length}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                            className="bg-green-500 h-3 rounded-full transition-all duration-500"
+                            style={{ width: `${(completedTasks / step.tasks.length) * 100}%` }}
+                        ></div>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <h3 className="text-xl font-bold">Sarcini:</h3>
+                    {step.tasks.map(task => (
+                        <div key={task.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                            <input
+                                type="checkbox"
+                                checked={task.completed}
+                                onChange={() => onTaskToggle(step.id, task.id)}
+                                disabled={task.action && !task.viewed}
+                                className="mt-1 w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <div className="flex-grow">
+                                <p className={`${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                                    {task.text}
+                                </p>
+                                {task.action && (
+                                    <button
+                                        onClick={() => onActionClick(task.action, step.id, task.id)}
+                                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                                    >
+                                        <Info size={16} />
+                                        {task.viewed ? 'Vezi din nou' : 'Vezi detalii'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {allTasksCompleted && (
+                    <div className="mt-6 p-4 bg-green-100 border border-green-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-green-800">
+                            <Check size={20} />
+                            <span className="font-semibold">Felicitări! Ai completat acest pas.</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- Content Modal Component ---
+const ContentModal = ({ content, onClose }) => {
+    if (!content) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-fast">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
+                    <X size={28} />
+                </button>
+                
+                <h2 className="text-2xl md:text-3xl font-bold mb-6">{content.title}</h2>
+                
+                <div className="text-gray-700 leading-relaxed">
+                    {content.body}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Decorative Cloud Component ---
+const Cloud = ({ style }) => (
+    <div className="absolute bg-white/80 rounded-full" style={style}></div>
+);
+
+// --- Main Application Component ---
+export default function App() {
+    const [steps, setSteps] = useState(initialStepsData);
+    const [selectedStep, setSelectedStep] = useState(null);
+    const [activeContent, setActiveContent] = useState(null);
+    const [activeGeminiModal, setActiveGeminiModal] = useState(null);
+    const [personalFileModalOpen, setPersonalFileModalOpen] = useState(false);
+    const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
+    const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
+    const [freeMode, setFreeMode] = useState(false);
+    const [confettiKey, setConfettiKey] = useState(null);
+
+    useEffect(() => {
+        let loadedSteps = initialStepsData.map(step => {
+            const savedStep = JSON.parse(localStorage.getItem(`step_${step.id}`) || 'null');
+            return savedStep ? { ...step, ...savedStep } : { ...step, tasks: step.tasks.map(t => ({...t, completed: false, viewed: false})) };
+        });
+        setSteps(loadedSteps);
+    }, []);
+
+    const displayedSteps = useMemo(() => {
+        let currentSteps = steps.map(s => ({ ...s }));
+        if (freeMode) {
+            return currentSteps.map((s, i) => ({ ...s, status: 'unlocked', icon: initialStepsData[i].icon }));
+        }
+        
+        let lockNext = false;
+        currentSteps.forEach((step, index) => {
+            const allTasksCompleted = step.tasks.every(t => t.completed);
+            
+            if (index === 0) {
+                step.status = allTasksCompleted ? 'completed' : 'unlocked';
+            } else {
+                const prevStep = currentSteps[index - 1];
+                if (prevStep.status === 'completed') {
+                    step.status = allTasksCompleted ? 'completed' : 'unlocked';
+                } else {
+                    step.status = 'locked';
+                }
+            }
+            if (step.status !== 'completed' && !lockNext) {
+                lockNext = true;
+            }
+            if (lockNext) {
+                 for(let j = index + 1; j < currentSteps.length; j++) {
+                    currentSteps[j].status = 'locked';
+                }
+            }
+        });
+
+        return currentSteps.map((step, index) => ({...step, icon: initialStepsData[index].icon}));
+    }, [freeMode, steps]);
+
+    const handleTaskToggle = (stepId, taskId) => {
+        const oldStep = steps.find(s => s.id === stepId);
+        const wasCompleted = oldStep.tasks.every(t => t.completed);
+
+        const newSteps = steps.map(step => {
+            if (step.id === stepId) {
+                const newTasks = step.tasks.map((task) => {
+                    if (task.id === taskId) {
+                        return { ...task, completed: !task.completed };
+                    }
+                    return task;
+                });
+                const updatedStep = { ...step, tasks: newTasks };
+                localStorage.setItem(`step_${step.id}`, JSON.stringify(updatedStep));
+                if (selectedStep && selectedStep.id === stepId) {
+                    setSelectedStep(updatedStep);
+                }
+                return updatedStep;
+            }
+            return step;
+        });
+        setSteps(newSteps);
+        
+        // Check if step was just completed
+        const newStep = newSteps.find(s => s.id === stepId);
+        const isNowCompleted = newStep.tasks.every(t => t.completed);
+
+        if (!wasCompleted && isNowCompleted) {
+            setConfettiKey(Date.now()); // Trigger confetti
+        }
+    };
+
+    const handleActionClick = (action, stepId, taskId) => {
+        if (action.type === 'personal_file') { 
+            setPersonalFileModalOpen(true); 
+            return; 
+        }
+
+        if (stepId && taskId) {
+            setSteps(prevSteps => {
+                const newSteps = prevSteps.map(step => {
+                    if (step.id === stepId) {
+                        const newTasks = step.tasks.map(task => 
+                            task.id === taskId ? { ...task, viewed: true } : task
+                        );
+                        const updatedStep = { ...step, tasks: newTasks };
+                        localStorage.setItem(`step_${stepId}`, JSON.stringify(updatedStep));
+                        if (selectedStep && selectedStep.id === stepId) {
+                            setSelectedStep(updatedStep);
+                        }
+                        return updatedStep;
+                    }
+                    return step;
+                });
+                return newSteps;
+            });
+        }
+
+        if (action.type === 'link') { 
+            window.open(action.content, '_blank', 'noopener,noreferrer'); 
+        } else if (action.type === 'modal') { 
+            setActiveContent(action.content); 
+        } else if (action.type === 'gemini_fsp_tutor') { 
+            setActiveGeminiModal('fsp_tutor'); 
+        } else if (action.type === 'gemini_email_generator') { 
+            setActiveGeminiModal('email_generator'); 
+        } else if (action.type === 'gemini_land_recommender') { 
+            setRecommenderModalOpen(true); 
+        } else if (action.type === 'info_hub') { 
+            setInfoHubModalOpen(true); 
+        }
+    };
+
+    const handleStepClick = (step) => {
+        if (step.status !== 'locked') {
+            const originalStepData = initialStepsData.find(s => s.id === step.id);
+            const stepWithIcons = {...step, icon: originalStepData.icon };
+            setSelectedStep(stepWithIcons);
+        }
+    };
+
+    const closeModal = () => setSelectedStep(null);
+    const closeContentModal = () => setActiveContent(null);
+    const closeGeminiModal = () => setActiveGeminiModal(null);
+    const closeRecommenderModal = () => setRecommenderModalOpen(false);
+    const closeInfoHubModal = () => setInfoHubModalOpen(false);
+
+    const currentStep = displayedSteps.find(step => step.status === 'unlocked');
+    const progressPercentage = (steps.filter(s => s.tasks.every(t => t.completed)).length / steps.length) * 100;
+
+    return (
+        <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen p-4 sm:p-6 lg:p-8 overflow-hidden">
+            {confettiKey && <Confetti key={confettiKey} />}
+            
+            <button 
+                onClick={() => setPersonalFileModalOpen(true)}
+                className="fixed top-4 right-4 z-40 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
+                title="Dosarul Meu Personal"
+            >
+                <FolderKanban size={28} />
+            </button>
+            
+            <div className="fixed bottom-4 right-4 z-40 flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
+                <span className={`text-sm font-bold ${!freeMode ? 'text-blue-600' : 'text-gray-500'}`}>Progresiv</span>
+                <button onClick={() => setFreeMode(!freeMode)} className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${freeMode ? 'bg-green-500' : 'bg-gray-300'}`}>
+                    <span className={`block w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${freeMode ? 'translate-x-6' : 'translate-x-0'}`}></span>
+                </button>
+                <span className={`text-sm font-bold ${freeMode ? 'text-green-600' : 'text-gray-500'}`}>Liber</span>
+            </div>
+
+            <div className="max-w-md mx-auto relative">
+                <header className="text-center mb-6 bg-white/70 backdrop-blur-sm p-4 rounded-xl shadow-md">
+                    <h1 className="text-3xl md:text-4xl font-black text-gray-800">Approbation în Germania</h1>
+                    <p className="text-gray-500 mt-1">Ghidul tău interactiv pas cu pas.</p>
+                    <div className="w-full bg-gray-200 rounded-full h-4 mt-4 overflow-hidden border border-gray-300">
+                        <div className="bg-green-500 h-4 rounded-full transition-all duration-500" style={{ width: `${progressPercentage}%` }}></div>
+                    </div>
+                </header>
+                
+                <main className="relative w-full aspect-[9/16] md:aspect-[3/4]">
+                    <Cloud style={{ top: '5%', left: '10%', width: '100px', height: '100px' }} />
+                    <Cloud style={{ top: '60%', right: '5%', width: '80px', height: '80px' }} />
+                    
+                    <svg width="100%" height="100%" viewBox="0 0 400 700" preserveAspectRatio="xMidYMin meet" className="absolute top-0 left-0">
+                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 440 335, 160 385 T 240 525 Q 320 595, 140 644" stroke="#d6a770" strokeWidth="12" fill="none" strokeLinecap="round" />
+                        <path d="M 200 70 Q 120 125, 120 175 T 280 280 Q 440 335, 160 385 T 240 525 Q 320 595, 140 644" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" strokeDasharray="1 15" />
+                    </svg>
+                    
+                    {displayedSteps.map((step, index) => ( 
+                        <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} /> 
+                    ))}
+                    
+                    {bonusNodes.map(node => <BonusNode key={node.id} node={node} onClick={handleActionClick} />)}
+                </main>
+            </div>
+            
+            <StepModal step={selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
+            <ContentModal content={activeContent} onClose={closeContentModal} />
+            {activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
+            {activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
+            {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
+            <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
+            <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
+        </div>
+    );
+}
