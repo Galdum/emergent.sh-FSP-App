@@ -1008,7 +1008,27 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
 
                     {/* Right Column: Chatbot */}
                     <div className="flex flex-col bg-gray-200 p-4 rounded-lg min-h-0">
-                         <h3 className="text-lg font-bold mb-3 flex items-center flex-shrink-0 text-gray-700"><Sparkles className="text-purple-600 mr-2"/> Asistent Approbation</h3>
+                         <h3 className="text-lg font-bold mb-3 flex items-center flex-shrink-0 text-gray-700">
+                             <Sparkles className="text-purple-600 mr-2"/> 
+                             Asistent Approbation
+                             {!hasAIAccess() && <Lock className="h-4 w-4 ml-2 text-gray-500" />}
+                         </h3>
+                         
+                         {!hasAIAccess() ? (
+                             <div className="flex-grow bg-gray-100 rounded-lg p-6 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center">
+                                 <Lock className="h-12 w-12 text-gray-400 mb-3" />
+                                 <h4 className="text-lg font-semibold text-gray-700 mb-2">Funcție Premium</h4>
+                                 <p className="text-gray-500 mb-4 text-sm">
+                                     Asistentul AI cu analiză de documente este disponibil doar pentru utilizatorii Premium.
+                                 </p>
+                                 <button
+                                     onClick={() => setSubscriptionUpgradeOpen(true)}
+                                     className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                                 >
+                                     Upgrade la Premium
+                                 </button>
+                             </div>
+                         ) : (
                          <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300">
                             {history.map((msg, index) => (
                                  <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
@@ -1017,7 +1037,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                      </div>
                                  </div>
                              ))}
-                             {chatLoading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-gray-100 text-gray-800">...</div></div>}
+                             {chatLoading && <div className="text-center"><div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-600 border-t-transparent mx-auto"></div></div>}
                              <div ref={chatEndRef} />
                          </div>
                          
