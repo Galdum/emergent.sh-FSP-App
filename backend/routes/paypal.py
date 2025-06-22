@@ -235,11 +235,19 @@ async def cancel_subscription(
         user = await db.users.find_one({"id": user_id})
         
         if not user or user.get("subscription_provider") != "paypal":
-            raise HTTPException(status_code=404, detail="No active PayPal subscription found")
+            return {
+                "success": False,
+                "message": "No active PayPal subscription found",
+                "tier": user.get("subscription_tier", "FREE") if user else "FREE"
+            }
         
         agreement_id = user.get("paypal_agreement_id")
         if not agreement_id:
-            raise HTTPException(status_code=404, detail="PayPal agreement ID not found")
+            return {
+                "success": False,
+                "message": "PayPal agreement ID not found",
+                "tier": user.get("subscription_tier", "FREE")
+            }
         
         # Cancel the billing agreement
         billing_agreement = paypalrestsdk.BillingAgreement.find(agreement_id)
