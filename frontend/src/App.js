@@ -1948,14 +1948,27 @@ Erstelle die komplette E-Mail. Sie soll perfekt korrekt sein, aber menschlich un
                                             <textarea
                                                 value={formData[field.key] || ''}
                                                 onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                placeholder={field.placeholder || ''}
                                                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                                 rows="3"
                                             />
+                                        ) : field.type === 'select' ? (
+                                            <select
+                                                value={formData[field.key] || ''}
+                                                onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            >
+                                                <option value="">Selectează o opțiune...</option>
+                                                {field.options.map(option => (
+                                                    <option key={option} value={option}>{option}</option>
+                                                ))}
+                                            </select>
                                         ) : (
                                             <input
                                                 type={field.type}
                                                 value={formData[field.key] || ''}
                                                 onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                placeholder={field.placeholder || ''}
                                                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                             />
                                         )}
