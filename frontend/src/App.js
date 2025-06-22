@@ -1388,13 +1388,17 @@ Bitte erstelle die komplette E-Mail inklusive Betreff.`;
 };
 
 // --- Step Node Component ---
-const StepNode = ({ step, position, onStepClick, isCurrent }) => {
+const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
     const getStatusStyles = () => {
+        if (!isAccessible) {
+            return 'fill-gray-300 cursor-not-allowed';
+        }
+        
         switch (step.status) {
             case 'completed':
                 return 'fill-green-500 hover:fill-green-600 cursor-pointer';
             case 'unlocked':
-                return `fill-blue-500 hover:fill-blue-600 cursor-pointer ${isCurrent ? 'animate-pulse-strong' : ''}`;
+                return 'fill-blue-500 hover:fill-blue-600 cursor-pointer';
             case 'locked':
             default:
                 return 'fill-gray-400 cursor-not-allowed';
@@ -1403,11 +1407,13 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
 
     const getIcon = () => {
         if (step.status === 'completed') return <Check size={24} />;
-        if (step.status === 'locked') return <Lock size={20} />;
+        if (step.status === 'locked' || !isAccessible) return <Lock size={20} />;
         return <step.icon size={20} />;
     };
 
     const getIconColor = () => {
+        if (!isAccessible) return 'text-gray-400';
+        
         switch (step.status) {
             case 'completed':
                 return 'text-white';
@@ -1419,6 +1425,12 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
         }
     };
 
+    const handleClick = () => {
+        if (isAccessible && step.status !== 'locked') {
+            onStepClick(step);
+        }
+    };
+
     return (
         <g>
             {/* Larger invisible clickable area */}
@@ -1427,8 +1439,8 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
                 cy={position.y}
                 r="40"
                 className="fill-transparent cursor-pointer"
-                onClick={() => step.status !== 'locked' && onStepClick(step)}
-                style={{ cursor: step.status !== 'locked' ? 'pointer' : 'not-allowed' }}
+                onClick={handleClick}
+                style={{ cursor: (isAccessible && step.status !== 'locked') ? 'pointer' : 'not-allowed' }}
             />
             {/* Visible circle */}
             <circle
@@ -1443,9 +1455,14 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
                     {getIcon()}
                 </div>
             </foreignObject>
-            {(step.status === 'unlocked' || step.status === 'completed') && (
+            {((step.status === 'unlocked' || step.status === 'completed') && isAccessible) && (
                 <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-700 text-sm font-semibold pointer-events-none">
                     {step.title}
+                </text>
+            )}
+            {!isAccessible && (
+                <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-400 text-xs font-semibold pointer-events-none">
+                    Premium
                 </text>
             )}
         </g>
@@ -1453,7 +1470,13 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
 };
 
 // --- Bonus Node Component ---
-const BonusNode = ({ node, onClick }) => {
+const BonusNode = ({ node, onClick, isAccessible }) => {
+    const handleClick = () => {
+        if (isAccessible) {
+            onClick(node.action);
+        }
+    };
+
     return (
         <g>
             {/* Larger invisible clickable area */}
@@ -1462,24 +1485,40 @@ const BonusNode = ({ node, onClick }) => {
                 cy={node.position.y}
                 r="35"
                 className="fill-transparent cursor-pointer"
-                onClick={() => onClick(node.action)}
+                onClick={handleClick}
+                style={{ cursor: isAccessible ? 'pointer' : 'not-allowed' }}
             />
             {/* Visible circle */}
             <circle
                 cx={node.position.x}
                 cy={node.position.y}
                 r="25"
-                className="fill-orange-500 hover:fill-orange-600 transition-all duration-300"
+                className={`transition-all duration-300 ${
+                    isAccessible 
+                        ? 'fill-orange-500 hover:fill-orange-600' 
+                        : 'fill-gray-300'
+                }`}
                 style={{ pointerEvents: 'none' }}
             />
             <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
-                <div className="flex items-center justify-center w-full h-full text-white">
+                <div className={`flex items-center justify-center w-full h-full ${isAccessible ? 'text-white' : 'text-gray-400'}`}>
                     <node.icon size={20} />
                 </div>
             </foreignObject>
-            <text x={node.position.x} y={node.position.y + 40} textAnchor="middle" className="fill-gray-700 text-xs font-semibold pointer-events-none">
-                {node.title}
+            <text x={node.position.x} y={node.position.y + 40} textAnchor="middle" className={`text-xs font-semibold pointer-events-none ${isAccessible ? 'fill-gray-700' : 'fill-gray-400'}`}>
+                {isAccessible ? node.title : 'Premium'}
             </text>
+            {!isAccessible && (
+                <Lock 
+                    size={12} 
+                    className="pointer-events-none text-gray-400" 
+                    style={{ 
+                        position: 'absolute', 
+                        left: node.position.x + 15, 
+                        top: node.position.y - 15 
+                    }} 
+                />
+            )}
         </g>
     );
 };
