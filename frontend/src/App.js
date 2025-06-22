@@ -1019,8 +1019,46 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                              {chatLoading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-gray-100 text-gray-800">...</div></div>}
                              <div ref={chatEndRef} />
                          </div>
+                         
+                         {/* Image Upload Section */}
+                         <input
+                             type="file"
+                             ref={imageInputRef}
+                             onChange={handleImageUpload}
+                             accept="image/*,application/pdf"
+                             className="hidden"
+                         />
+                         
+                         {/* Display uploaded images */}
+                         {uploadedImages.length > 0 && (
+                             <div className="mb-3 flex flex-wrap gap-2">
+                                 {uploadedImages.map(image => (
+                                     <div key={image.id} className="relative bg-gray-100 p-2 rounded-lg border">
+                                         <div className="flex items-center gap-2">
+                                             <ImageIcon className="h-4 w-4 text-blue-600" />
+                                             <span className="text-sm text-gray-700 truncate max-w-[120px]">{image.name}</span>
+                                             <button
+                                                 onClick={() => handleImageRemove(image.id)}
+                                                 className="text-red-500 hover:text-red-700"
+                                             >
+                                                 <X className="h-4 w-4" />
+                                             </button>
+                                         </div>
+                                     </div>
+                                 ))}
+                             </div>
+                         )}
+                         
                          <div className="flex items-center flex-shrink-0">
-                             <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare..." />
+                             <button
+                                 onClick={() => imageInputRef.current?.click()}
+                                 disabled={uploadingImage}
+                                 className="bg-gray-500 text-white p-3 border hover:bg-gray-600 disabled:bg-gray-400 flex items-center justify-center"
+                                 title="Adaugă imagine sau document"
+                             >
+                                 {uploadingImage ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+                             </button>
+                             <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare sau încarcă o imagine..." />
                              <button onClick={handleSend} disabled={chatLoading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
                          </div>
                     </div>
