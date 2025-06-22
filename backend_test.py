@@ -846,6 +846,10 @@ def test_paypal_cancel_subscription():
     """Test the POST /paypal/cancel-subscription endpoint."""
     global auth_token
     
+    # Ensure we have an auth token
+    if not auth_token:
+        test_login()
+    
     if not auth_token:
         print_test_result("Cancel PayPal Subscription", False, error="No auth token available. Login first.")
         return False
@@ -857,6 +861,8 @@ def test_paypal_cancel_subscription():
             f"{API_URL}/paypal/cancel-subscription",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
+        
+        print(f"PayPal Cancel Subscription Response: {response.status_code} {response.text}")
         
         # Either we successfully cancel or get a 404 because there's no subscription
         success = response.status_code in [200, 404]
