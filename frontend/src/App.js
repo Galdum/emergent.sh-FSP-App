@@ -2391,6 +2391,8 @@ const AppContent = () => {
             setRecommenderModalOpen(true); 
         } else if (action.type === 'info_hub') { 
             setInfoHubModalOpen(true); 
+        } else if (action.type === 'leaderboard') { 
+            setLeaderboardModalOpen(true); 
         }
     };
 
