@@ -185,6 +185,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "GET and POST /files endpoints are working correctly with authentication. File creation and retrieval are functioning properly."
+  - task: "Subscription"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/subscription.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "GET /subscription endpoint is working correctly with authentication. User subscription information is returned properly."
+        
   - task: "PayPal Integration"
     implemented: true
     working: true
