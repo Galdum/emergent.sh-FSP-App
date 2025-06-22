@@ -2113,7 +2113,7 @@ const Cloud = ({ style }) => (
 // --- Main Application Component with Authentication Integration ---
 const AppContent = () => {
     const { isAuthenticated, user, logout } = useAuth();
-    const { canAccessStep, canAccessOrangeNode, hasAIAccess, subscriptionTier } = useSubscription();
+    const { canAccessStep, canAccessOrangeNode, hasAIAccess, subscriptionTier, SUBSCRIPTION_TIERS } = useSubscription();
     const { updateTaskProgress, getTaskProgress, isStepUnlocked } = useProgress();
     
     const [steps, setSteps] = useState(initialStepsData);
