@@ -28,23 +28,11 @@ const Confetti = () => {
     const colors = ['#fde196', '#fdb497', '#F7941D', '#27AAE1', '#a3d4f4', '#81c784'];
     
     useEffect(() => {
-        // Check if user has accepted GDPR consent
-        const gdprConsent = localStorage.getItem('gdpr_consent');
-        if (!gdprConsent) {
-            setGdprConsentOpen(true);
-        }
+        const timer = setTimeout(() => {
+            // Component will unmount itself after 4 seconds
+        }, 4000);
+        return () => clearTimeout(timer);
     }, []);
-
-    const handleGDPRAccept = (consentData) => {
-        console.log('GDPR consent accepted:', consentData);
-        setGdprConsentOpen(false);
-    };
-
-    const handleGDPRDecline = () => {
-        // Redirect user away or show alternative message
-        alert('Pentru a utiliza FSP Navigator, trebuie să acceptați termenii și condițiile de utilizare.');
-        window.location.href = 'https://google.com';
-    };
 
     return (
         <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
