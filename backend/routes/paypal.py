@@ -54,6 +54,9 @@ async def create_paypal_subscription(
     db = Depends(get_database)
 ):
     try:
+        # Convert current_user to dict if it's not already
+        user_id = current_user.id if hasattr(current_user, 'id') else current_user["id"]
+        
         if request.plan_type not in SUBSCRIPTION_PLANS:
             raise HTTPException(status_code=400, detail="Invalid plan type")
         
