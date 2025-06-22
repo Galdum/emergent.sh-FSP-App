@@ -2260,6 +2260,13 @@ const AppContent = () => {
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
     const [freeMode, setFreeMode] = useState(false);
+    
+    // Gamification states
+    const [userStats, setUserStats] = useState(gamificationManager.getUserStats());
+    const [showProgress, setShowProgress] = useState(false);
+    const [activeQuiz, setActiveQuiz] = useState(null);
+    const [achievements, setAchievements] = useState([]);
+    const [pointsAnimation, setPointsAnimation] = useState(null);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
