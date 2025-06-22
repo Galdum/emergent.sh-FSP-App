@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Check, Lock, Rocket, FileText, UserPlus, Send, Target, X, Clock, Users, ArrowRight, Info, BookOpen, MessageCircle, Youtube, Star, Sparkles, Clipboard, Mail, RefreshCw, ChevronLeft, FolderKanban, Upload, FileCheck2, PencilRuler, Compass, Link as LinkIcon, StickyNote, Trash2, PlusCircle } from 'lucide-react';
+import { Check, Lock, Rocket, FileText, UserPlus, Send, Target, X, Clock, Users, ArrowRight, Info, BookOpen, MessageCircle, Youtube, Star, Sparkles, Clipboard, Mail, RefreshCw, ChevronLeft, FolderKanban, Upload, FileCheck2, PencilRuler, Compass, Link as LinkIcon, StickyNote, Trash2, PlusCircle, User, LogOut } from 'lucide-react';
 import './App.css';
+
+// Import new authentication and API components
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useProgress } from './hooks/useProgress';
+import { usePersonalFiles } from './hooks/usePersonalFiles';
+import { useSubscription } from './hooks/useSubscription';
+import AuthModal from './components/AuthModal';
 
 // --- Confetti Component ---
 const Confetti = () => {
