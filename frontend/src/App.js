@@ -1690,7 +1690,19 @@ export default function App() {
         setSteps(loadedSteps);
     }, []);
 
-    const displayedSteps = useMemo(() => {
+    const getCurrentSubscription = () => SUBSCRIPTION_TIERS[currentTier];
+
+    const isStepAccessible = (stepIndex) => {
+        const subscription = getCurrentSubscription();
+        return stepIndex < subscription.maxSteps;
+    };
+
+    const isBonusNodeAccessible = (nodeIndex) => {
+        const subscription = getCurrentSubscription();
+        return nodeIndex < subscription.maxOrangeNodes;
+    };
+
+    const hasAIAccess = () => getCurrentSubscription().hasAI;
         let currentSteps = steps.map(s => ({ ...s }));
         if (freeMode) {
             return currentSteps.map((s, i) => ({ ...s, status: 'unlocked', icon: initialStepsData[i].icon }));
