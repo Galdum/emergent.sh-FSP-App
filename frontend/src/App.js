@@ -2097,13 +2097,4 @@ export default function App() {
             <AppContent />
         </AuthProvider>
     );
-};
-
-// Main App Component with AuthProvider
-export default function App() {
-    return (
-        <AuthProvider>
-            <AppContent />
-        </AuthProvider>
-    );
 }
