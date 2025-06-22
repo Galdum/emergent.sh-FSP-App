@@ -180,7 +180,7 @@ const infoDocs = [
                     
                     <div className="p-3 bg-gray-50 rounded-lg">
                         <h4 className="font-semibold text-gray-800">7. Easy German – Medizin</h4>
-                        <p className="text-sm">Interviuri cu pacienți reali; >1 mil. subs la Easy German</p>
+                        <p className="text-sm">Interviuri cu pacienți reali; &gt;1 mil. subs la Easy German</p>
                         <a href="https://www.youtube.com/@EasyGerman/search?query=medizin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline text-sm break-all">https://www.youtube.com/@EasyGerman/search?query=medizin</a>
                     </div>
                     
