@@ -479,6 +479,115 @@ const infoDocs = [
                 </div>
             </div>
         )
+    },
+    { 
+        id: 'land-documents', 
+        title: 'Documente specifice per Land',
+        content: (
+            <div className="space-y-6 text-gray-700">
+                <p className="font-bold text-lg">Ghiduri detaliate pentru fiecare Land german cu cerințe specifice și proceduri locale.</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div className="border rounded-lg p-4 bg-blue-50">
+                        <h4 className="font-bold text-blue-700 mb-2">🏛️ Bayern</h4>
+                        <ul className="text-sm space-y-1">
+                            <li>• Cerințe specifice FSP</li>
+                            <li>• Proceduri Landesprüfungsamt</li>
+                            <li>• Timeline și documentația</li>
+                        </ul>
+                        <a href="https://fromsmash.com/FSP-info-utile-per-Land" target="_blank" rel="noopener noreferrer" 
+                           className="text-blue-600 hover:underline text-sm mt-2 inline-block">
+                           📄 Descarcă ghidul Bayern →
+                        </a>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-green-50">
+                        <h4 className="font-bold text-green-700 mb-2">🌊 Baden-Württemberg</h4>
+                        <ul className="text-sm space-y-1">
+                            <li>• Specificități regionale</li>
+                            <li>• Contact autorități</li>
+                            <li>• Cerințe suplimentare</li>
+                        </ul>
+                        <a href="https://fromsmash.com/FSP-info-utile-per-Land" target="_blank" rel="noopener noreferrer" 
+                           className="text-green-600 hover:underline text-sm mt-2 inline-block">
+                           📄 Descarcă ghidul B-W →
+                        </a>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-purple-50">
+                        <h4 className="font-bold text-purple-700 mb-2">🏰 Nordrhein-Westfalen</h4>
+                        <ul className="text-sm space-y-1">
+                            <li>• Proceduri NRW</li>
+                            <li>• Centre de examinare</li>
+                            <li>• Timp de așteptare</li>
+                        </ul>
+                        <a href="https://fromsmash.com/FSP-info-utile-per-Land" target="_blank" rel="noopener noreferrer" 
+                           className="text-purple-600 hover:underline text-sm mt-2 inline-block">
+                           📄 Descarcă ghidul NRW →
+                        </a>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-red-50">
+                        <h4 className="font-bold text-red-700 mb-2">🏙️ Hessen</h4>
+                        <ul className="text-sm space-y-1">
+                            <li>• Frankfurt/Darmstadt</li>
+                            <li>• Cerințe specifice</li>
+                            <li>• Calendarul examenelor</li>
+                        </ul>
+                        <a href="https://fromsmash.com/FSP-info-utile-per-Land" target="_blank" rel="noopener noreferrer" 
+                           className="text-red-600 hover:underline text-sm mt-2 inline-block">
+                           📄 Descarcă ghidul Hessen →
+                        </a>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-yellow-50">
+                        <h4 className="font-bold text-yellow-700 mb-2">⚓ Hamburg</h4>
+                        <ul className="text-sm space-y-1">
+                            <li>• Proceduri în nord</li>
+                            <li>• Particularități locale</li>
+                            <li>• Contacte utile</li>
+                        </ul>
+                        <a href="https://fromsmash.com/FSP-info-utile-per-Land" target="_blank" rel="noopener noreferrer" 
+                           className="text-yellow-600 hover:underline text-sm mt-2 inline-block">
+                           📄 Descarcă ghidul Hamburg →
+                        </a>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-indigo-50">
+                        <h4 className="font-bold text-indigo-700 mb-2">🎭 Alte Länder</h4>
+                        <ul className="text-sm space-y-1">
+                            <li>• Berlin, Sachsen, etc.</li>
+                            <li>• Ghiduri comparative</li>
+                            <li>• Resurse suplimentare</li>
+                        </ul>
+                        <a href="https://fromsmash.com/FSP-info-utile-per-Land" target="_blank" rel="noopener noreferrer" 
+                           className="text-indigo-600 hover:underline text-sm mt-2 inline-block">
+                           📄 Descarcă toate ghidurile →
+                        </a>
+                    </div>
+
+                </div>
+
+                <div className="bg-gray-100 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">💡 Cum să folosești aceste ghiduri:</h4>
+                    <ol className="text-sm space-y-1 list-decimal list-inside">
+                        <li>Alege Land-ul în care vrei să aplici</li>
+                        <li>Descarcă ghidul specific (.docx/.pdf)</li>
+                        <li>Studiază cerințele și procedurile</li>
+                        <li>Pregătește documentația necesară</li>
+                        <li>Contactează autoritățile locale</li>
+                    </ol>
+                </div>
+
+                <div className="bg-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                    <p className="text-blue-800">
+                        <strong>📋 Tip:</strong> Fiecare Land are specificități în proceduri, timpi de așteptare și cerințe suplimentare. 
+                        Aceste ghiduri conțin informații actualizate și contacte directe pentru fiecare regiune.
+                    </p>
+                </div>
+            </div>
+        )
     }
 ];
 
