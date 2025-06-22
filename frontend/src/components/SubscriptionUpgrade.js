@@ -10,6 +10,8 @@ const SubscriptionUpgrade = ({ isOpen, onClose, targetPlan = null }) => {
   const [error, setError] = useState('');
   const [plans, setPlans] = useState({});
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('stripe'); // 'stripe' or 'paypal'
 
   // Load subscription plans
   useEffect(() => {
