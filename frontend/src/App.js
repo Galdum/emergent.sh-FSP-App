@@ -19,6 +19,7 @@ import { gamificationManager } from './utils/gamificationManager';
 import { InteractiveQuiz, sampleQuizzes } from './components/InteractiveQuiz';
 import GamificationProgress from './components/GamificationProgress';
 import LeaderboardModal from './components/LeaderboardModal';
+import EmailVerificationModal from './components/EmailVerificationModal';
 
 // --- Confetti Component ---
 const Confetti = () => {
