@@ -2199,8 +2199,8 @@ const ContentModal = ({ content, onClose, onBackToStep }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
-                // Always go back to step modal, not close completely
-                onBackToStep();
+                // Close current content modal first, then let step modal handle its own closing
+                onClose();
             }
         };
 
