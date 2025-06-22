@@ -2127,7 +2127,7 @@ const AppContent = () => {
     const [confetti, setConfetti] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
-    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+    const [freeMode, setFreeMode] = useState(false);
 
     useEffect(() => {
         let loadedSteps = initialStepsData.map(step => {
