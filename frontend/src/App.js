@@ -2571,6 +2571,7 @@ const AppContent = () => {
             {activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
             {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
             <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
+            <LeaderboardModal isOpen={leaderboardModalOpen} onClose={() => setLeaderboardModalOpen(false)} />
             <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
             <SubscriptionUpgrade 
                 isOpen={subscriptionUpgradeOpen} 
