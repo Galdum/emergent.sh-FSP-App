@@ -1041,18 +1041,6 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                              <div ref={chatEndRef} />
                          </div>
                          
-                         {/* Chat Input - only show for Premium users */}
-                         {hasAIAccess() && (
-                         <div>
-                         {/* Image Upload Section */}
-                         <input
-                             type="file"
-                             ref={imageInputRef}
-                             onChange={handleImageUpload}
-                             accept="image/*,application/pdf"
-                             className="hidden"
-                         />
-                         
                          {/* Display uploaded images */}
                          {uploadedImages.length > 0 && (
                              <div className="mb-3 flex flex-wrap gap-2">
