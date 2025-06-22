@@ -84,6 +84,9 @@ api_router.include_router(auth_router)
 api_router.include_router(progress_router)
 api_router.include_router(files_router)
 api_router.include_router(subscription_router)
+api_router.include_router(billing_router)
+api_router.include_router(admin_router)
+api_router.include_router(monitoring_router)
 
 # Legacy routes for compatibility
 @api_router.get("/")
