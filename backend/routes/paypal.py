@@ -222,8 +222,11 @@ async def cancel_subscription(
     db = Depends(get_database)
 ):
     try:
+        # Convert current_user to dict if it's not already
+        user_id = current_user.id if hasattr(current_user, 'id') else current_user["id"]
+        
         # Find user's active PayPal subscription
-        user = await db.users.find_one({"id": current_user["id"]})
+        user = await db.users.find_one({"id": user_id})
         
         if not user or user.get("subscription_provider") != "paypal":
             raise HTTPException(status_code=404, detail="No active PayPal subscription found")
