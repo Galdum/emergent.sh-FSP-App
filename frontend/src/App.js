@@ -1855,7 +1855,8 @@ export default function App() {
 
         handleActionClick(action);
     };
-    const closeContentModal = () => setActiveContent(null);
+    const closeContentModal = () => setActiveContent(null); // This closes content modal but keeps step modal open
+    const backToStepFromContent = () => setActiveContent(null); // Same as above - goes back to step modal
     const closeGeminiModal = () => setActiveGeminiModal(null);
     const closeRecommenderModal = () => setRecommenderModalOpen(false);
     const closeInfoHubModal = () => setInfoHubModalOpen(false);
