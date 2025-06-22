@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Crown, Zap, Star, Check, AlertCircle } from 'lucide-react';
+import { X, Crown, Zap, Star, Check, AlertCircle, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import PayPalSubscription from './PayPalSubscription';
 
 const SubscriptionUpgrade = ({ isOpen, onClose, targetPlan = null }) => {
   const { user, isAuthenticated } = useAuth();
