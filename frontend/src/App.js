@@ -2519,10 +2519,12 @@ const AppContent = () => {
     const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            // Component will unmount itself after 4 seconds
-        }, 4000);
-        return () => clearTimeout(timer);
+        // Check if user has accepted GDPR consent
+        const gdprConsent = localStorage.getItem('gdpr_consent');
+        if (!gdprConsent) {
+            setGdprConsentOpen(true);
+        }
+    }, []);
     }, []);
 
     useEffect(() => {
