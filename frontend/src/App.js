@@ -1888,7 +1888,14 @@ export default function App() {
                             <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={!freeMode && currentStep?.id === step.id} /> 
                         ))}
                         
-                        {bonusNodes.map(node => <BonusNode key={node.id} node={node} onClick={handleActionClick} />)}
+                        {bonusNodes.map((node, index) => 
+                            <BonusNode 
+                                key={node.id} 
+                                node={node} 
+                                onClick={handleBonusNodeClick} 
+                                isAccessible={isBonusNodeAccessible(index)}
+                            />
+                        )}
                     </svg>
                 </main>
             </div>
