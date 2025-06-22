@@ -1040,7 +1040,11 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                              {chatLoading && <div className="text-center"><div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-600 border-t-transparent mx-auto"></div></div>}
                              <div ref={chatEndRef} />
                          </div>
+                         )}
                          
+                         {/* Chat Input - only show for Premium users */}
+                         {hasAIAccess() && (
+                         <div>
                          {/* Image Upload Section */}
                          <input
                              type="file"
