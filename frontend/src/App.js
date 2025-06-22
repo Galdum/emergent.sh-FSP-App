@@ -1064,12 +1064,12 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
     const getStatusStyles = () => {
         switch (step.status) {
             case 'completed':
-                return 'bg-green-500 text-white hover:bg-green-600 cursor-pointer';
+                return 'fill-green-500 hover:fill-green-600 cursor-pointer';
             case 'unlocked':
-                return `bg-blue-500 text-white hover:bg-blue-600 cursor-pointer ${isCurrent ? 'animate-pulse-strong' : ''}`;
+                return `fill-blue-500 hover:fill-blue-600 cursor-pointer ${isCurrent ? 'animate-pulse-strong' : ''}`;
             case 'locked':
             default:
-                return 'bg-gray-400 text-gray-200 cursor-not-allowed';
+                return 'fill-gray-400 cursor-not-allowed';
         }
     };
 
@@ -1079,23 +1079,35 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
         return <step.icon size={20} />;
     };
 
+    const getIconColor = () => {
+        switch (step.status) {
+            case 'completed':
+                return 'text-white';
+            case 'unlocked':
+                return 'text-white';
+            case 'locked':
+            default:
+                return 'text-gray-200';
+        }
+    };
+
     return (
         <g>
             <circle
                 cx={position.x}
                 cy={position.y}
                 r="30"
-                className={`transition-all duration-300 hover:r-32 ${getStatusStyles()}`}
-                onClick={() => onStepClick(step)}
+                className={`transition-all duration-300 ${getStatusStyles()}`}
+                onClick={() => step.status !== 'locked' && onStepClick(step)}
                 style={{ cursor: step.status !== 'locked' ? 'pointer' : 'not-allowed' }}
             />
             <foreignObject x={position.x - 12} y={position.y - 12} width="24" height="24">
-                <div className="flex items-center justify-center w-full h-full">
+                <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
                     {getIcon()}
                 </div>
             </foreignObject>
             {(step.status === 'unlocked' || step.status === 'completed') && (
-                <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-700 text-sm font-semibold">
+                <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-700 text-sm font-semibold pointer-events-none">
                     {step.title}
                 </text>
             )}
@@ -1106,17 +1118,23 @@ const StepNode = ({ step, position, onStepClick, isCurrent }) => {
 // --- Bonus Node Component ---
 const BonusNode = ({ node, onClick }) => {
     return (
-        <button
-            onClick={() => onClick(node.action)}
-            className="fixed w-14 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center group"
-            style={node.position}
-            title={node.title}
-        >
-            <node.icon size={24} />
-            <span className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+        <g>
+            <circle
+                cx={node.position.x}
+                cy={node.position.y}
+                r="25"
+                className="fill-orange-500 hover:fill-orange-600 cursor-pointer transition-all duration-300"
+                onClick={() => onClick(node.action)}
+            />
+            <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24">
+                <div className="flex items-center justify-center w-full h-full text-white">
+                    <node.icon size={20} />
+                </div>
+            </foreignObject>
+            <text x={node.position.x} y={node.position.y + 40} textAnchor="middle" className="fill-gray-700 text-xs font-semibold pointer-events-none">
                 {node.title}
-            </span>
-        </button>
+            </text>
+        </g>
     );
 };
 
