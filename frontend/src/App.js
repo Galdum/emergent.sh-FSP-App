@@ -2445,6 +2445,15 @@ const AppContent = () => {
         }
     };
 
+    // Test mode functions
+    const handleTestModeSubscription = async (tier) => {
+        try {
+            await upgradeSubscription(tier);
+        } catch (error) {
+            console.error('Failed to change subscription tier:', error);
+        }
+    };
+
     const currentStep = displayedSteps.find(step => step.status === 'unlocked');
     const progressPercentage = (steps.filter(s => s.tasks.every(t => t.completed)).length / steps.length) * 100;
 
