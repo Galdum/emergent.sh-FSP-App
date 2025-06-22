@@ -1109,10 +1109,25 @@ Bitte erstelle die komplette E-Mail inklusive Betreff.`;
                                 <button
                                     key={template.id}
                                     onClick={() => handleTemplateSelect(template)}
-                                    className="text-left bg-green-50 hover:bg-green-100 border border-green-200 p-4 rounded-lg transition-all duration-200 hover:shadow-md"
+                                    className={`text-left border-2 p-4 rounded-lg transition-all duration-200 hover:shadow-md ${
+                                        template.id === 'ai_correction' 
+                                            ? 'bg-cyan-50 hover:bg-cyan-100 border-cyan-200' 
+                                            : 'bg-green-50 hover:bg-green-100 border-green-200'
+                                    }`}
                                 >
-                                    <h3 className="font-bold text-green-800 mb-2">{template.title}</h3>
-                                    <p className="text-green-600 text-sm">{template.description}</p>
+                                    <h3 className={`font-bold mb-2 ${
+                                        template.id === 'ai_correction' ? 'text-cyan-800' : 'text-green-800'
+                                    }`}>
+                                        {template.title}
+                                        {template.id === 'ai_correction' && (
+                                            <span className="ml-2 text-xs bg-cyan-200 text-cyan-800 px-2 py-1 rounded-full">AI</span>
+                                        )}
+                                    </h3>
+                                    <p className={`text-sm ${
+                                        template.id === 'ai_correction' ? 'text-cyan-600' : 'text-green-600'
+                                    }`}>
+                                        {template.description}
+                                    </p>
                                 </button>
                             ))}
                         </div>
