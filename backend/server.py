@@ -59,13 +59,15 @@ async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Dep
     return user
 
 # Import routes
-from backend.routes.auth import router as auth_router
-from backend.routes.progress import router as progress_router
-from backend.routes.files import router as files_router
-from backend.routes.subscription import router as subscription_router
-from backend.routes.billing import router as billing_router
-from backend.routes.admin import router as admin_router
-from backend.routes.monitoring import router as monitoring_router
+from routes.auth import router as auth_router
+from routes.progress import router as progress_router
+from routes.files import router as files_router
+from routes.subscription import router as subscription_router
+from routes.billing import router as billing_router
+from routes.admin import router as admin_router
+from routes.monitoring import router as monitoring_router
+from routes.backup import router as backup_router
+from routes.deployment import router as deployment_router
 
 # Override the auth dependency in routes
 import backend.routes.auth as auth_module
