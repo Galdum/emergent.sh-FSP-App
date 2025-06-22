@@ -137,14 +137,14 @@ const initialStepsData = [
     { id: 6, title: 'Approbation Obținut!', icon: Target, description: 'Felicitări, Doktortitel! Ai parcurs tot drumul și ai obținut dreptul de liberă practică în Germania. ', status: 'locked', tasks: [ { id: 601, text: 'Primește Approbationsurkunde.', completed: false, viewed: false, action: {type: 'modal', content: {title: 'Detalii: Approbationsurkunde', body: <div className="space-y-4 text-gray-600"><p><b>Ce este?</b> Este documentul final, "Sfântul Graal" al acestui proces. Atestă dreptul tău deplin și nelimitat de a profesa ca medic pe teritoriul Germaniei.</p><p><b>Când îl primesc?</b> De obicei, la câteva săptămâni după promovarea ultimului examen necesar (FSP sau KP). Taxa pentru eliberarea documentului (~200-400€) se achită în acest interval.</p><p><b>Sfat Important:</b> Când ridici documentul personal, solicită pe loc eliberarea a 1-2 copii legalizate ("beglaubigte Kopien"). Le vei avea nevoie pentru angajare și înscrierea la Camera Medicilor și te scutește de un drum ulterior la notar.</p></div>}} } ] },
 ];
 
-// Node positions for the SVG path
+// Node positions for the SVG path (adjusted for smaller viewport)
 const nodePositions = [
     { x: 200, y: 70 },
-    { x: 120, y: 175 },
-    { x: 280, y: 280 },
-    { x: 160, y: 385 },
-    { x: 240, y: 525 },
-    { x: 140, y: 644 }
+    { x: 120, y: 140 },
+    { x: 280, y: 220 },
+    { x: 160, y: 300 },
+    { x: 240, y: 380 },
+    { x: 140, y: 460 }
 ];
 
 // Static bonus nodes positioned within the journey map
