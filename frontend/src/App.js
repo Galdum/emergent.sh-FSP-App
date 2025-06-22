@@ -2861,8 +2861,8 @@ const AppContent = () => {
                 onClose={() => setSubscriptionUpgradeOpen(false)}
             />
             <AdminPanel 
-                isOpen={freeMode} 
-                onClose={() => setFreeMode(false)}
+                isOpen={adminPanelOpen} 
+                onClose={() => setAdminPanelOpen(false)}
             />
             <AuthModal 
                 isOpen={authModalOpen} 
