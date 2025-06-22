@@ -7,6 +7,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from backend.models import UserInDB, User
+from backend.database import get_database
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -73,9 +74,10 @@ async def authenticate_user(db, email: str, password: str) -> Optional[UserInDB]
         return None
     return user
 
+# This function will be overridden in server.py
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    db = Depends(lambda: None)  # Will be overridden in main server
+    db = Depends(get_database)
 ) -> UserInDB:
     """Get current authenticated user from JWT token."""
     try:
