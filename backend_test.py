@@ -752,6 +752,10 @@ def test_paypal_create_subscription():
     """Test the POST /paypal/create-subscription endpoint."""
     global auth_token, paypal_approval_url
     
+    # Ensure we have an auth token
+    if not auth_token:
+        test_login()
+    
     if not auth_token:
         print_test_result("Create PayPal Subscription", False, error="No auth token available. Login first.")
         return False
@@ -782,6 +786,10 @@ def test_paypal_create_subscription():
 def test_paypal_subscription_status():
     """Test the GET /paypal/subscription-status endpoint."""
     global auth_token
+    
+    # Ensure we have an auth token
+    if not auth_token:
+        test_login()
     
     if not auth_token:
         print_test_result("Get PayPal Subscription Status", False, error="No auth token available. Login first.")
