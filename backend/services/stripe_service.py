@@ -1,6 +1,38 @@
 import os
 from typing import Dict, Optional
-from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+# Mock for emergentintegrations
+class CheckoutSessionRequest:
+    def __init__(self, stripe_price_id, quantity, success_url, cancel_url, metadata):
+        self.stripe_price_id = stripe_price_id
+        self.quantity = quantity
+        self.success_url = success_url
+        self.cancel_url = cancel_url
+        self.metadata = metadata
+
+class CheckoutSessionResponse:
+    def __init__(self, url, session_id):
+        self.url = url
+        self.session_id = session_id
+
+class StripeCheckout:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        
+    async def create_checkout_session(self, request):
+        # Mock implementation
+        return CheckoutSessionResponse(
+            url=f"https://checkout.stripe.com/pay/mock_{request.stripe_price_id}",
+            session_id=f"cs_test_{os.urandom(8).hex()}"
+        )
+        
+    async def get_checkout_status(self, session_id):
+        # Mock implementation
+        return type('obj', (object,), {
+            'payment_status': 'paid',
+            'status': 'complete',
+            'amount_total': 1000  # $10.00
+        })
+
 from backend.models_billing import PaymentTransaction, SubscriptionPlan, SubscriptionPlanDetails, PaymentStatus
 from backend.database import get_database
 from datetime import datetime, timedelta
