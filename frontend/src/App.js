@@ -2890,6 +2890,11 @@ const AppContent = () => {
                 isOpen={authModalOpen} 
                 onClose={() => setAuthModalOpen(false)}
             />
+            <GDPRConsentModal 
+                isOpen={gdprConsentOpen}
+                onAccept={handleGDPRAccept}
+                onDecline={handleGDPRDecline}
+            />
             
             {/* Feedback Widget */}
             <FeedbackWidget />
