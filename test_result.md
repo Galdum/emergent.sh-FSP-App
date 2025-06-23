@@ -385,7 +385,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/components/LeaderboardModal.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
@@ -398,6 +398,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Attempted to test the Leaderboard Modal by clicking on the trophy icon/Clasament node in the journey map. While the click was registered, the Leaderboard modal did not open. This suggests there may be an issue with the modal trigger or the modal component itself. The Leaderboard functionality is not working as expected."
+      - working: false
+        agent: "testing"
+        comment: "Final verification test confirms the Leaderboard Modal is still not working. When clicking on the Trophy/Clasament bonus node, the modal does not open. This is a critical issue that needs to be fixed before launch."
   
   - task: "Payment Integration UI"
     implemented: true
