@@ -278,6 +278,31 @@ const GDPRConsentModal = ({ isOpen, onAccept, onDecline }) => {
                             <X size={18} />
                             Refuz și Ies
                         </button>
+                        
+                        {/* Demo/Testing Mode Button */}
+                        <button
+                            onClick={() => {
+                                localStorage.setItem('gdpr_consent', JSON.stringify({
+                                    accepted: true,
+                                    date: new Date().toISOString(),
+                                    privacy_version: '1.0',
+                                    terms_version: '1.0',
+                                    marketing_consent: false,
+                                    analytics_consent: false,
+                                    demo_mode: true
+                                }));
+                                onAccept({
+                                    termsAccepted: true,
+                                    privacyAccepted: true,
+                                    marketingConsent: false,
+                                    analyticsConsent: false
+                                });
+                            }}
+                            className="px-4 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm"
+                        >
+                            Demo Mode
+                        </button>
+                        
                         <button
                             onClick={handleAccept}
                             disabled={!acceptedTerms || !acceptedPrivacy || loading}
