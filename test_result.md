@@ -435,6 +435,8 @@ test_plan:
     - "Payment Integration UI"
   stuck_tasks:
     - "Medical Licensing Guide React Application"
+    - "Leaderboard Modal"
+    - "Payment Integration UI"
   test_all: false
   test_priority: "high_first"
 
