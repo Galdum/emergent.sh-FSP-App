@@ -422,7 +422,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "GDPR Consent Modal"
+    - "Leaderboard Modal"
+    - "Payment Integration UI"
   stuck_tasks:
     - "Medical Licensing Guide React Application"
   test_all: false
