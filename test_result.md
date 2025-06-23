@@ -356,11 +356,11 @@ frontend:
   
   - task: "Toggle Button Functionality (Progresiv/Liber)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
@@ -368,6 +368,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "Cannot test Toggle Button functionality because the GDPR modal is blocking interaction with the rest of the application. The GDPR modal needs to be closed first."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested the toggle button functionality. The toggle button is located at the bottom of the page and allows switching between 'Progresiv' and 'Liber' modes. The button is visually responsive and changes state when clicked. In the screenshots, we can see the toggle button in both states and the journey map nodes appear to be properly connected."
   
   - task: "Leaderboard Modal"
     implemented: true
