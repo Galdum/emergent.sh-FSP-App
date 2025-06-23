@@ -2895,6 +2895,11 @@ const AppContent = () => {
                 onAccept={handleGDPRAccept}
                 onDecline={handleGDPRDecline}
             />
+            <GDPRConsentModal 
+                isOpen={gdprConsentOpen}
+                onAccept={handleGDPRAccept}
+                onDecline={handleGDPRDecline}
+            />
             
             {/* Feedback Widget */}
             <FeedbackWidget />
