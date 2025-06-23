@@ -9,7 +9,7 @@ from backend.database import get_database
 import zipfile
 import io
 
-router = APIRouter(prefix="/api/gdpr", tags=["GDPR & Legal"])
+router = APIRouter(prefix="/gdpr", tags=["GDPR & Legal"])
 
 @router.get("/privacy-policy")
 async def get_privacy_policy(lang: str = "en"):
