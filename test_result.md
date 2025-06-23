@@ -401,6 +401,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Final verification test confirms the Leaderboard Modal is still not working. When clicking on the Trophy/Clasament bonus node, the modal does not open. This is a critical issue that needs to be fixed before launch."
+      - working: false
+        agent: "testing"
+        comment: "Code analysis revealed two potential issues: 1) There's a duplicate condition for the 'leaderboard' action type in the handleActionClick function (lines 2669-2672), which might be causing confusion in the code execution. 2) The code is trying to make the leaderboard node (index 3) accessible for all users in the isBonusNodeAccessible function, but according to the bonusNodes array, the leaderboard is actually at index 4, not index 3. This could be why the leaderboard modal is not opening when clicked."
   
   - task: "Payment Integration UI"
     implemented: true
