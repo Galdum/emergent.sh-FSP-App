@@ -2743,7 +2743,7 @@ const AppContent = () => {
                 </div>
                 {subscriptionTier !== 'PREMIUM' && (
                     <button 
-                        onClick={() => setSubscriptionModalOpen(true)}
+                        onClick={() => setSubscriptionUpgradeOpen(true)}
                         className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
                     >
                         Upgrade
