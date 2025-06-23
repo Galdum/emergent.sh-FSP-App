@@ -221,11 +221,11 @@ backend:
 frontend:
   - task: "Medical Licensing Guide React Application"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "pending_api_key"
         agent: "main"
@@ -239,66 +239,132 @@ frontend:
       - working: true
         agent: "main"
         comment: "Fixed AdminPanel import error - removed duplicate import statements for AdminPanel and AuthModal. Frontend now compiles successfully and preview is accessible at https://981ce99e-9838-490b-bef9-0d4c86f335d2.preview.emergentagent.com with 200 status code."
+      - working: false
+        agent: "testing"
+        comment: "Critical error in GDPRConsentModal component: 'Cannot read properties of undefined (reading 'replace')'. The application is not loading properly. Backend API endpoints for GDPR content (/api/gdpr/privacy-policy and /api/gdpr/terms-of-service) are returning 404 errors."
   
   - task: "InfoHub Modal with New Sections"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "InfoHub modal is implemented with the three new sections: 'Canale Youtube utile', 'Grupuri de suport', and 'Site-uri oficiale'. The sections contain the required links that open in new tabs."
+      - working: false
+        agent: "testing"
+        comment: "Cannot test InfoHub modal functionality due to critical error in GDPRConsentModal component that prevents the application from loading properly."
   
   - task: "Journey Map with Steps and Bonus Nodes"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "Journey map is implemented with 6 main steps and 4 bonus nodes as required. The steps are properly structured and the bonus nodes are correctly styled with orange color."
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Journey Map functionality due to critical error in GDPRConsentModal component that prevents the application from loading properly."
   
   - task: "Authentication Flow"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/components/AuthModal.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "Authentication flow is implemented with login and register functionality. The AuthModal component handles both login and registration with proper form validation and error handling."
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Authentication flow due to critical error in GDPRConsentModal component that prevents the application from loading properly."
   
   - task: "Personal File Management"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/hooks/usePersonalFiles.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "Personal file management is implemented with the ability to add, view, and delete files. The usePersonalFiles hook provides the necessary functionality for file management."
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Personal File Management due to critical error in GDPRConsentModal component that prevents the application from loading properly."
   
   - task: "AI Features (FSP Tutor, Email Generator)"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "AI features (FSP Tutor and Email Generator) are implemented and accessible through the UI. These features are available to users with premium subscription tier."
+      - working: false
+        agent: "testing"
+        comment: "Cannot test AI Features due to critical error in GDPRConsentModal component that prevents the application from loading properly."
+  
+  - task: "GDPR Consent Modal"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/GDPRConsentModal.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Critical error in GDPRConsentModal component: 'Cannot read properties of undefined (reading 'replace')'. This is likely happening in the renderDocument function where it's trying to use document.content.replace() but the document content is undefined. Backend API endpoints for GDPR content (/api/gdpr/privacy-policy and /api/gdpr/terms-of-service) are returning 404 errors."
+  
+  - task: "Toggle Button Functionality (Progresiv/Liber)"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Toggle Button functionality due to critical error in GDPRConsentModal component that prevents the application from loading properly."
+  
+  - task: "Leaderboard Modal"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/LeaderboardModal.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Leaderboard Modal functionality due to critical error in GDPRConsentModal component that prevents the application from loading properly."
+  
+  - task: "Payment Integration UI"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/SubscriptionUpgrade.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Payment Integration UI due to critical error in GDPRConsentModal component that prevents the application from loading properly."
 
 metadata:
   created_by: "main_agent"
