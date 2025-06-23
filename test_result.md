@@ -251,7 +251,7 @@ frontend:
   
   - task: "InfoHub Modal with New Sections"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
@@ -269,10 +269,13 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "While the GDPR modal has been fixed and can be bypassed, we were unable to test the InfoHub modal functionality as we couldn't find a clear way to open it in the UI. The code review shows it's implemented, but we couldn't verify its functionality in the UI."
+      - working: false
+        agent: "testing"
+        comment: "Comprehensive testing shows that the InfoHub modal does not open when clicking on the 'Informații Utile' node. The node is visible in the UI, but clicking on it does not trigger the modal to open."
   
   - task: "Journey Map with Steps and Bonus Nodes"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
@@ -290,6 +293,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully tested the Journey Map functionality. The map displays correctly with the 6 main steps and bonus nodes. The steps are visually connected with a path, and the nodes are properly styled. The journey map is the central element of the application and appears to be working as expected."
+      - working: false
+        agent: "testing"
+        comment: "Comprehensive testing shows that while the Journey Map is displayed correctly, clicking on the step nodes does not open the corresponding step modals. This is a critical issue that affects the core functionality of the application."
   
   - task: "Authentication Flow"
     implemented: true
@@ -362,6 +368,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Verified that the GDPR Consent Modal loads properly with no JavaScript errors. The 'Demo Mode' button works correctly and allows bypassing the GDPR consent for testing purposes. The modal closes properly after clicking the Demo Mode button, allowing access to the rest of the application."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing confirms that the GDPR Consent Modal is working correctly. The Demo Mode button successfully bypasses the consent process and allows access to the main application."
   
   - task: "Toggle Button Functionality (Progresiv/Liber)"
     implemented: true
@@ -380,6 +389,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Successfully tested the toggle button functionality. The toggle button is located at the bottom of the page and allows switching between 'Progresiv' and 'Liber' modes. The button is visually responsive and changes state when clicked. In the screenshots, we can see the toggle button in both states and the journey map nodes appear to be properly connected."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing confirms that the Toggle Button functionality is working correctly. The buttons for 'Progresiv' and 'Liber' modes are visible at the bottom-left of the screen and can be clicked to switch between modes."
   
   - task: "Leaderboard Modal"
     implemented: true
@@ -404,14 +416,17 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Code analysis revealed two potential issues: 1) There's a duplicate condition for the 'leaderboard' action type in the handleActionClick function (lines 2669-2672), which might be causing confusion in the code execution. 2) The code is trying to make the leaderboard node (index 3) accessible for all users in the isBonusNodeAccessible function, but according to the bonusNodes array, the leaderboard is actually at index 4, not index 3. This could be why the leaderboard modal is not opening when clicked."
+      - working: false
+        agent: "testing"
+        comment: "Comprehensive testing confirms that the Leaderboard Modal is still not working. When clicking on the Trophy/Clasament bonus node, the modal does not open. The node is visible and clickable, but the click does not trigger the modal to open."
   
   - task: "Payment Integration UI"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/components/SubscriptionUpgrade.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
@@ -428,6 +443,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Code analysis shows that the Upgrade button is correctly set to call setSubscriptionUpgradeOpen(true), and the SubscriptionUpgrade component is properly implemented. The issue might be related to event propagation or a conflict with other UI elements. Further investigation is needed to determine the exact cause of the issue."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing shows that the Payment Integration UI is now working. The Upgrade button successfully opens the subscription modal with payment options. However, there's a JavaScript console error related to loading subscription plans: 'Failed to load subscription plans: TypeError: _services_api__WEBPACK_IMPORTED_MODULE_2__.api.get is not a function'. This error affects the display of plan details in the modal, but the modal itself opens correctly."
 
 metadata:
   created_by: "main_agent"
