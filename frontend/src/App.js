@@ -2498,7 +2498,7 @@ const AppContent = () => {
     const [activeContent, setActiveContent] = useState(null);
     const [activeGeminiModal, setActiveGeminiModal] = useState(null);
     const [personalFileModalOpen, setPersonalFileModalOpen] = useState(false);
-    const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+    const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
     const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
     const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
     const [confetti, setConfetti] = useState(false);
