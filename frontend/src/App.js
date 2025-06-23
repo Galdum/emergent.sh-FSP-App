@@ -2617,7 +2617,7 @@ const AppContent = () => {
     const handleActionClick = (action, stepId, taskId) => {
         // Check AI access for AI-powered features
         if ((action.type === 'gemini_fsp_tutor' || action.type === 'gemini_email_generator' || action.type === 'gemini_land_recommender') && !hasAIAccess()) {
-            setSubscriptionModalOpen(true);
+            setSubscriptionUpgradeOpen(true);
             return;
         }
 
