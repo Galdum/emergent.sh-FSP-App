@@ -50,6 +50,32 @@ class ApiService {
     delete this.client.defaults.headers.Authorization;
   }
 
+  // Generic HTTP methods
+  async get(endpoint, config = {}) {
+    const response = await this.client.get(endpoint, config);
+    return response.data;
+  }
+
+  async post(endpoint, data, config = {}) {
+    const response = await this.client.post(endpoint, data, config);
+    return response.data;
+  }
+
+  async put(endpoint, data, config = {}) {
+    const response = await this.client.put(endpoint, data, config);
+    return response.data;
+  }
+
+  async patch(endpoint, data, config = {}) {
+    const response = await this.client.patch(endpoint, data, config);
+    return response.data;
+  }
+
+  async delete(endpoint, config = {}) {
+    const response = await this.client.delete(endpoint, config);
+    return response.data;
+  }
+
   // Authentication endpoints
   async register(email, password) {
     const response = await this.client.post('/auth/register/', { email, password });
