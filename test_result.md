@@ -469,10 +469,10 @@ test_plan:
   current_focus:
     - "Leaderboard Modal"
     - "Payment Integration UI"
+    - "InfoHub Modal with New Sections"
+    - "Journey Map with Steps and Bonus Nodes"
   stuck_tasks:
     - "Medical Licensing Guide React Application"
-    - "Leaderboard Modal"
-    - "Payment Integration UI"
   test_all: false
   test_priority: "high_first"
 
