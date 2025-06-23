@@ -392,7 +392,7 @@ frontend:
   
   - task: "Payment Integration UI"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/SubscriptionUpgrade.js"
     stuck_count: 0
     priority: "high"
@@ -404,6 +404,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "Cannot test Payment Integration UI because the GDPR modal is blocking interaction with the rest of the application. The GDPR modal needs to be closed first."
+      - working: false
+        agent: "testing"
+        comment: "Attempted to test the Payment Integration UI by clicking on the Upgrade button in the top section of the page. While the click was registered, the subscription modal did not open. This suggests there may be an issue with the modal trigger or the subscription modal component itself. The Payment Integration UI is not working as expected."
 
 metadata:
   created_by: "main_agent"
