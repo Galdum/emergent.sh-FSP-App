@@ -105,7 +105,9 @@ const GDPRConsentModal = ({ isOpen, onAccept, onDecline }) => {
                 <div 
                     className="text-sm text-gray-700 leading-relaxed"
                     dangerouslySetInnerHTML={{ 
-                        __html: document.content.replace(/\n/g, '<br>').replace(/## /g, '<h4 class="font-semibold text-gray-800 mt-4 mb-2">').replace(/# /g, '<h3 class="font-bold text-gray-900 text-lg mt-6 mb-3">')
+                        __html: document.content && document.content.replace ? 
+                            document.content.replace(/\n/g, '<br>').replace(/## /g, '<h4 class="font-semibold text-gray-800 mt-4 mb-2">').replace(/# /g, '<h3 class="font-bold text-gray-900 text-lg mt-6 mb-3">') 
+                            : 'Conținut indisponibil. Vă rugăm încercați mai târziu.'
                     }}
                 />
             </div>
