@@ -269,11 +269,11 @@ frontend:
   
   - task: "Journey Map with Steps and Bonus Nodes"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
@@ -284,6 +284,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "Cannot test Journey Map functionality because the GDPR modal is blocking interaction with the rest of the application. The GDPR modal needs to be closed first."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested the Journey Map functionality. The map displays correctly with the 6 main steps and bonus nodes. The steps are visually connected with a path, and the nodes are properly styled. The journey map is the central element of the application and appears to be working as expected."
   
   - task: "Authentication Flow"
     implemented: true
