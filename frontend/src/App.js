@@ -2545,6 +2545,8 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
+        // Temporarily make leaderboard (index 3) accessible for all users
+        if (nodeIndex === 3) return true;
         return canAccessOrangeNode(nodeIndex);
     };
 
