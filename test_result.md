@@ -350,6 +350,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Fixed GDPRConsentModal component by adding null checks for document.content and providing fallback content. The application now loads properly, but backend API endpoints for GDPR content are still returning 404 errors. The modal displays fallback content and is functional."
+      - working: true
+        agent: "testing"
+        comment: "Verified that the GDPR Consent Modal loads properly with no JavaScript errors. The 'Demo Mode' button works correctly and allows bypassing the GDPR consent for testing purposes. The modal closes properly after clicking the Demo Mode button, allowing access to the rest of the application."
   
   - task: "Toggle Button Functionality (Progresiv/Liber)"
     implemented: true
