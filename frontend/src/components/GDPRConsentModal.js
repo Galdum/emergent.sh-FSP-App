@@ -21,16 +21,51 @@ const GDPRConsentModal = ({ isOpen, onAccept, onDecline }) => {
         try {
             setLoading(true);
             
-            const [privacyResponse, termsResponse] = await Promise.all([
-                fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gdpr/privacy-policy?lang=ro`),
-                fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gdpr/terms-of-service?lang=ro`)
-            ]);
+            try {
+                const [privacyResponse, termsResponse] = await Promise.all([
+                    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gdpr/privacy-policy?lang=ro`),
+                    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gdpr/terms-of-service?lang=ro`)
+                ]);
 
-            const privacyData = await privacyResponse.json();
-            const termsData = await termsResponse.json();
+                if (privacyResponse.ok) {
+                    const privacyData = await privacyResponse.json();
+                    setPrivacyPolicy(privacyData);
+                } else {
+                    console.error('Failed to load privacy policy:', privacyResponse.status);
+                    // Set fallback data
+                    setPrivacyPolicy({
+                        version: "1.0",
+                        effective_date: "2025-01-01",
+                        content: "Politica de confidențialitate nu este disponibilă momentan. Vă rugăm încercați mai târziu."
+                    });
+                }
 
-            setPrivacyPolicy(privacyData);
-            setTermsOfService(termsData);
+                if (termsResponse.ok) {
+                    const termsData = await termsResponse.json();
+                    setTermsOfService(termsData);
+                } else {
+                    console.error('Failed to load terms of service:', termsResponse.status);
+                    // Set fallback data
+                    setTermsOfService({
+                        version: "1.0",
+                        effective_date: "2025-01-01",
+                        content: "Termenii și condițiile nu sunt disponibile momentan. Vă rugăm încercați mai târziu."
+                    });
+                }
+            } catch (error) {
+                console.error('Network error loading legal documents:', error);
+                // Set fallback data for both
+                setPrivacyPolicy({
+                    version: "1.0",
+                    effective_date: "2025-01-01",
+                    content: "Politica de confidențialitate nu este disponibilă momentan. Vă rugăm încercați mai târziu."
+                });
+                setTermsOfService({
+                    version: "1.0",
+                    effective_date: "2025-01-01",
+                    content: "Termenii și condițiile nu sunt disponibile momentan. Vă rugăm încercați mai târziu."
+                });
+            }
         } catch (error) {
             console.error('Failed to load legal documents:', error);
         } finally {
