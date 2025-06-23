@@ -2892,18 +2892,14 @@ const AppContent = () => {
             />
             <GDPRConsentModal 
                 isOpen={gdprConsentOpen}
-                onAccept={handleGDPRAccept}
-                onDecline={handleGDPRDecline}
-            />
-            <GDPRConsentModal 
-                isOpen={gdprConsentOpen}
-                onAccept={handleGDPRAccept}
-                onDecline={handleGDPRDecline}
-            />
-            <GDPRConsentModal 
-                isOpen={gdprConsentOpen}
-                onAccept={handleGDPRAccept}
-                onDecline={handleGDPRDecline}
+                onAccept={(consentData) => {
+                    console.log('GDPR consent accepted:', consentData);
+                    setGdprConsentOpen(false);
+                }}
+                onDecline={() => {
+                    alert('Pentru a utiliza FSP Navigator, trebuie să acceptați termenii și condițiile de utilizare.');
+                    window.location.href = 'https://google.com';
+                }}
             />
             
             {/* Feedback Widget */}
