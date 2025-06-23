@@ -374,7 +374,7 @@ frontend:
   
   - task: "Leaderboard Modal"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/LeaderboardModal.js"
     stuck_count: 0
     priority: "high"
@@ -386,6 +386,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "Cannot test Leaderboard Modal functionality because the GDPR modal is blocking interaction with the rest of the application. The GDPR modal needs to be closed first."
+      - working: false
+        agent: "testing"
+        comment: "Attempted to test the Leaderboard Modal by clicking on the trophy icon/Clasament node in the journey map. While the click was registered, the Leaderboard modal did not open. This suggests there may be an issue with the modal trigger or the modal component itself. The Leaderboard functionality is not working as expected."
   
   - task: "Payment Integration UI"
     implemented: true
