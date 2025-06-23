@@ -2707,7 +2707,7 @@ const AppContent = () => {
             return;
         }
 
-        handleActionClick(action);
+        handleActionClick(action, null, null);
     };
     const closeContentModal = () => setActiveContent(null); // This closes content modal but keeps step modal open
     const backToStepFromContent = () => {
