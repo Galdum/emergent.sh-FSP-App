@@ -2674,7 +2674,7 @@ const AppContent = () => {
     const handleStepClick = (step) => {
         const stepIndex = displayedSteps.findIndex(s => s.id === step.id);
         if (!canAccessStep(stepIndex + 1)) {
-            setSubscriptionModalOpen(true);
+            setSubscriptionUpgradeOpen(true);
             return;
         }
 
