@@ -21,7 +21,7 @@ sys.path.append(str(ROOT_DIR))
 load_dotenv(ROOT_DIR / '.env')
 
 # Validate required environment variables
-required_env_vars = ['MONGO_URL', 'DB_NAME', 'JWT_SECRET']
+required_env_vars = ['MONGO_URL', 'DB_NAME', 'JWT_SECRET_KEY']
 missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
 if missing_vars:
     raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
@@ -94,7 +94,7 @@ async def get_database():
     return db
 
 # Create custom dependency for authentication
-from backend.auth import verify_token, get_user_by_id
+from auth import verify_token, get_user_by_id
 
 async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Depends(get_database)):
     try:
@@ -131,10 +131,10 @@ from routes.mongodb_example import router as mongodb_example_router
 # from routes.gamification import router as gamification_router
 
 # Override the auth dependency in routes
-import backend.routes.auth as auth_module
-import backend.routes.progress as progress_module
-import backend.routes.files as files_module
-import backend.routes.subscription as subscription_module
+import routes.auth as auth_module
+import routes.progress as progress_module
+import routes.files as files_module
+import routes.subscription as subscription_module
 
 # Patch the dependencies
 auth_module.get_current_user = lambda: Depends(get_current_user_with_db)
@@ -220,7 +220,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 
 # Add rate limiting middleware
-from backend.security import rate_limiter
+from security import rate_limiter
 from starlette.status import HTTP_429_TOO_MANY_REQUESTS
 
 class RateLimitMiddleware(BaseHTTPMiddleware):

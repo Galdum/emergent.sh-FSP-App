@@ -6,16 +6,16 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-from backend.models import UserInDB, User
-from backend.database import get_database
+from models import UserInDB, User
+from database import get_database
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings - Validate on module load
-JWT_SECRET = os.environ.get("JWT_SECRET")
+JWT_SECRET = os.environ.get("JWT_SECRET_KEY")
 if not JWT_SECRET:
-    raise ValueError("JWT_SECRET environment variable must be set")
+    raise ValueError("JWT_SECRET_KEY environment variable must be set")
 
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
 JWT_EXPIRE_MINUTES = int(os.environ.get("JWT_EXPIRE_MINUTES", "1440"))
