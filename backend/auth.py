@@ -18,7 +18,13 @@ if not JWT_SECRET:
     raise ValueError("JWT_SECRET_KEY environment variable must be set")
 
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
-JWT_EXPIRE_MINUTES = int(os.environ.get("JWT_EXPIRE_MINUTES", "1440"))
+
+# Token expiration (minutes). Prefer new var, fallback to legacy for backward compatibility
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES")
+    or os.environ.get("JWT_EXPIRE_MINUTES", "1440")
+)
+JWT_EXPIRE_MINUTES = ACCESS_TOKEN_EXPIRE_MINUTES  # alias for code that still expects the old name
 
 security = HTTPBearer()
 
