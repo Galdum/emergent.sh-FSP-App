@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 # Mock for emergentintegrations
 class CheckoutSessionRequest:
     def __init__(self, stripe_price_id, quantity, success_url, cancel_url, metadata):
@@ -143,7 +143,7 @@ class StripeService:
             "transaction_id": transaction.id
         }
     
-    async def verify_payment(self, session_id: str) -> Dict[str, any]:
+    async def verify_payment(self, session_id: str) -> Dict[str, Any]:
         """Verify payment status and update records."""
         self._check_initialized()
         

@@ -4,7 +4,7 @@ import subprocess
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Any
 import boto3
 from botocore.exceptions import ClientError
 
@@ -45,6 +45,7 @@ class BackupService:
     
     async def create_database_backup(self) -> Dict[str, str]:
         """Create a MongoDB database backup."""
+        self._check_initialized()
         
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         backup_filename = f"mongodb_backup_{timestamp}.gz"
@@ -98,6 +99,7 @@ class BackupService:
     
     async def create_files_backup(self) -> Dict[str, str]:
         """Create a backup of uploaded files."""
+        self._check_initialized()
         
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         backup_filename = f"files_backup_{timestamp}.tar.gz"
@@ -173,6 +175,7 @@ class BackupService:
     
     async def cleanup_old_backups(self, keep_days: int = 30):
         """Clean up old backup files."""
+        self._check_initialized()
         
         cutoff_date = datetime.utcnow() - timedelta(days=keep_days)
         
@@ -193,6 +196,7 @@ class BackupService:
     
     async def restore_database(self, backup_filename: str) -> Dict[str, str]:
         """Restore database from backup."""
+        self._check_initialized()
         
         backup_path = self.backup_dir / backup_filename
         
@@ -238,8 +242,9 @@ class BackupService:
             logger.error(f"Database restore failed: {str(e)}")
             raise
     
-    async def get_backup_status(self) -> Dict[str, any]:
+    async def get_backup_status(self) -> Dict[str, Any]:
         """Get current backup status and statistics."""
+        self._check_initialized()
         
         try:
             backups = []

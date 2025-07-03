@@ -31,7 +31,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
-    context: Optional[Dict[str, any]] = None
+    context: Optional[Dict[str, Any]] = None
     language: str = "en"  # en, de, ro
 
 class ChatResponse(BaseModel):
