@@ -12,6 +12,9 @@ import FeedbackWidget from './components/FeedbackWidget';
 import AdminPanel from './components/AdminPanel';
 import AuthModal from './components/AuthModal';
 import GDPRConsentModal from './components/GDPRConsentModal';
+import SettingsModal from './components/SettingsModal';
+import InteractiveTutorial from './components/InteractiveTutorial';
+import LegalModal from './components/LegalModal';
 
 // Import new utilities
 import { renderMarkdown } from './utils/markdownRenderer';
@@ -2510,7 +2513,10 @@ const AppContent = () => {
         adminPanel: false,
         leaderboard: false,
         emailVerification: false,
-        gdprConsent: false
+        gdprConsent: false,
+        settings: false,
+        tutorial: false,
+        legal: false
     });
     
     // Gamification states
@@ -2527,11 +2533,30 @@ const AppContent = () => {
         if (!gdprConsent) {
             setModalStates(prev => ({...prev, gdprConsent: true}));
         }
+        
+        // Check if user has completed tutorial
+        const tutorialCompleted = localStorage.getItem('tutorial_completed');
+        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
+        if (!tutorialCompleted && !tutorialSkipped && gdprConsent) {
+            // Show tutorial after GDPR is accepted
+            setTimeout(() => {
+                setModalStates(prev => ({...prev, tutorial: true}));
+            }, 1000);
+        }
     }, []);
 
     const handleGDPRAccept = (consentData) => {
         console.log('GDPR consent accepted:', consentData);
         setModalStates(prev => ({...prev, gdprConsent: false}));
+        
+        // Check if tutorial should be shown
+        const tutorialCompleted = localStorage.getItem('tutorial_completed');
+        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
+        if (!tutorialCompleted && !tutorialSkipped) {
+            setTimeout(() => {
+                setModalStates(prev => ({...prev, tutorial: true}));
+            }, 500);
+        }
     };
 
     const handleGDPRDecline = () => {
@@ -2745,6 +2770,9 @@ const AppContent = () => {
     const closePersonalFileModal = () => setModalStates(prev => ({...prev, personalFileModal: false}));
     const closeSubscriptionModal = () => setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
     const closeEmailVerificationModal = () => setModalStates(prev => ({...prev, emailVerification: false}));
+    const closeSettingsModal = () => setModalStates(prev => ({...prev, settings: false}));
+    const closeTutorial = () => setModalStates(prev => ({...prev, tutorial: false}));
+    const closeLegal = () => setModalStates(prev => ({...prev, legal: false}));
 
     // Test mode functions
     const handleTestModeSubscription = async (tier) => {
@@ -2803,13 +2831,31 @@ const AppContent = () => {
                 </div>
             </div>
             
-            <button 
-                onClick={() => setModalStates(prev => ({...prev, personalFileModal: true}))}
-                className="fixed top-4 right-4 z-40 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
-                title="Dosarul Meu Personal"
-            >
-                <FolderKanban size={28} />
-            </button>
+            <div className="fixed top-4 right-4 z-40 flex flex-col gap-2">
+                <button 
+                    onClick={() => setModalStates(prev => ({...prev, personalFileModal: true}))}
+                    className="bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
+                    title="Dosarul Meu Personal"
+                >
+                    <FolderKanban size={28} />
+                </button>
+                
+                <button 
+                    onClick={() => setModalStates(prev => ({...prev, settings: true}))}
+                    className="bg-gray-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-transform duration-300 hover:scale-110"
+                    title="Setări"
+                >
+                    <Settings size={28} />
+                </button>
+                
+                <button 
+                    onClick={() => setModalStates(prev => ({...prev, tutorial: true}))}
+                    className="bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-transform duration-300 hover:scale-110"
+                    title="Tutorial"
+                >
+                    <Info size={28} />
+                </button>
+            </div>
             
             <div className="fixed bottom-4 right-4 z-40 flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
                 <span className={`text-sm font-bold ${!freeMode ? 'text-blue-600' : 'text-gray-500'}`}>Progresiv</span>
@@ -2923,7 +2969,40 @@ const AppContent = () => {
                 onAccept={handleGDPRAccept}
                 onDecline={handleGDPRDecline}
             />
+            <SettingsModal 
+                isOpen={modalStates.settings}
+                onClose={closeSettingsModal}
+            />
+            <InteractiveTutorial
+                isOpen={modalStates.tutorial}
+                onClose={closeTutorial}
+                onComplete={() => console.log('Tutorial completed!')}
+            />
+            <LegalModal
+                isOpen={modalStates.legal}
+                onClose={closeLegal}
+            />
             
+            {/* Footer with Legal Links */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30">
+                <div>© 2024 ApprobMed</div>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                        className="hover:text-gray-700 transition-colors"
+                    >
+                        Termeni și Condiții
+                    </button>
+                    <button
+                        onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                        className="hover:text-gray-700 transition-colors"
+                    >
+                        Politica de Confidențialitate
+                    </button>
+                    <span>contact@approbmed.com</span>
+                </div>
+            </div>
+
             {/* Feedback Widget */}
             <FeedbackWidget />
             

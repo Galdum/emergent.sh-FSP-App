@@ -15,6 +15,7 @@ from backend.auth import (
 from backend.database import get_database
 from backend.models import UserInDB, User
 from backend.security import AuditLogger, validate_email
+from backend.services.email_service import send_password_reset_email, send_welcome_email
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -64,6 +65,12 @@ async def register(
     
     # Save to database
     await db.users.insert_one(user_in_db.dict())
+    
+    # Send welcome email
+    try:
+        await send_welcome_email(user.email, user.first_name)
+    except Exception as e:
+        print(f"Failed to send welcome email: {e}")
     
     # Log registration
     audit_logger = AuditLogger(db)
@@ -371,8 +378,13 @@ async def forgot_password(
         "used": False
     })
     
-    # TODO: Send email with reset link
-    # For now, just log the action
+    # Send password reset email
+    try:
+        await send_password_reset_email(request_data.email, reset_token)
+    except Exception as e:
+        print(f"Failed to send password reset email: {e}")
+    
+    # Log the action
     audit_logger = AuditLogger(db)
     await audit_logger.log_action(
         user_id=user["id"],
@@ -381,8 +393,7 @@ async def forgot_password(
     )
     
     return MessageResponse(
-        message="If the email exists, a reset link will be sent",
-        details={"reset_token": reset_token}  # Remove in production
+        message="If the email exists, a reset link will be sent"
     )
 
 @router.post("/reset-password", response_model=MessageResponse)
