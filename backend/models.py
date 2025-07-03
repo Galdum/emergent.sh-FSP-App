@@ -24,6 +24,12 @@ class FileType(str, Enum):
     LINK = "link"
     FILE = "file"
 
+class SubscriptionTier(str, Enum):
+    FREE = "FREE"
+    BASIC = "BASIC"
+    PREMIUM = "PREMIUM"
+    ENTERPRISE = "ENTERPRISE"
+
 # User Models
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

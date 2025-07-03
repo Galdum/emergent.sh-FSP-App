@@ -7,7 +7,7 @@ from backend.models_billing import (
 from backend.auth import get_current_user
 from backend.database import get_database
 from backend.models import UserInDB
-from backend.services.stripe_service import stripe_service
+from backend.services.stripe_service import get_stripe_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/billing", tags=["billing"])
 @router.get("/plans")
 async def get_subscription_plans():
     """Get all available subscription plans."""
-    return await stripe_service.get_subscription_plans()
+    return await get_stripe_service().get_subscription_plans()
 
 @router.post("/checkout", response_model=CheckoutSessionResponse)
 async def create_checkout_session(
@@ -36,7 +36,7 @@ async def create_checkout_session(
     
     try:
         # Create checkout session
-        session_data = await stripe_service.create_subscription_checkout(
+        session_data = await get_stripe_service().create_subscription_checkout(
             plan=checkout_data.subscription_plan,
             user_id=current_user.id,
             user_email=current_user.email,
@@ -88,7 +88,7 @@ async def get_payment_status(
             )
         
         # Get updated payment status from Stripe
-        payment_result = await stripe_service.verify_payment(session_id)
+        payment_result = await get_stripe_service().verify_payment(session_id)
         
         return payment_result
         
@@ -122,7 +122,7 @@ async def cancel_subscription(
     """Cancel user's current subscription."""
     
     try:
-        await stripe_service.cancel_subscription(current_user.id)
+        await get_stripe_service().cancel_subscription(current_user.id)
         
         # Log audit event
         audit_log = AuditLog(

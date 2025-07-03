@@ -12,8 +12,19 @@ logger = logging.getLogger(__name__)
 
 class BackupService:
     def __init__(self):
-        self.backup_dir = Path("/app/backups")
-        self.backup_dir.mkdir(exist_ok=True)
+        # Use environment variable or fall back to local directory
+        backup_path = os.environ.get("BACKUP_DIR", "/workspace/backups")
+        self.backup_dir = Path(backup_path)
+        try:
+            self.backup_dir.mkdir(exist_ok=True, parents=True)
+            self._initialized = True
+        except PermissionError:
+            logger.warning(f"Cannot create backup directory at {backup_path} - backup functionality disabled")
+            self._initialized = False
+    
+    def _check_initialized(self):
+        if not self._initialized:
+            raise ValueError("Backup service not initialized - cannot create backup directory")
         
         # AWS S3 configuration (optional for offsite backups)
         self.s3_bucket = os.environ.get("BACKUP_S3_BUCKET")
@@ -255,5 +266,11 @@ class BackupService:
             logger.error(f"Failed to get backup status: {str(e)}")
             raise
 
-# Global service instance
-backup_service = BackupService()
+# Global service instance - initialize conditionally  
+backup_service = None
+
+def get_backup_service():
+    global backup_service
+    if backup_service is None:
+        backup_service = BackupService()
+    return backup_service
