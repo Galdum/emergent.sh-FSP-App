@@ -2603,8 +2603,8 @@ const AppContent = () => {
                 });
                 const updatedStep = { ...step, tasks: newTasks };
                 localStorage.setItem(`step_${step.id}`, JSON.stringify(updatedStep));
-                if (selectedStep && selectedStep.id === stepId) {
-                    setSelectedStep(updatedStep);
+                if (modalStates.selectedStep && modalStates.selectedStep.id === stepId) {
+                    setModalStates(prev => ({...prev, selectedStep: updatedStep}));
                 }
                 return updatedStep;
             }
@@ -2623,19 +2623,21 @@ const AppContent = () => {
     };
 
     const handleActionClick = (action, stepId, taskId) => {
+        console.log('Action clicked:', action, stepId, taskId);
+        
         // Check AI access for AI-powered features
         if ((action.type === 'gemini_fsp_tutor' || action.type === 'gemini_email_generator' || action.type === 'gemini_land_recommender') && !hasAIAccess()) {
-            setSubscriptionUpgradeOpen(true);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
 
         if (action.type === 'personal_file') { 
-            setPersonalFileModalOpen(true); 
+            setModalStates(prev => ({...prev, personalFileModal: true})); 
             return; 
         }
 
         if (action.type === 'email_verification') {
-            setEmailVerificationOpen(true);
+            setModalStates(prev => ({...prev, emailVerification: true}));
             return;
         }
 
@@ -2648,8 +2650,8 @@ const AppContent = () => {
                         );
                         const updatedStep = { ...step, tasks: newTasks };
                         localStorage.setItem(`step_${stepId}`, JSON.stringify(updatedStep));
-                        if (selectedStep && selectedStep.id === stepId) {
-                            setSelectedStep(updatedStep);
+                        if (modalStates.selectedStep && modalStates.selectedStep.id === stepId) {
+                            setModalStates(prev => ({...prev, selectedStep: updatedStep}));
                         }
                         return updatedStep;
                     }
@@ -2660,42 +2662,59 @@ const AppContent = () => {
         }
 
         // Handle different action types
-        if (action.type === 'link') { 
-            window.open(action.content, '_blank', 'noopener,noreferrer'); 
-        } else if (action.type === 'modal') { 
-            setActiveContent(action.content); 
-            // Don't close step modal here - content modal will handle the hierarchy
-        } else if (action.type === 'gemini_fsp_tutor') { 
-            setActiveGeminiModal('fsp_tutor'); 
-        } else if (action.type === 'gemini_email_generator') { 
-            setActiveGeminiModal('email_generator'); 
-        } else if (action.type === 'gemini_land_recommender') { 
-            setRecommenderModalOpen(true); 
-        } else if (action.type === 'info_hub') { 
-            setInfoHubModalOpen(true); 
-        } else if (action.type === 'leaderboard') { 
-            setLeaderboardModalOpen(true); 
+        switch(action.type) {
+            case 'link':
+                window.open(action.content, '_blank', 'noopener,noreferrer');
+                break;
+                
+            case 'modal':
+                setModalStates(prev => ({...prev, activeContent: action.content}));
+                // Don't close step modal here - content modal will handle the hierarchy
+                break;
+                
+            case 'gemini_fsp_tutor':
+                setModalStates(prev => ({...prev, activeGeminiModal: 'fsp_tutor'}));
+                break;
+                
+            case 'gemini_email_generator':
+                setModalStates(prev => ({...prev, activeGeminiModal: 'email_generator'}));
+                break;
+                
+            case 'gemini_land_recommender':
+                setModalStates(prev => ({...prev, recommender: true}));
+                break;
+                
+            case 'info_hub':
+                setModalStates(prev => ({...prev, infoHub: true}));
+                break;
+                
+            case 'leaderboard':
+                setModalStates(prev => ({...prev, leaderboard: true}));
+                break;
+                
+            default:
+                console.log('Unknown action type:', action.type);
         }
     };
 
     const handleStepClick = (step) => {
         const stepIndex = displayedSteps.findIndex(s => s.id === step.id);
         if (!canAccessStep(stepIndex + 1)) {
-            setSubscriptionUpgradeOpen(true);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
 
         if (step.status !== 'locked') {
             const originalStepData = initialStepsData.find(s => s.id === step.id);
             const stepWithIcons = {...step, icon: originalStepData.icon };
-            setSelectedStep(stepWithIcons);
+            setModalStates(prev => ({...prev, selectedStep: stepWithIcons}));
         }
     };
 
     const handleSubscriptionUpgrade = async (tier) => {
         try {
             await upgradeSubscription(tier);
-            setSubscriptionModalOpen(false);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
             // In a real app, you'd redirect to payment processor
             alert(`Redirection către procesarea plății pentru planul ${SUBSCRIPTION_TIERS[tier].name} (€${SUBSCRIPTION_TIERS[tier].price}/lună)`);
         } catch (error) {
