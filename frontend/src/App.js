@@ -257,7 +257,7 @@ const infoDocs = [
         content: (
             <div className="space-y-4 text-gray-700">
                 <p className="font-bold">Grupuri Facebook active pentru medici români în Germania</p>
-                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea „Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie („FSP raport", „Berufserlaubnis").</p>
+                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea "Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie ("FSP raport", "Berufserlaubnis").</p>
                 
                 <div className="space-y-3">
                     <div className="p-3 bg-gray-50 rounded-lg">
@@ -1291,12 +1291,12 @@ ${taskInstruction}
 Präsentiere deine Antwort **auf Rumänisch** und formatiere sie mit Markdown für gute Lesbarkeit.
 
 Für jedes Bundesland in deiner Analyse, gib bitte die folgenden Informationen an:
-1.  **De ce este o alegere bună?** O scurtă descriere a motivelor pentru care acest land se potrivește profilului.
-2.  **Analiza Criteriilor:** Explică detaliat cum se aliniază landul cu fiecare dintre prioritățile selectate.
-3.  **Pro & Contra:** O listă echilibrată de avantaje și dezavantaje specifice pentru un medic din România.
-4.  **Plan de Acțiune:** Pași concreți și practici pentru a începe (ex. autoritatea relevantă pentru Approbation, portaluri de joburi recomandate în regiune, sfaturi pentru integrare).
+1.  **De ce ist eine gute Wahl?** Eine kurze Beschreibung der Gründe, warum dieses Land zu Ihrem Profil passt.
+2.  **Analysieren Sie die Kriterien:** Erklären Sie ausführlich, wie sich das Land mit jeder der ausgewählten Prioritäten deckt.
+3.  **Pro & Contra:** Eine ausgewogene Liste von Vorteilen und Nachteilen für einen Ärztin/einen Ärzte aus Rumänien.
+4.  **Plan der Handlungen:** Detaillierte Schritte und Praktiken, um loszulegen (z.B. relevante Behörden für die Approbation, empfohlene Jobportalen in der Region, Ratschläge für die Integration).
 
-Strukturiere deine Antwort klar und beginne direkt mit der Empfehlung für Platz 1. Sei ermutigend und professionell.`;
+Strukturieren Sie Ihre Antwort klar und beginnen Sie direkt mit der Empfehlung für Platz 1. Sei ermutigend und professionell.`;
     };
 
     const getRecommendation = async () => {
@@ -2509,7 +2509,7 @@ const AppContent = () => {
         subscriptionUpgrade: false,
         infoHub: false,
         recommender: false,
-        authModal: false,
+        authModal: !isAuthenticated,
         adminPanel: false,
         leaderboard: false,
         emailVerification: false,
@@ -2535,9 +2535,8 @@ const AppContent = () => {
         }
         
         // Check if user has completed tutorial
-        const tutorialCompleted = localStorage.getItem('tutorial_completed');
-        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
-        if (!tutorialCompleted && !tutorialSkipped && gdprConsent) {
+        const tutorialViewed = localStorage.getItem('tutorialViewed');
+        if (!tutorialViewed && gdprConsent) {
             // Show tutorial after GDPR is accepted
             setTimeout(() => {
                 setModalStates(prev => ({...prev, tutorial: true}));
@@ -2550,9 +2549,8 @@ const AppContent = () => {
         setModalStates(prev => ({...prev, gdprConsent: false}));
         
         // Check if tutorial should be shown
-        const tutorialCompleted = localStorage.getItem('tutorial_completed');
-        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
-        if (!tutorialCompleted && !tutorialSkipped) {
+        const tutorialViewed = localStorage.getItem('tutorialViewed');
+        if (!tutorialViewed) {
             setTimeout(() => {
                 setModalStates(prev => ({...prev, tutorial: true}));
             }, 500);
@@ -2849,7 +2847,10 @@ const AppContent = () => {
                 </button>
                 
                 <button 
-                    onClick={() => setModalStates(prev => ({...prev, tutorial: true}))}
+                    onClick={() => {
+                        localStorage.removeItem('tutorialViewed');
+                        setModalStates(prev => ({...prev, tutorial: true}));
+                    }}
                     className="bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-transform duration-300 hover:scale-110"
                     title="Tutorial"
                 >

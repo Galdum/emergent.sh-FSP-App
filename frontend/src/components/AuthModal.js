@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, User, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import LegalModal from './LegalModal';
 
 const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
   const [mode, setMode] = useState(defaultMode); // 'login', 'register', or 'forgot-password'
@@ -11,6 +12,10 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [showLegal, setShowLegal] = useState(false);
+  const [legalTab, setLegalTab] = useState('terms');
 
   const { login, register } = useAuth();
 
@@ -22,6 +27,12 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
     if (mode === 'register' && password !== confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (mode === 'register' && (!acceptedTerms || !acceptedPrivacy)) {
+      setError('Trebuie să accepți Termenii și Condițiile și Politica de Confidențialitate.');
       setLoading(false);
       return;
     }
@@ -107,25 +118,26 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[80] p-4 animate-fade-in-fast">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md text-gray-800 p-6 relative transform animate-scale-in">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg text-gray-800 p-6 relative transform animate-scale-in">
+        <button onClick={onClose} className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10">
           <X size={24} />
         </button>
 
-        <div className="text-center mb-6">
-          {mode === 'forgot-password' && (
-            <button
-              onClick={() => setMode('login')}
-              className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 transition-colors"
-            >
-              <ArrowLeft size={24} />
-            </button>
-          )}
-          
-          <h2 className="text-2xl font-bold mb-2">
+        {mode === 'forgot-password' && (
+          <button
+            onClick={() => setMode('login')}
+            className="absolute top-4 left-4 text-white/80 hover:text-white transition-colors z-10"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        )}
+
+        {/* Gradient Header */}
+        <div className="-mx-6 -mt-6 mb-6 p-6 rounded-t-2xl bg-gradient-to-r from-green-500 to-blue-600 text-center text-white">
+          <h2 className="text-2xl font-bold mb-1 tracking-tight">
             {getModalTitle()}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-sm opacity-90">
             {getModalSubtitle()}
           </p>
         </div>
@@ -202,6 +214,56 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
             </div>
           )}
 
+          {mode === 'register' && (
+            <div className="space-y-2">
+              <label className="flex items-start gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  required
+                />
+                <span>
+                  Sunt de acord cu{' '}
+                  <button
+                    type="button"
+                    className="text-blue-600 underline hover:text-blue-800"
+                    onClick={() => {
+                      setLegalTab('terms');
+                      setShowLegal(true);
+                    }}
+                  >
+                    Termenii și Condițiile
+                  </button>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={acceptedPrivacy}
+                  onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                  required
+                />
+                <span>
+                  Sunt de acord cu{' '}
+                  <button
+                    type="button"
+                    className="text-blue-600 underline hover:text-blue-800"
+                    onClick={() => {
+                      setLegalTab('privacy');
+                      setShowLegal(true);
+                    }}
+                  >
+                    Politica de Confidențialitate
+                  </button>
+                </span>
+              </label>
+            </div>
+          )}
+
           {mode === 'login' && (
             <div className="text-center">
               <button
@@ -216,7 +278,7 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (mode === 'register' && (!acceptedTerms || !acceptedPrivacy))}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 font-semibold transition-colors"
           >
             {loading ? 'Se procesează...' : 
@@ -269,6 +331,12 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
             </p>
           </div>
         )}
+
+        <LegalModal
+          isOpen={showLegal}
+          onClose={() => setShowLegal(false)}
+          initialTab={legalTab}
+        />
       </div>
     </div>
   );
