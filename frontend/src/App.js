@@ -12,6 +12,9 @@ import FeedbackWidget from './components/FeedbackWidget';
 import AdminPanel from './components/AdminPanel';
 import AuthModal from './components/AuthModal';
 import GDPRConsentModal from './components/GDPRConsentModal';
+import SettingsModal from './components/SettingsModal';
+import InteractiveTutorial from './components/InteractiveTutorial';
+import LegalModal from './components/LegalModal';
 
 // Import new utilities
 import { renderMarkdown } from './utils/markdownRenderer';
@@ -2494,18 +2497,27 @@ const AppContent = () => {
     const { updateTaskProgress, getTaskProgress, isStepUnlocked } = useProgress();
     
     const [steps, setSteps] = useState(initialStepsData);
-    const [selectedStep, setSelectedStep] = useState(null);
-    const [activeContent, setActiveContent] = useState(null);
-    const [activeGeminiModal, setActiveGeminiModal] = useState(null);
-    const [personalFileModalOpen, setPersonalFileModalOpen] = useState(false);
-    const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
-    const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
-    const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
     const [confetti, setConfetti] = useState(false);
-    const [authModalOpen, setAuthModalOpen] = useState(false);
     const [freeMode, setFreeMode] = useState(false);
-    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
-    const [leaderboardModalOpen, setLeaderboardModalOpen] = useState(false);
+    
+    // Consolidated modal state management
+    const [modalStates, setModalStates] = useState({
+        selectedStep: null,
+        activeContent: null,
+        activeGeminiModal: null,
+        personalFileModal: false,
+        subscriptionUpgrade: false,
+        infoHub: false,
+        recommender: false,
+        authModal: false,
+        adminPanel: false,
+        leaderboard: false,
+        emailVerification: false,
+        gdprConsent: false,
+        settings: false,
+        tutorial: false,
+        legal: false
+    });
     
     // Gamification states
     const [userStats, setUserStats] = useState(gamificationManager.getUserStats());
@@ -2514,20 +2526,37 @@ const AppContent = () => {
     const [achievements, setAchievements] = useState([]);
     const [pointsAnimation, setPointsAnimation] = useState(null);
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
-    const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
-    const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
 
     useEffect(() => {
         // Check if user has accepted GDPR consent
         const gdprConsent = localStorage.getItem('gdpr_consent');
         if (!gdprConsent) {
-            setGdprConsentOpen(true);
+            setModalStates(prev => ({...prev, gdprConsent: true}));
+        }
+        
+        // Check if user has completed tutorial
+        const tutorialCompleted = localStorage.getItem('tutorial_completed');
+        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
+        if (!tutorialCompleted && !tutorialSkipped && gdprConsent) {
+            // Show tutorial after GDPR is accepted
+            setTimeout(() => {
+                setModalStates(prev => ({...prev, tutorial: true}));
+            }, 1000);
         }
     }, []);
 
     const handleGDPRAccept = (consentData) => {
         console.log('GDPR consent accepted:', consentData);
-        setGdprConsentOpen(false);
+        setModalStates(prev => ({...prev, gdprConsent: false}));
+        
+        // Check if tutorial should be shown
+        const tutorialCompleted = localStorage.getItem('tutorial_completed');
+        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
+        if (!tutorialCompleted && !tutorialSkipped) {
+            setTimeout(() => {
+                setModalStates(prev => ({...prev, tutorial: true}));
+            }, 500);
+        }
     };
 
     const handleGDPRDecline = () => {
@@ -2545,10 +2574,11 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
-        // Temporarily make leaderboard (index 4) accessible for all users
-        if (nodeIndex === 4) return true;
-        // Temporarily make info hub (index 3) accessible for all users
-        if (nodeIndex === 3) return true;
+        // Make InfoHub (index 3) and Leaderboard (index 4) accessible for all users
+        if (nodeIndex === 3 || nodeIndex === 4) {
+            return true;
+        }
+        // Other nodes require premium subscription
         return canAccessOrangeNode(nodeIndex);
     };
 
@@ -2598,8 +2628,8 @@ const AppContent = () => {
                 });
                 const updatedStep = { ...step, tasks: newTasks };
                 localStorage.setItem(`step_${step.id}`, JSON.stringify(updatedStep));
-                if (selectedStep && selectedStep.id === stepId) {
-                    setSelectedStep(updatedStep);
+                if (modalStates.selectedStep && modalStates.selectedStep.id === stepId) {
+                    setModalStates(prev => ({...prev, selectedStep: updatedStep}));
                 }
                 return updatedStep;
             }
@@ -2618,19 +2648,21 @@ const AppContent = () => {
     };
 
     const handleActionClick = (action, stepId, taskId) => {
+        console.log('Action clicked:', action, stepId, taskId);
+        
         // Check AI access for AI-powered features
         if ((action.type === 'gemini_fsp_tutor' || action.type === 'gemini_email_generator' || action.type === 'gemini_land_recommender') && !hasAIAccess()) {
-            setSubscriptionUpgradeOpen(true);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
 
         if (action.type === 'personal_file') { 
-            setPersonalFileModalOpen(true); 
+            setModalStates(prev => ({...prev, personalFileModal: true})); 
             return; 
         }
 
         if (action.type === 'email_verification') {
-            setEmailVerificationOpen(true);
+            setModalStates(prev => ({...prev, emailVerification: true}));
             return;
         }
 
@@ -2643,8 +2675,8 @@ const AppContent = () => {
                         );
                         const updatedStep = { ...step, tasks: newTasks };
                         localStorage.setItem(`step_${stepId}`, JSON.stringify(updatedStep));
-                        if (selectedStep && selectedStep.id === stepId) {
-                            setSelectedStep(updatedStep);
+                        if (modalStates.selectedStep && modalStates.selectedStep.id === stepId) {
+                            setModalStates(prev => ({...prev, selectedStep: updatedStep}));
                         }
                         return updatedStep;
                     }
@@ -2655,42 +2687,59 @@ const AppContent = () => {
         }
 
         // Handle different action types
-        if (action.type === 'link') { 
-            window.open(action.content, '_blank', 'noopener,noreferrer'); 
-        } else if (action.type === 'modal') { 
-            setActiveContent(action.content); 
-            // Don't close step modal here - content modal will handle the hierarchy
-        } else if (action.type === 'gemini_fsp_tutor') { 
-            setActiveGeminiModal('fsp_tutor'); 
-        } else if (action.type === 'gemini_email_generator') { 
-            setActiveGeminiModal('email_generator'); 
-        } else if (action.type === 'gemini_land_recommender') { 
-            setRecommenderModalOpen(true); 
-        } else if (action.type === 'info_hub') { 
-            setInfoHubModalOpen(true); 
-        } else if (action.type === 'leaderboard') { 
-            setLeaderboardModalOpen(true); 
+        switch(action.type) {
+            case 'link':
+                window.open(action.content, '_blank', 'noopener,noreferrer');
+                break;
+                
+            case 'modal':
+                setModalStates(prev => ({...prev, activeContent: action.content}));
+                // Don't close step modal here - content modal will handle the hierarchy
+                break;
+                
+            case 'gemini_fsp_tutor':
+                setModalStates(prev => ({...prev, activeGeminiModal: 'fsp_tutor'}));
+                break;
+                
+            case 'gemini_email_generator':
+                setModalStates(prev => ({...prev, activeGeminiModal: 'email_generator'}));
+                break;
+                
+            case 'gemini_land_recommender':
+                setModalStates(prev => ({...prev, recommender: true}));
+                break;
+                
+            case 'info_hub':
+                setModalStates(prev => ({...prev, infoHub: true}));
+                break;
+                
+            case 'leaderboard':
+                setModalStates(prev => ({...prev, leaderboard: true}));
+                break;
+                
+            default:
+                console.log('Unknown action type:', action.type);
         }
     };
 
     const handleStepClick = (step) => {
         const stepIndex = displayedSteps.findIndex(s => s.id === step.id);
         if (!canAccessStep(stepIndex + 1)) {
-            setSubscriptionUpgradeOpen(true);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
 
         if (step.status !== 'locked') {
             const originalStepData = initialStepsData.find(s => s.id === step.id);
             const stepWithIcons = {...step, icon: originalStepData.icon };
-            setSelectedStep(stepWithIcons);
+            setModalStates(prev => ({...prev, selectedStep: stepWithIcons}));
         }
     };
 
     const handleSubscriptionUpgrade = async (tier) => {
         try {
             await upgradeSubscription(tier);
-            setSubscriptionModalOpen(false);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
             // In a real app, you'd redirect to payment processor
             alert(`Redirection către procesarea plății pentru planul ${SUBSCRIPTION_TIERS[tier].name} (€${SUBSCRIPTION_TIERS[tier].price}/lună)`);
         } catch (error) {
@@ -2699,25 +2748,31 @@ const AppContent = () => {
         }
     };
 
-    const closeModal = () => setSelectedStep(null);
+    const closeModal = () => setModalStates(prev => ({...prev, selectedStep: null}));
 
     const handleBonusNodeClick = (action) => {
         const nodeIndex = bonusNodes.findIndex(node => node.action.type === action.type);
         if (!isBonusNodeAccessible(nodeIndex)) {
-            setSubscriptionUpgradeOpen(true);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
 
         handleActionClick(action, null, null);
     };
-    const closeContentModal = () => setActiveContent(null); // This closes content modal but keeps step modal open
-    const backToStepFromContent = () => {
-        setActiveContent(null);
-        // Keep step modal open
-    };
-    const closeGeminiModal = () => setActiveGeminiModal(null);
-    const closeRecommenderModal = () => setRecommenderModalOpen(false);
-    const closeInfoHubModal = () => setInfoHubModalOpen(false);
+    
+    // Modal close handlers
+    const closeContentModal = () => setModalStates(prev => ({...prev, activeContent: null}));
+    const backToStepFromContent = () => setModalStates(prev => ({...prev, activeContent: null}));
+    const closeGeminiModal = () => setModalStates(prev => ({...prev, activeGeminiModal: null}));
+    const closeRecommenderModal = () => setModalStates(prev => ({...prev, recommender: false}));
+    const closeInfoHubModal = () => setModalStates(prev => ({...prev, infoHub: false}));
+    const closeLeaderboardModal = () => setModalStates(prev => ({...prev, leaderboard: false}));
+    const closePersonalFileModal = () => setModalStates(prev => ({...prev, personalFileModal: false}));
+    const closeSubscriptionModal = () => setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
+    const closeEmailVerificationModal = () => setModalStates(prev => ({...prev, emailVerification: false}));
+    const closeSettingsModal = () => setModalStates(prev => ({...prev, settings: false}));
+    const closeTutorial = () => setModalStates(prev => ({...prev, tutorial: false}));
+    const closeLegal = () => setModalStates(prev => ({...prev, legal: false}));
 
     // Test mode functions
     const handleTestModeSubscription = async (tier) => {
@@ -2744,7 +2799,7 @@ const AppContent = () => {
                 </div>
                 {subscriptionTier !== 'PREMIUM' && (
                     <button 
-                        onClick={() => setSubscriptionUpgradeOpen(true)}
+                        onClick={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
                         className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
                     >
                         Upgrade
@@ -2776,13 +2831,31 @@ const AppContent = () => {
                 </div>
             </div>
             
-            <button 
-                onClick={() => setPersonalFileModalOpen(true)}
-                className="fixed top-4 right-4 z-40 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
-                title="Dosarul Meu Personal"
-            >
-                <FolderKanban size={28} />
-            </button>
+            <div className="fixed top-4 right-4 z-40 flex flex-col gap-2">
+                <button 
+                    onClick={() => setModalStates(prev => ({...prev, personalFileModal: true}))}
+                    className="bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
+                    title="Dosarul Meu Personal"
+                >
+                    <FolderKanban size={28} />
+                </button>
+                
+                <button 
+                    onClick={() => setModalStates(prev => ({...prev, settings: true}))}
+                    className="bg-gray-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-transform duration-300 hover:scale-110"
+                    title="Setări"
+                >
+                    <Settings size={28} />
+                </button>
+                
+                <button 
+                    onClick={() => setModalStates(prev => ({...prev, tutorial: true}))}
+                    className="bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-transform duration-300 hover:scale-110"
+                    title="Tutorial"
+                >
+                    <Info size={28} />
+                </button>
+            </div>
             
             <div className="fixed bottom-4 right-4 z-40 flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
                 <span className={`text-sm font-bold ${!freeMode ? 'text-blue-600' : 'text-gray-500'}`}>Progresiv</span>
@@ -2851,16 +2924,16 @@ const AppContent = () => {
                 </main>
             </div>
             
-            <StepModal step={selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
-            <ContentModal content={activeContent} onClose={closeContentModal} onBackToStep={backToStepFromContent} />
-            {activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
-            {activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
-            {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
-            <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
-            <LeaderboardModal isOpen={leaderboardModalOpen} onClose={() => setLeaderboardModalOpen(false)} />
+            <StepModal step={modalStates.selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
+            <ContentModal content={modalStates.activeContent} onClose={closeContentModal} onBackToStep={backToStepFromContent} />
+            {modalStates.activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
+            {modalStates.activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
+            {modalStates.recommender && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
+            <InfoHubModal isOpen={modalStates.infoHub} onClose={closeInfoHubModal} />
+            <LeaderboardModal isOpen={modalStates.leaderboard} onClose={closeLeaderboardModal} />
             <EmailVerificationModal 
-                isOpen={emailVerificationOpen} 
-                onClose={() => setEmailVerificationOpen(false)}
+                isOpen={modalStates.emailVerification} 
+                onClose={closeEmailVerificationModal}
                 onVerified={(email) => {
                     // Mark task as completed when email is verified
                     setSteps(prevSteps => {
@@ -2878,31 +2951,58 @@ const AppContent = () => {
                     });
                 }}
             />
-            <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
+            <PersonalFileModal isOpen={modalStates.personalFileModal} onClose={closePersonalFileModal} />
             <SubscriptionUpgrade 
-                isOpen={subscriptionUpgradeOpen} 
-                onClose={() => setSubscriptionUpgradeOpen(false)}
+                isOpen={modalStates.subscriptionUpgrade} 
+                onClose={closeSubscriptionModal}
             />
             <AdminPanel 
-                isOpen={adminPanelOpen} 
-                onClose={() => setAdminPanelOpen(false)}
+                isOpen={modalStates.adminPanel} 
+                onClose={() => setModalStates(prev => ({...prev, adminPanel: false}))}
             />
             <AuthModal 
-                isOpen={authModalOpen} 
-                onClose={() => setAuthModalOpen(false)}
+                isOpen={modalStates.authModal} 
+                onClose={() => setModalStates(prev => ({...prev, authModal: false}))}
             />
             <GDPRConsentModal 
-                isOpen={gdprConsentOpen}
-                onAccept={(consentData) => {
-                    console.log('GDPR consent accepted:', consentData);
-                    setGdprConsentOpen(false);
-                }}
-                onDecline={() => {
-                    alert('Pentru a utiliza FSP Navigator, trebuie să acceptați termenii și condițiile de utilizare.');
-                    window.location.href = 'https://google.com';
-                }}
+                isOpen={modalStates.gdprConsent}
+                onAccept={handleGDPRAccept}
+                onDecline={handleGDPRDecline}
+            />
+            <SettingsModal 
+                isOpen={modalStates.settings}
+                onClose={closeSettingsModal}
+            />
+            <InteractiveTutorial
+                isOpen={modalStates.tutorial}
+                onClose={closeTutorial}
+                onComplete={() => console.log('Tutorial completed!')}
+            />
+            <LegalModal
+                isOpen={modalStates.legal}
+                onClose={closeLegal}
             />
             
+            {/* Footer with Legal Links */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30">
+                <div>© 2024 ApprobMed</div>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                        className="hover:text-gray-700 transition-colors"
+                    >
+                        Termeni și Condiții
+                    </button>
+                    <button
+                        onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                        className="hover:text-gray-700 transition-colors"
+                    >
+                        Politica de Confidențialitate
+                    </button>
+                    <span>contact@approbmed.com</span>
+                </div>
+            </div>
+
             {/* Feedback Widget */}
             <FeedbackWidget />
             
