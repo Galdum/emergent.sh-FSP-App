@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, User, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import LegalModal from './LegalModal';
 
 const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
   const [mode, setMode] = useState(defaultMode); // 'login', 'register', or 'forgot-password'
@@ -11,6 +12,10 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [showLegal, setShowLegal] = useState(false);
+  const [legalTab, setLegalTab] = useState('terms');
 
   const { login, register } = useAuth();
 
@@ -22,6 +27,12 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
     if (mode === 'register' && password !== confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (mode === 'register' && (!acceptedTerms || !acceptedPrivacy)) {
+      setError('Trebuie să accepți Termenii și Condițiile și Politica de Confidențialitate.');
       setLoading(false);
       return;
     }
@@ -202,6 +213,56 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
             </div>
           )}
 
+          {mode === 'register' && (
+            <div className="space-y-2">
+              <label className="flex items-start gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  required
+                />
+                <span>
+                  Sunt de acord cu{' '}
+                  <button
+                    type="button"
+                    className="text-blue-600 underline hover:text-blue-800"
+                    onClick={() => {
+                      setLegalTab('terms');
+                      setShowLegal(true);
+                    }}
+                  >
+                    Termenii și Condițiile
+                  </button>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={acceptedPrivacy}
+                  onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                  required
+                />
+                <span>
+                  Sunt de acord cu{' '}
+                  <button
+                    type="button"
+                    className="text-blue-600 underline hover:text-blue-800"
+                    onClick={() => {
+                      setLegalTab('privacy');
+                      setShowLegal(true);
+                    }}
+                  >
+                    Politica de Confidențialitate
+                  </button>
+                </span>
+              </label>
+            </div>
+          )}
+
           {mode === 'login' && (
             <div className="text-center">
               <button
@@ -216,7 +277,7 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (mode === 'register' && (!acceptedTerms || !acceptedPrivacy))}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 font-semibold transition-colors"
           >
             {loading ? 'Se procesează...' : 
@@ -269,6 +330,12 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
             </p>
           </div>
         )}
+
+        <LegalModal
+          isOpen={showLegal}
+          onClose={() => setShowLegal(false)}
+          initialTab={legalTab}
+        />
       </div>
     </div>
   );

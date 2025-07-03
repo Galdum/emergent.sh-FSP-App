@@ -1291,7 +1291,7 @@ ${taskInstruction}
 Präsentiere deine Antwort **auf Rumänisch** und formatiere sie mit Markdown für gute Lesbarkeit.
 
 Für jedes Bundesland in deiner Analyse, gib bitte die folgenden Informationen an:
-1.  **De ce este o alegere bună?** O scurtă descriere a motivelor pentru care acest land se potrivește profilului.
+1.  **De ce este o alegere bună?** O scurtă descriere a motivelor pentru die, acest land se potrivește profilului.
 2.  **Analiza Criteriilor:** Explică detaliat cum se aliniază landul cu fiecare dintre prioritățile selectate.
 3.  **Pro & Contra:** O listă echilibrată de avantaje și dezavantaje specifice pentru un medic din România.
 4.  **Plan de Acțiune:** Pași concreți și practici pentru a începe (ex. autoritatea relevantă pentru Approbation, portaluri de joburi recomandate în regiune, sfaturi pentru integrare).
@@ -2509,7 +2509,7 @@ const AppContent = () => {
         subscriptionUpgrade: false,
         infoHub: false,
         recommender: false,
-        authModal: false,
+        authModal: !isAuthenticated,
         adminPanel: false,
         leaderboard: false,
         emailVerification: false,
