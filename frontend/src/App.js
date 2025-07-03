@@ -254,7 +254,7 @@ const infoDocs = [
         content: (
             <div className="space-y-4 text-gray-700">
                 <p className="font-bold">Grupuri Facebook active pentru medici români în Germania</p>
-                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea „Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie („FSP raport", „Berufserlaubnis").</p>
+                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea "Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie ("FSP raport", "Berufserlaubnis").</p>
                 
                 <div className="space-y-3">
                     <div className="p-3 bg-gray-50 rounded-lg">
@@ -1288,7 +1288,7 @@ ${taskInstruction}
 Präsentiere deine Antwort **auf Rumänisch** und formatiere sie mit Markdown für gute Lesbarkeit.
 
 Für jedes Bundesland in deiner Analyse, gib bitte die folgenden Informationen an:
-1.  **De ce este o alegere bună?** O scurtă descriere a motivelor pentru care acest land se potrivește profilului.
+1.  **De ce este o alegere bună?** O scurtă descriere a motivelor pentru die, acest land se potrivește profilului.
 2.  **Analiza Criteriilor:** Explică detaliat cum se aliniază landul cu fiecare dintre prioritățile selectate.
 3.  **Pro & Contra:** O listă echilibrată de avantaje și dezavantaje specifice pentru un medic din România.
 4.  **Plan de Acțiune:** Pași concreți și practici pentru a începe (ex. autoritatea relevantă pentru Approbation, portaluri de joburi recomandate în regiune, sfaturi pentru integrare).
