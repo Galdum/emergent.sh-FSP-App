@@ -257,7 +257,7 @@ const infoDocs = [
         content: (
             <div className="space-y-4 text-gray-700">
                 <p className="font-bold">Grupuri Facebook active pentru medici români în Germania</p>
-                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea „Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie („FSP raport", „Berufserlaubnis").</p>
+                <p className="font-semibold text-blue-700">Cum folosești: caută în secțiunea "Fișiere" pentru protocoale PDF recente și folosește bara de căutare internă cu cuvinte‑cheie ("FSP raport", "Berufserlaubnis").</p>
                 
                 <div className="space-y-3">
                     <div className="p-3 bg-gray-50 rounded-lg">
@@ -2535,9 +2535,8 @@ const AppContent = () => {
         }
         
         // Check if user has completed tutorial
-        const tutorialCompleted = localStorage.getItem('tutorial_completed');
-        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
-        if (!tutorialCompleted && !tutorialSkipped && gdprConsent) {
+        const tutorialViewed = localStorage.getItem('tutorialViewed');
+        if (!tutorialViewed && gdprConsent) {
             // Show tutorial after GDPR is accepted
             setTimeout(() => {
                 setModalStates(prev => ({...prev, tutorial: true}));
@@ -2550,9 +2549,8 @@ const AppContent = () => {
         setModalStates(prev => ({...prev, gdprConsent: false}));
         
         // Check if tutorial should be shown
-        const tutorialCompleted = localStorage.getItem('tutorial_completed');
-        const tutorialSkipped = localStorage.getItem('tutorial_skipped');
-        if (!tutorialCompleted && !tutorialSkipped) {
+        const tutorialViewed = localStorage.getItem('tutorialViewed');
+        if (!tutorialViewed) {
             setTimeout(() => {
                 setModalStates(prev => ({...prev, tutorial: true}));
             }, 500);
@@ -2849,7 +2847,10 @@ const AppContent = () => {
                 </button>
                 
                 <button 
-                    onClick={() => setModalStates(prev => ({...prev, tutorial: true}))}
+                    onClick={() => {
+                        localStorage.removeItem('tutorialViewed');
+                        setModalStates(prev => ({...prev, tutorial: true}));
+                    }}
                     className="bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-transform duration-300 hover:scale-110"
                     title="Tutorial"
                 >
