@@ -126,6 +126,7 @@ from routes.paypal import router as paypal_router
 # Import new ApprobMed specific routes
 from routes.documents import router as documents_router
 from routes.ai_assistant import router as ai_assistant_router
+from routes.mongodb_example import router as mongodb_example_router
 # from routes.fsp_preparation import router as fsp_router
 # from routes.gamification import router as gamification_router
 
@@ -157,6 +158,7 @@ api_router.include_router(paypal_router)
 # Include new ApprobMed routes
 api_router.include_router(documents_router)
 api_router.include_router(ai_assistant_router)
+api_router.include_router(mongodb_example_router)
 # api_router.include_router(fsp_router)
 # api_router.include_router(gamification_router)
 
