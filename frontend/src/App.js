@@ -2494,18 +2494,24 @@ const AppContent = () => {
     const { updateTaskProgress, getTaskProgress, isStepUnlocked } = useProgress();
     
     const [steps, setSteps] = useState(initialStepsData);
-    const [selectedStep, setSelectedStep] = useState(null);
-    const [activeContent, setActiveContent] = useState(null);
-    const [activeGeminiModal, setActiveGeminiModal] = useState(null);
-    const [personalFileModalOpen, setPersonalFileModalOpen] = useState(false);
-    const [subscriptionUpgradeOpen, setSubscriptionUpgradeOpen] = useState(false);
-    const [infoHubModalOpen, setInfoHubModalOpen] = useState(false);
-    const [recommenderModalOpen, setRecommenderModalOpen] = useState(false);
     const [confetti, setConfetti] = useState(false);
-    const [authModalOpen, setAuthModalOpen] = useState(false);
     const [freeMode, setFreeMode] = useState(false);
-    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
-    const [leaderboardModalOpen, setLeaderboardModalOpen] = useState(false);
+    
+    // Consolidated modal state management
+    const [modalStates, setModalStates] = useState({
+        selectedStep: null,
+        activeContent: null,
+        activeGeminiModal: null,
+        personalFileModal: false,
+        subscriptionUpgrade: false,
+        infoHub: false,
+        recommender: false,
+        authModal: false,
+        adminPanel: false,
+        leaderboard: false,
+        emailVerification: false,
+        gdprConsent: false
+    });
     
     // Gamification states
     const [userStats, setUserStats] = useState(gamificationManager.getUserStats());
@@ -2514,20 +2520,18 @@ const AppContent = () => {
     const [achievements, setAchievements] = useState([]);
     const [pointsAnimation, setPointsAnimation] = useState(null);
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
-    const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
-    const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
 
     useEffect(() => {
         // Check if user has accepted GDPR consent
         const gdprConsent = localStorage.getItem('gdpr_consent');
         if (!gdprConsent) {
-            setGdprConsentOpen(true);
+            setModalStates(prev => ({...prev, gdprConsent: true}));
         }
     }, []);
 
     const handleGDPRAccept = (consentData) => {
         console.log('GDPR consent accepted:', consentData);
-        setGdprConsentOpen(false);
+        setModalStates(prev => ({...prev, gdprConsent: false}));
     };
 
     const handleGDPRDecline = () => {
@@ -2545,10 +2549,11 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
-        // Temporarily make leaderboard (index 4) accessible for all users
-        if (nodeIndex === 4) return true;
-        // Temporarily make info hub (index 3) accessible for all users
-        if (nodeIndex === 3) return true;
+        // Make InfoHub (index 3) and Leaderboard (index 4) accessible for all users
+        if (nodeIndex === 3 || nodeIndex === 4) {
+            return true;
+        }
+        // Other nodes require premium subscription
         return canAccessOrangeNode(nodeIndex);
     };
 
