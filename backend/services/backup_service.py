@@ -21,10 +21,6 @@ class BackupService:
         except PermissionError:
             logger.warning(f"Cannot create backup directory at {backup_path} - backup functionality disabled")
             self._initialized = False
-    
-    def _check_initialized(self):
-        if not self._initialized:
-            raise ValueError("Backup service not initialized - cannot create backup directory")
         
         # AWS S3 configuration (optional for offsite backups)
         self.s3_bucket = os.environ.get("BACKUP_S3_BUCKET")
@@ -33,15 +29,24 @@ class BackupService:
         self.aws_region = os.environ.get("AWS_REGION", "us-east-1")
         
         if self.s3_bucket and self.aws_access_key:
-            self.s3_client = boto3.client(
-                's3',
-                aws_access_key_id=self.aws_access_key,
-                aws_secret_access_key=self.aws_secret_key,
-                region_name=self.aws_region
-            )
+            try:
+                self.s3_client = boto3.client(
+                    's3',
+                    aws_access_key_id=self.aws_access_key,
+                    aws_secret_access_key=self.aws_secret_key,
+                    region_name=self.aws_region
+                )
+                logger.info("S3 backup configured successfully")
+            except Exception as e:
+                logger.error(f"Failed to configure S3 client: {str(e)}")
+                self.s3_client = None
         else:
             self.s3_client = None
-            logger.warning("S3 backup not configured - using local backups only")
+            logger.info("S3 backup not configured - using local backups only")
+    
+    def _check_initialized(self):
+        if not self._initialized:
+            raise ValueError("Backup service not initialized - cannot create backup directory")
     
     async def create_database_backup(self) -> Dict[str, str]:
         """Create a MongoDB database backup."""
