@@ -111,6 +111,32 @@ class Token(BaseModel):
     token_type: str = "bearer"
     user: UserResponse
 
+# Password Reset Models
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+    
+    @validator('email')
+    def email_to_lower(cls, v):
+        return v.lower()
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+    
+    @validator('new_password')
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
+
+class PasswordReset(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    token: str
+    expires_at: datetime
+    used: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Progress Models
 class TaskProgress(BaseModel):
     task_id: str

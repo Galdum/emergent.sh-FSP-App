@@ -1,6 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from datetime import timedelta, datetime
-from backend.models import UserCreate, UserLogin, Token, UserResponse, MessageResponse
+import secrets
+import json
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from backend.models import (
+    UserCreate, UserLogin, Token, UserResponse, MessageResponse,
+    ForgotPasswordRequest, ResetPasswordRequest
+)
 from backend.auth import (
     authenticate_user, create_access_token, get_password_hash, 
     get_current_user, JWT_EXPIRE_MINUTES, validate_password_strength
@@ -151,6 +158,86 @@ async def login(
         user=UserResponse(**user.dict())
     )
 
+@router.post("/google", response_model=Token)
+async def google_login(
+    google_token: dict,
+    request: Request,
+    db = Depends(get_database)
+):
+    """Login with Google OAuth."""
+    try:
+        # Verify the Google token
+        idinfo = id_token.verify_oauth2_token(
+            google_token["token"], 
+            requests.Request(), 
+            audience=None  # Will need to set actual Google Client ID
+        )
+        
+        email = idinfo.get('email')
+        given_name = idinfo.get('given_name')
+        family_name = idinfo.get('family_name')
+        
+        if not email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No email found in Google account"
+            )
+        
+        # Check if user exists
+        user_data = await db.users.find_one({"email": email.lower()})
+        
+        if not user_data:
+            # Create new user from Google info
+            user = User(
+                email=email.lower(),
+                first_name=given_name,
+                last_name=family_name,
+                email_verified=True  # Google accounts are pre-verified
+            )
+            
+            user_in_db = UserInDB(
+                **user.dict(),
+                password_hash=""  # No password for Google users
+            )
+            
+            # Save to database
+            await db.users.insert_one(user_in_db.dict())
+            user_response = user
+        else:
+            # Convert existing user
+            user_response = User(**user_data)
+        
+        # Log successful login
+        audit_logger = AuditLogger(db)
+        await audit_logger.log_action(
+            user_id=user_response.id,
+            action="user_login",
+            details={"method": "google_oauth"},
+            ip_address=request.client.host if request.client else None
+        )
+        
+        # Create access token
+        access_token_expires = timedelta(minutes=JWT_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user_response.id}, expires_delta=access_token_expires
+        )
+        
+        return Token(
+            access_token=access_token,
+            user=UserResponse(**user_response.dict())
+        )
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid Google token"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to authenticate with Google"
+        )
+
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_user)):
     """Get current user information."""
@@ -260,21 +347,20 @@ async def change_password(
     
     return MessageResponse(message="Password changed successfully")
 
-@router.post("/request-password-reset", response_model=MessageResponse)
-async def request_password_reset(
-    email: str,
+@router.post("/forgot-password", response_model=MessageResponse)
+async def forgot_password(
+    request_data: ForgotPasswordRequest,
     db = Depends(get_database)
 ):
     """Request a password reset token."""
     # Check if user exists
-    user = await db.users.find_one({"email": email.lower()})
+    user = await db.users.find_one({"email": request_data.email})
     if not user:
         # Don't reveal if email exists
         return MessageResponse(message="If the email exists, a reset link will be sent")
     
-    # Generate reset token
-    from backend.security import security_manager
-    reset_token = security_manager.generate_secure_token()
+    # Generate secure reset token
+    reset_token = secrets.token_urlsafe(32)
     
     # Store reset token with expiration
     await db.password_resets.insert_one({
@@ -291,10 +377,57 @@ async def request_password_reset(
     await audit_logger.log_action(
         user_id=user["id"],
         action="password_reset_requested",
-        details={"email": email}
+        details={"email": request_data.email}
     )
     
     return MessageResponse(
         message="If the email exists, a reset link will be sent",
         details={"reset_token": reset_token}  # Remove in production
     )
+
+@router.post("/reset-password", response_model=MessageResponse)
+async def reset_password(
+    reset_data: ResetPasswordRequest,
+    db = Depends(get_database)
+):
+    """Reset password using reset token."""
+    # Find valid reset token
+    reset_record = await db.password_resets.find_one({
+        "token": reset_data.token,
+        "used": False,
+        "expires_at": {"$gt": datetime.utcnow()}
+    })
+    
+    if not reset_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+    
+    # Update user password
+    new_password_hash = get_password_hash(reset_data.new_password)
+    await db.users.update_one(
+        {"id": reset_record["user_id"]},
+        {"$set": {
+            "password_hash": new_password_hash,
+            "updated_at": datetime.utcnow(),
+            "failed_login_attempts": 0,  # Reset failed attempts
+            "account_locked_until": None  # Unlock account
+        }}
+    )
+    
+    # Mark token as used
+    await db.password_resets.update_one(
+        {"_id": reset_record["_id"]},
+        {"$set": {"used": True}}
+    )
+    
+    # Log password reset
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=reset_record["user_id"],
+        action="password_reset_completed",
+        details={"method": "reset_token"}
+    )
+    
+    return MessageResponse(message="Password reset successfully")

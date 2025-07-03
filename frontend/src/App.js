@@ -2723,25 +2723,28 @@ const AppContent = () => {
         }
     };
 
-    const closeModal = () => setSelectedStep(null);
+    const closeModal = () => setModalStates(prev => ({...prev, selectedStep: null}));
 
     const handleBonusNodeClick = (action) => {
         const nodeIndex = bonusNodes.findIndex(node => node.action.type === action.type);
         if (!isBonusNodeAccessible(nodeIndex)) {
-            setSubscriptionUpgradeOpen(true);
+            setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
 
         handleActionClick(action, null, null);
     };
-    const closeContentModal = () => setActiveContent(null); // This closes content modal but keeps step modal open
-    const backToStepFromContent = () => {
-        setActiveContent(null);
-        // Keep step modal open
-    };
-    const closeGeminiModal = () => setActiveGeminiModal(null);
-    const closeRecommenderModal = () => setRecommenderModalOpen(false);
-    const closeInfoHubModal = () => setInfoHubModalOpen(false);
+    
+    // Modal close handlers
+    const closeContentModal = () => setModalStates(prev => ({...prev, activeContent: null}));
+    const backToStepFromContent = () => setModalStates(prev => ({...prev, activeContent: null}));
+    const closeGeminiModal = () => setModalStates(prev => ({...prev, activeGeminiModal: null}));
+    const closeRecommenderModal = () => setModalStates(prev => ({...prev, recommender: false}));
+    const closeInfoHubModal = () => setModalStates(prev => ({...prev, infoHub: false}));
+    const closeLeaderboardModal = () => setModalStates(prev => ({...prev, leaderboard: false}));
+    const closePersonalFileModal = () => setModalStates(prev => ({...prev, personalFileModal: false}));
+    const closeSubscriptionModal = () => setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
+    const closeEmailVerificationModal = () => setModalStates(prev => ({...prev, emailVerification: false}));
 
     // Test mode functions
     const handleTestModeSubscription = async (tier) => {
@@ -2768,7 +2771,7 @@ const AppContent = () => {
                 </div>
                 {subscriptionTier !== 'PREMIUM' && (
                     <button 
-                        onClick={() => setSubscriptionUpgradeOpen(true)}
+                        onClick={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
                         className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
                     >
                         Upgrade
@@ -2801,7 +2804,7 @@ const AppContent = () => {
             </div>
             
             <button 
-                onClick={() => setPersonalFileModalOpen(true)}
+                onClick={() => setModalStates(prev => ({...prev, personalFileModal: true}))}
                 className="fixed top-4 right-4 z-40 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
                 title="Dosarul Meu Personal"
             >
@@ -2875,16 +2878,16 @@ const AppContent = () => {
                 </main>
             </div>
             
-            <StepModal step={selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
-            <ContentModal content={activeContent} onClose={closeContentModal} onBackToStep={backToStepFromContent} />
-            {activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
-            {activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
-            {recommenderModalOpen && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
-            <InfoHubModal isOpen={infoHubModalOpen} onClose={closeInfoHubModal} />
-            <LeaderboardModal isOpen={leaderboardModalOpen} onClose={() => setLeaderboardModalOpen(false)} />
+            <StepModal step={modalStates.selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
+            <ContentModal content={modalStates.activeContent} onClose={closeContentModal} onBackToStep={backToStepFromContent} />
+            {modalStates.activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
+            {modalStates.activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
+            {modalStates.recommender && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
+            <InfoHubModal isOpen={modalStates.infoHub} onClose={closeInfoHubModal} />
+            <LeaderboardModal isOpen={modalStates.leaderboard} onClose={closeLeaderboardModal} />
             <EmailVerificationModal 
-                isOpen={emailVerificationOpen} 
-                onClose={() => setEmailVerificationOpen(false)}
+                isOpen={modalStates.emailVerification} 
+                onClose={closeEmailVerificationModal}
                 onVerified={(email) => {
                     // Mark task as completed when email is verified
                     setSteps(prevSteps => {
@@ -2902,29 +2905,23 @@ const AppContent = () => {
                     });
                 }}
             />
-            <PersonalFileModal isOpen={personalFileModalOpen} onClose={() => setPersonalFileModalOpen(false)} />
+            <PersonalFileModal isOpen={modalStates.personalFileModal} onClose={closePersonalFileModal} />
             <SubscriptionUpgrade 
-                isOpen={subscriptionUpgradeOpen} 
-                onClose={() => setSubscriptionUpgradeOpen(false)}
+                isOpen={modalStates.subscriptionUpgrade} 
+                onClose={closeSubscriptionModal}
             />
             <AdminPanel 
-                isOpen={adminPanelOpen} 
-                onClose={() => setAdminPanelOpen(false)}
+                isOpen={modalStates.adminPanel} 
+                onClose={() => setModalStates(prev => ({...prev, adminPanel: false}))}
             />
             <AuthModal 
-                isOpen={authModalOpen} 
-                onClose={() => setAuthModalOpen(false)}
+                isOpen={modalStates.authModal} 
+                onClose={() => setModalStates(prev => ({...prev, authModal: false}))}
             />
             <GDPRConsentModal 
-                isOpen={gdprConsentOpen}
-                onAccept={(consentData) => {
-                    console.log('GDPR consent accepted:', consentData);
-                    setGdprConsentOpen(false);
-                }}
-                onDecline={() => {
-                    alert('Pentru a utiliza FSP Navigator, trebuie să acceptați termenii și condițiile de utilizare.');
-                    window.location.href = 'https://google.com';
-                }}
+                isOpen={modalStates.gdprConsent}
+                onAccept={handleGDPRAccept}
+                onDecline={handleGDPRDecline}
             />
             
             {/* Feedback Widget */}
