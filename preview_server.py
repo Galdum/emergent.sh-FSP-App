@@ -269,16 +269,16 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
 
 def main():
     port = 8000
-    server_address = ('', port)
+    server_address = ('0.0.0.0', port)  # Bind to all interfaces
     httpd = HTTPServer(server_address, ApprobMedHandler)
     
     print(f"""
 ╔══════════════════════════════════════════════════════╗
 ║          ApprobMed Preview Server                      ║
 ╠══════════════════════════════════════════════════════╣
-║  🚀 Server running at: http://localhost:{port}         ║
-║  📚 API Docs at: http://localhost:{port}/docs         ║
-║  🌐 Preview UI at: http://localhost:{port}/            ║
+║  🚀 Server running on all interfaces, port {port}      ║
+║  📚 API Docs at: /docs                                ║
+║  🌐 Preview UI at: /                                  ║
 ║                                                        ║
 ║  This is a preview server with mock data.             ║
 ║  Press Ctrl+C to stop the server.                     ║
