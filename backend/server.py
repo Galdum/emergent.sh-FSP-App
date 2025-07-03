@@ -17,11 +17,11 @@ from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 # Add the parent directory to sys.path
 ROOT_DIR = Path(__file__).parent
-sys.path.append(str(ROOT_DIR))
+sys.path.append(str(ROOT_DIR.parent))
 load_dotenv(ROOT_DIR / '.env')
 
 # Validate required environment variables
-required_env_vars = ['MONGO_URL', 'DB_NAME', 'JWT_SECRET']
+required_env_vars = ['MONGO_URL', 'DB_NAME', 'JWT_SECRET_KEY']
 missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
 if missing_vars:
     raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
@@ -111,21 +111,26 @@ async def get_current_user_with_db(credentials = Depends(HTTPBearer()), db = Dep
     return user
 
 # Import routes
-from routes.auth import router as auth_router
-from routes.progress import router as progress_router
-from routes.files import router as files_router
-from routes.subscription import router as subscription_router
-from routes.billing import router as billing_router
-from routes.admin import router as admin_router
-from routes.monitoring import router as monitoring_router
-from routes.backup import router as backup_router
-from routes.deployment import router as deployment_router
-from routes.gdpr import router as gdpr_router
-from routes.paypal import router as paypal_router
+from backend.routes.auth import router as auth_router
+from backend.routes.progress import router as progress_router
+from backend.routes.files import router as files_router
+from backend.routes.subscription import router as subscription_router
+from backend.routes.billing import router as billing_router
+from backend.routes.admin import router as admin_router
+from backend.routes.monitoring import router as monitoring_router
+from backend.routes.backup import router as backup_router
+from backend.routes.deployment import router as deployment_router
+from backend.routes.gdpr import router as gdpr_router
 
 # Import new ApprobMed specific routes
-from routes.documents import router as documents_router
-from routes.ai_assistant import router as ai_assistant_router
+from backend.routes.documents import router as documents_router
+try:
+    from backend.routes.ai_assistant import router as ai_assistant_router
+    AI_ROUTER_AVAILABLE = True
+except ModuleNotFoundError:
+    AI_ROUTER_AVAILABLE = False
+
+from backend.routes.mongodb_example import router as mongodb_example_router
 # from routes.fsp_preparation import router as fsp_router
 # from routes.gamification import router as gamification_router
 
@@ -152,11 +157,12 @@ api_router.include_router(monitoring_router)
 api_router.include_router(backup_router)
 api_router.include_router(deployment_router)
 api_router.include_router(gdpr_router)
-api_router.include_router(paypal_router)
 
 # Include new ApprobMed routes
 api_router.include_router(documents_router)
-api_router.include_router(ai_assistant_router)
+if AI_ROUTER_AVAILABLE:
+    api_router.include_router(ai_assistant_router)
+api_router.include_router(mongodb_example_router)
 # api_router.include_router(fsp_router)
 # api_router.include_router(gamification_router)
 
@@ -241,3 +247,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return response
 
 app.add_middleware(RateLimitMiddleware)
+
+try:
+    from backend.routes.paypal import router as paypal_router
+    PAYPAL_AVAILABLE = True
+except ModuleNotFoundError:
+    PAYPAL_AVAILABLE = False
+
+if PAYPAL_AVAILABLE:
+    api_router.include_router(paypal_router)
