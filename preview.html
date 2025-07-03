@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApprobMed - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .auth-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            background: #e2e8f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .content-section {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .chat-container {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f7fafc;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+        }
+        
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: 20%;
+        }
+        
+        .message.assistant {
+            background: #e2e8f0;
+            margin-right: 20%;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .document-item {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-uploaded {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-verified {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .api-info {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏥 ApprobMed</h1>
+            <p class="subtitle">AI-Powered Medical License Guide for Germany</p>
+        </header>
+        
+        <div class="alert alert-info">
+            <strong>Preview Mode:</strong> This is a demonstration of the ApprobMed API. 
+            <span class="api-info">API URL: http://localhost:8000 | Docs: <a href="http://localhost:8000/docs" target="_blank">http://localhost:8000/docs</a></span>
+        </div>
+        
+        <!-- Authentication Section -->
+        <div class="auth-section" id="authSection">
+            <h2>Get Started</h2>
+            <div class="tabs">
+                <div class="tab active" onclick="switchAuthTab('login')">Login</div>
+                <div class="tab" onclick="switchAuthTab('register')">Register</div>
+            </div>
+            
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="doctor@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <button onclick="login()">Login</button>
+            </div>
+            
+            <div id="registerForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="doctor@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="registerFirstName" placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="registerLastName" placeholder="Doe">
+                </div>
+                <button onclick="register()">Register</button>
+            </div>
+        </div>
+        
+        <!-- Main App Section (Hidden until logged in) -->
+        <div id="mainApp" class="hidden">
+            <div class="alert alert-success">
+                Welcome, <span id="userEmail"></span>! You're now logged in.
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+                <div class="tab" onclick="switchTab('documents')">Documents</div>
+                <div class="tab" onclick="switchTab('assistant')">AI Assistant</div>
+                <div class="tab" onclick="switchTab('requirements')">Requirements</div>
+                <div class="tab" onclick="logout()">Logout</div>
+            </div>
+            
+            <!-- Dashboard -->
+            <div id="dashboard" class="content-section active">
+                <h2>Your Progress Dashboard</h2>
+                <p>Welcome to ApprobMed! Here's your current status:</p>
+                <div style="margin-top: 2rem;">
+                    <h3>Quick Stats</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div class="document-item">
+                            <div>
+                                <strong>Documents</strong>
+                                <p>0/4 uploaded</p>
+                            </div>
+                        </div>
+                        <div class="document-item">
+                            <div>
+                                <strong>Profile</strong>
+                                <p>50% complete</p>
+                            </div>
+                        </div>
+                        <div class="document-item">
+                            <div>
+                                <strong>Next Step</strong>
+                                <p>Set target Bundesland</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Documents -->
+            <div id="documents" class="content-section">
+                <h2>Document Checklist</h2>
+                <p>Track your document preparation progress:</p>
+                <div id="documentsList" style="margin-top: 2rem;">
+                    <!-- Documents will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- AI Assistant -->
+            <div id="assistant" class="content-section">
+                <h2>AI Assistant</h2>
+                <p>Ask me anything about the Approbation process!</p>
+                <div class="chat-container" style="margin-top: 1rem;">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message assistant">
+                            Hello! I'm your ApprobMed assistant. How can I help you with your medical license journey in Germany?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Requirements -->
+            <div id="requirements" class="content-section">
+                <h2>Bundesland Requirements</h2>
+                <p>Select a Bundesland to see specific requirements:</p>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <select id="bundeslandSelect" onchange="loadRequirements()" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Select a Bundesland...</option>
+                        <option value="baden-wuerttemberg">Baden-Württemberg</option>
+                        <option value="bayern">Bayern</option>
+                        <option value="berlin">Berlin</option>
+                        <option value="brandenburg">Brandenburg</option>
+                        <option value="bremen">Bremen</option>
+                        <option value="hamburg">Hamburg</option>
+                        <option value="hessen">Hessen</option>
+                        <option value="nordrhein-westfalen">Nordrhein-Westfalen</option>
+                    </select>
+                </div>
+                <div id="requirementsList" style="margin-top: 2rem;">
+                    <!-- Requirements will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let authToken = null;
+        let currentUser = null;
+        const API_URL = 'http://localhost:8000';
+        
+        // Check if already logged in
+        const savedToken = localStorage.getItem('approbmed_token');
+        if (savedToken) {
+            authToken = savedToken;
+            checkAuth();
+        }
+        
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-section .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
+            
+            if (tab === 'login') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('loginForm').classList.remove('hidden');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('registerForm').classList.remove('hidden');
+            }
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('#mainApp .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+            
+            if (tab === 'documents') {
+                loadDocuments();
+            }
+        }
+        
+        async function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const firstName = document.getElementById('registerFirstName').value;
+            const lastName = document.getElementById('registerLastName').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        first_name: firstName,
+                        last_name: lastName
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    localStorage.setItem('approbmed_token', authToken);
+                    showMainApp(email);
+                } else {
+                    const error = await response.json();
+                    alert('Registration failed: ' + error.detail);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    localStorage.setItem('approbmed_token', authToken);
+                    showMainApp(email);
+                } else {
+                    const error = await response.json();
+                    alert('Login failed: ' + error.detail);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    showMainApp(user.email);
+                } else {
+                    authToken = null;
+                    localStorage.removeItem('approbmed_token');
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+        
+        function showMainApp(email) {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = email;
+            loadDocuments();
+        }
+        
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('approbmed_token');
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+        
+        async function loadDocuments() {
+            try {
+                const response = await fetch(`${API_URL}/api/documents/checklist`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('documentsList');
+                    container.innerHTML = '';
+                    
+                    data.checklist.forEach(doc => {
+                        const item = document.createElement('div');
+                        item.className = 'document-item';
+                        item.innerHTML = `
+                            <div>
+                                <strong>${doc.title}</strong>
+                                <p>Type: ${doc.type}</p>
+                            </div>
+                            <span class="status-badge status-${doc.status}">${doc.status}</span>
+                        `;
+                        container.appendChild(item);
+                    });
+                    
+                    const progress = document.createElement('div');
+                    progress.className = 'alert alert-info';
+                    progress.innerHTML = `Progress: ${data.progress.completed}/${data.progress.total} documents (${data.progress.percentage}%)`;
+                    container.appendChild(progress);
+                }
+            } catch (error) {
+                console.error('Failed to load documents:', error);
+            }
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.textContent = message;
+            messagesContainer.appendChild(userMsg);
+            
+            input.value = '';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/ai-assistant/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ message, language: 'en' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const assistantMsg = document.createElement('div');
+                    assistantMsg.className = 'message assistant';
+                    assistantMsg.innerHTML = `
+                        ${data.response}
+                        ${data.suggestions.length > 0 ? '<br><br><strong>Suggestions:</strong><br>' + data.suggestions.join('<br>') : ''}
+                    `;
+                    messagesContainer.appendChild(assistantMsg);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Failed to send message:', error);
+            }
+        }
+        
+        async function loadRequirements() {
+            const bundesland = document.getElementById('bundeslandSelect').value;
+            if (!bundesland) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/documents/requirements/${bundesland}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('requirementsList');
+                    container.innerHTML = `
+                        <h3>Requirements for ${data.bundesland}</h3>
+                        <p><strong>Note:</strong> ${data.specific_notes}</p>
+                        <h4>Required Documents:</h4>
+                    `;
+                    
+                    data.required_documents.forEach(doc => {
+                        const item = document.createElement('div');
+                        item.className = 'document-item';
+                        item.innerHTML = `
+                            <div>
+                                <strong>${doc.title}</strong>
+                                <p>${doc.description}</p>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load requirements:', error);
+            }
+        }
+    </script>
+</body>
+</html>
