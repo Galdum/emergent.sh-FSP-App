@@ -4,33 +4,20 @@ from backend.models_billing import (
     AdminUserResponse, AdminStatsResponse, AuditLog, ErrorReport,
     PaymentTransaction, SubscriptionPlan
 )
-from backend.auth import get_current_user
+from backend.auth import get_current_user, get_current_admin_user
 from backend.database import get_database
 from backend.models import UserInDB
+from backend.security import sanitize_regex_pattern, AuditLogger
 from datetime import datetime, timedelta
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-async def verify_admin_user(current_user: UserInDB = Depends(get_current_user)):
-    """Verify that the current user is an admin."""
-    # For now, check if user email is in admin list (you can expand this)
-    admin_emails = [
-        "admin@medicalguidegermany.com",
-        # Add more admin emails as needed
-    ]
-    
-    if current_user.email not in admin_emails:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-    return current_user
-
 @router.get("/stats", response_model=AdminStatsResponse)
 async def get_admin_stats(
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Get admin dashboard statistics."""
@@ -77,6 +64,14 @@ async def get_admin_stats(
     revenue_today_result = await revenue_today_cursor.to_list(1)
     revenue_today = revenue_today_result[0]["total"] if revenue_today_result else 0.0
     
+    # Log admin access
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_view_stats",
+        details={"view": "dashboard_stats"}
+    )
+    
     return AdminStatsResponse(
         total_users=total_users,
         active_subscriptions=active_subscriptions,
@@ -91,15 +86,20 @@ async def get_all_users(
     skip: int = 0,
     limit: int = 50,
     search: Optional[str] = None,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Get all users with admin details."""
     
-    # Build query
+    # Limit max results
+    limit = min(limit, 100)
+    
+    # Build query with sanitized search
     query = {}
     if search:
-        query["email"] = {"$regex": search, "$options": "i"}
+        # Sanitize search pattern to prevent ReDoS
+        sanitized_search = sanitize_regex_pattern(search)
+        query["email"] = {"$regex": sanitized_search, "$options": "i"}
     
     # Get users
     users_cursor = db.users.find(query).skip(skip).limit(limit).sort("created_at", -1)
@@ -121,10 +121,19 @@ async def get_all_users(
             subscription_expires=user_data.get("subscription_expires"),
             created_at=user_data["created_at"],
             is_active=user_data.get("is_active", True),
+            is_admin=user_data.get("is_admin", False),
             total_files=user_files_count,
             total_progress_steps=progress_steps
         )
         admin_users.append(admin_user_response)
+    
+    # Log admin access
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_data_access(
+        user_id=admin_user.id,
+        data_type="user_list",
+        operation="list"
+    )
     
     return admin_users
 
@@ -133,17 +142,28 @@ async def get_all_transactions(
     skip: int = 0,
     limit: int = 100,
     status_filter: Optional[str] = None,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Get all payment transactions."""
     
+    # Limit max results
+    limit = min(limit, 100)
+    
     query = {}
-    if status_filter:
+    if status_filter and status_filter in ["pending", "completed", "failed", "refunded"]:
         query["status"] = status_filter
     
     transactions_cursor = db.payment_transactions.find(query).skip(skip).limit(limit).sort("created_at", -1)
     transactions_data = await transactions_cursor.to_list(limit)
+    
+    # Log admin access
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_data_access(
+        user_id=admin_user.id,
+        data_type="payment_transactions",
+        operation="list"
+    )
     
     return [PaymentTransaction(**tx) for tx in transactions_data]
 
@@ -153,16 +173,21 @@ async def get_audit_logs(
     limit: int = 100,
     user_id: Optional[str] = None,
     action: Optional[str] = None,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Get audit logs."""
+    
+    # Limit max results
+    limit = min(limit, 100)
     
     query = {}
     if user_id:
         query["user_id"] = user_id
     if action:
-        query["action"] = {"$regex": action, "$options": "i"}
+        # Sanitize action pattern
+        sanitized_action = sanitize_regex_pattern(action)
+        query["action"] = {"$regex": sanitized_action, "$options": "i"}
     
     logs_cursor = db.audit_logs.find(query).skip(skip).limit(limit).sort("timestamp", -1)
     logs_data = await logs_cursor.to_list(limit)
@@ -174,10 +199,13 @@ async def get_error_reports(
     skip: int = 0,
     limit: int = 100,
     resolved: Optional[bool] = None,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Get error reports."""
+    
+    # Limit max results
+    limit = min(limit, 100)
     
     query = {}
     if resolved is not None:
@@ -191,14 +219,14 @@ async def get_error_reports(
 @router.patch("/errors/{error_id}/resolve")
 async def resolve_error(
     error_id: str,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Mark an error as resolved."""
     
     result = await db.error_reports.update_one(
         {"id": error_id},
-        {"$set": {"resolved": True}}
+        {"$set": {"resolved": True, "resolved_by": admin_user.id, "resolved_at": datetime.utcnow()}}
     )
     
     if result.matched_count == 0:
@@ -207,13 +235,22 @@ async def resolve_error(
             detail="Error report not found"
         )
     
+    # Log admin action
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_resolve_error",
+        details={"error_id": error_id}
+    )
+    
     return {"message": "Error marked as resolved"}
 
-@router.patch("/users/{user_id}/subscription", response_model=None)
+@router.patch("/users/{user_id}/subscription")
 async def update_user_subscription(
     user_id: str,
     subscription_data: Dict[str, str],
-    admin_user: UserInDB = Depends(verify_admin_user),
+    request: Request,
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Update a user's subscription (admin only)."""
@@ -228,9 +265,18 @@ async def update_user_subscription(
                 detail="Invalid subscription tier"
             )
     
+    # Check if user exists
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
     update_data = {
         **subscription_data,
-        "updated_at": datetime.utcnow()
+        "updated_at": datetime.utcnow(),
+        "updated_by": admin_user.id
     }
     
     result = await db.users.update_one(
@@ -238,53 +284,193 @@ async def update_user_subscription(
         {"$set": update_data}
     )
     
-    if result.matched_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-    
     # Log admin action
-    audit_log = AuditLog(
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
         user_id=admin_user.id,
         action="admin_update_user_subscription",
         details={
             "target_user_id": user_id,
             "changes": subscription_data
-        }
+        },
+        ip_address=request.client.host if request.client else None
     )
-    await db.audit_logs.insert_one(audit_log.dict())
     
     return {"message": "User subscription updated successfully"}
 
-@router.delete("/users/{user_id}")
-async def delete_user(
+@router.patch("/users/{user_id}/admin-status")
+async def update_user_admin_status(
     user_id: str,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    is_admin: bool,
+    request: Request,
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
-    """Delete a user and all their data (GDPR compliance)."""
+    """Grant or revoke admin privileges for a user."""
     
-    # Delete user data in order
-    await db.personal_files.delete_many({"user_id": user_id})
-    await db.user_progress.delete_many({"user_id": user_id})
-    await db.payment_transactions.delete_many({"user_id": user_id})
+    # Prevent self-demotion
+    if user_id == admin_user.id and not is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot remove your own admin privileges"
+        )
     
-    # Delete user account
-    result = await db.users.delete_one({"id": user_id})
-    
-    if result.deleted_count == 0:
+    # Check if user exists
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
     
+    # Update admin status
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {
+            "is_admin": is_admin,
+            "admin_granted_by": admin_user.id if is_admin else None,
+            "admin_granted_at": datetime.utcnow() if is_admin else None,
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
     # Log admin action
-    audit_log = AuditLog(
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_update_user_admin_status",
+        details={
+            "target_user_id": user_id,
+            "is_admin": is_admin,
+            "target_email": target_user.get("email")
+        },
+        ip_address=request.client.host if request.client else None
+    )
+    
+    return {"message": f"Admin status {'granted' if is_admin else 'revoked'} successfully"}
+
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    request: Request,
+    admin_user: UserInDB = Depends(get_current_admin_user),
+    db = Depends(get_database)
+):
+    """Delete a user and all their data (GDPR compliance)."""
+    
+    # Prevent self-deletion
+    if user_id == admin_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account"
+        )
+    
+    # Check if user exists
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Delete user data in order
+    collections_to_clean = [
+        "personal_files",
+        "user_progress",
+        "documents",
+        "fsp_progress",
+        "payment_transactions",
+        "subscriptions",
+        "gdpr_consents",
+        "privacy_settings"
+    ]
+    
+    for collection in collections_to_clean:
+        await db[collection].delete_many({"user_id": user_id})
+    
+    # Delete user account
+    result = await db.users.delete_one({"id": user_id})
+    
+    # Log admin action (keep audit logs for compliance)
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_privacy_action(
         user_id=admin_user.id,
         action="admin_delete_user",
-        details={"deleted_user_id": user_id}
+        details={
+            "deleted_user_id": user_id,
+            "deleted_user_email": target_user.get("email"),
+            "reason": "Admin action"
+        },
+        ip_address=request.client.host if request.client else None
     )
-    await db.audit_logs.insert_one(audit_log.dict())
     
     return {"message": "User deleted successfully"}
+
+@router.post("/initialize-admin")
+async def initialize_admin(
+    request: Request,
+    db = Depends(get_database)
+):
+    """
+    Initialize the first admin user if no admins exist.
+    This endpoint can only be used when there are no admin users in the system.
+    """
+    # Check if any admin users exist
+    admin_count = await db.users.count_documents({"is_admin": True})
+    
+    if admin_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin users already exist"
+        )
+    
+    # Get the admin email and password from environment
+    admin_email = os.environ.get("ADMIN_EMAIL")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+    
+    if not admin_email or not admin_password:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Admin credentials not configured"
+        )
+    
+    # Check if user with this email already exists
+    existing_user = await db.users.find_one({"email": admin_email.lower()})
+    
+    if existing_user:
+        # Make existing user an admin
+        await db.users.update_one(
+            {"email": admin_email.lower()},
+            {"$set": {
+                "is_admin": True,
+                "admin_granted_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        user_id = existing_user["id"]
+    else:
+        # Create new admin user
+        from backend.auth import get_password_hash
+        from backend.models import User, UserInDB
+        
+        user = User(email=admin_email.lower())
+        user_in_db = UserInDB(
+            **user.dict(),
+            password_hash=get_password_hash(admin_password),
+            is_admin=True,
+            admin_granted_at=datetime.utcnow()
+        )
+        
+        await db.users.insert_one(user_in_db.dict())
+        user_id = user.id
+    
+    # Log the initialization
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=user_id,
+        action="admin_initialized",
+        details={"method": "environment_variables"},
+        ip_address=request.client.host if request.client else None
+    )
+    
+    return {"message": "Admin user initialized successfully"}

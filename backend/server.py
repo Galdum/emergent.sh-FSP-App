@@ -11,19 +11,71 @@ from typing import List
 import uuid
 from datetime import datetime
 import sys
+from contextlib import asynccontextmanager
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 # Add the parent directory to sys.path
 ROOT_DIR = Path(__file__).parent
 sys.path.append(str(ROOT_DIR))
 load_dotenv(ROOT_DIR / '.env')
 
+# Validate required environment variables
+required_env_vars = ['MONGO_URL', 'DB_NAME', 'JWT_SECRET']
+missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
+if missing_vars:
+    raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
+
+# Initialize Sentry for error tracking
+if os.environ.get('SENTRY_DSN') and os.environ.get('ENVIRONMENT') != 'development':
+    sentry_sdk.init(
+        dsn=os.environ['SENTRY_DSN'],
+        integrations=[FastApiIntegration()],
+        traces_sample_rate=0.1,
+        environment=os.environ.get('ENVIRONMENT', 'production')
+    )
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app
-app = FastAPI(title="Medical Licensing Guide API", version="1.0.0")
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Lifespan context manager for startup/shutdown
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    try:
+        await db.users.create_index("email", unique=True)
+        await db.users.create_index("id", unique=True)
+        await db.user_progress.create_index("user_id")
+        await db.personal_files.create_index("user_id")
+        await db.documents.create_index("user_id")
+        await db.fsp_progress.create_index("user_id")
+        await db.subscriptions.create_index("user_id")
+        logger.info("Database indexes created successfully")
+    except Exception as e:
+        logger.info(f"Database indexes already exist or error: {e}")
+    
+    yield
+    
+    # Shutdown
+    client.close()
+    logger.info("Database connection closed")
+
+# Create the main app with lifespan
+app = FastAPI(
+    title="ApprobMed API", 
+    version="1.0.0",
+    description="AI-powered platform for medical graduates seeking Approbation in Germany",
+    lifespan=lifespan
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -71,6 +123,12 @@ from routes.deployment import router as deployment_router
 from routes.gdpr import router as gdpr_router
 from routes.paypal import router as paypal_router
 
+# Import new ApprobMed specific routes
+from routes.documents import router as documents_router
+from routes.ai_assistant import router as ai_assistant_router
+# from routes.fsp_preparation import router as fsp_router
+# from routes.gamification import router as gamification_router
+
 # Override the auth dependency in routes
 import backend.routes.auth as auth_module
 import backend.routes.progress as progress_module
@@ -96,10 +154,20 @@ api_router.include_router(deployment_router)
 api_router.include_router(gdpr_router)
 api_router.include_router(paypal_router)
 
+# Include new ApprobMed routes
+api_router.include_router(documents_router)
+api_router.include_router(ai_assistant_router)
+# api_router.include_router(fsp_router)
+# api_router.include_router(gamification_router)
+
 # Legacy routes for compatibility
 @api_router.get("/")
 async def root():
-    return {"message": "Medical Licensing Guide API", "version": "1.0.0"}
+    return {
+        "message": "ApprobMed API", 
+        "version": "1.0.0",
+        "description": "AI-powered platform for medical graduates seeking Approbation in Germany"
+    }
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate, db = Depends(get_database)):
@@ -121,34 +189,55 @@ async def health_check():
 # Include the router in the main app
 app.include_router(api_router)
 
+# Configure CORS with proper security
+allowed_origins = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=allowed_origins,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Add security headers middleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
-@app.on_event("startup")
-async def startup_event():
-    # Create indexes for better performance
-    try:
-        await db.users.create_index("email", unique=True)
-        await db.users.create_index("id", unique=True)
-        await db.user_progress.create_index("user_id")
-        await db.personal_files.create_index("user_id")
-        logger.info("Database indexes created successfully")
-    except Exception as e:
-        logger.info(f"Database indexes already exist or error: {e}")
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+        return response
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
-    logger.info("Database connection closed")
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Add rate limiting middleware
+from backend.security import rate_limiter
+from starlette.status import HTTP_429_TOO_MANY_REQUESTS
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Get client identifier (IP or user ID)
+        client_ip = request.client.host if request.client else "unknown"
+        
+        # Check rate limit for sensitive endpoints
+        if request.url.path in ["/api/auth/login", "/api/auth/register", "/api/files/upload"]:
+            max_requests = int(os.environ.get('RATE_LIMIT_REQUESTS', 100))
+            window_minutes = int(os.environ.get('RATE_LIMIT_WINDOW_MINUTES', 60))
+            
+            if not rate_limiter.is_allowed(client_ip, max_requests, window_minutes):
+                return Response(
+                    content="Too many requests",
+                    status_code=HTTP_429_TOO_MANY_REQUESTS
+                )
+        
+        response = await call_next(request)
+        return response
+
+app.add_middleware(RateLimitMiddleware)
