@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 import paypalrestsdk
 import os
 import uuid
-from backend.auth import get_current_user
-from backend.database import get_database
+from auth import get_current_user
+from database import get_database
 
 router = APIRouter(prefix="/paypal", tags=["paypal"])
 

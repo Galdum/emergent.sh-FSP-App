@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
 from typing import List, Optional, Dict
-from backend.models import Document, DocumentType, PersonalFile, PersonalFileResponse, MessageResponse
-from backend.auth import get_current_user
-from backend.database import get_database
-from backend.models import UserInDB
-from backend.security import AuditLogger
+from models import Document, DocumentType, PersonalFile, PersonalFileResponse, MessageResponse
+from auth import get_current_user
+from database import get_database
+from models import UserInDB
+from security import AuditLogger
 from datetime import datetime, timedelta
 import logging
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List, Dict, Optional
-from backend.models_billing import ErrorReport, AuditLog
-from backend.auth import get_current_user
-from backend.database import get_database
-from backend.models import UserInDB
+from models_billing import ErrorReport, AuditLog
+from auth import get_current_user
+from database import get_database
+from models import UserInDB
 from pydantic import BaseModel
 import logging
 

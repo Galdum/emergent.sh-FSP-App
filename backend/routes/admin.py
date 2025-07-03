@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List, Dict, Optional
-from backend.models_billing import (
+from models_billing import (
     AdminUserResponse, AdminStatsResponse, AuditLog, ErrorReport,
     PaymentTransaction, SubscriptionPlan
 )
-from backend.auth import get_current_user, get_current_admin_user
-from backend.database import get_database
-from backend.models import UserInDB
-from backend.security import sanitize_regex_pattern, AuditLogger
+from auth import get_current_user, get_current_admin_user
+from database import get_database
+from models import UserInDB
+from security import sanitize_regex_pattern, AuditLogger
 from datetime import datetime, timedelta
 import logging
 import os
@@ -450,8 +450,8 @@ async def initialize_admin(
         user_id = existing_user["id"]
     else:
         # Create new admin user
-        from backend.auth import get_password_hash
-        from backend.models import User, UserInDB
+        from auth import get_password_hash
+        from models import User, UserInDB
         
         user = User(email=admin_email.lower())
         user_in_db = UserInDB(

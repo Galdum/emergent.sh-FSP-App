@@ -33,8 +33,8 @@ class StripeCheckout:
             'amount_total': 1000  # $10.00
         })
 
-from backend.models_billing import PaymentTransaction, SubscriptionPlan, SubscriptionPlanDetails, PaymentStatus
-from backend.database import get_database
+from models_billing import PaymentTransaction, SubscriptionPlan, SubscriptionPlanDetails, PaymentStatus
+from database import get_database
 from datetime import datetime, timedelta
 import logging
 

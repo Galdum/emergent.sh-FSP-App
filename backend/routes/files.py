@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
 from typing import List
-from backend.models import PersonalFileCreate, PersonalFileResponse, MessageResponse, PersonalFile
-from backend.auth import get_current_user
-from backend.database import get_database
-from backend.models import UserInDB
-from backend.security import (
+from models import PersonalFileCreate, PersonalFileResponse, MessageResponse, PersonalFile
+from auth import get_current_user
+from database import get_database
+from models import UserInDB
+from security import (
     sanitize_filename, validate_file_type, check_file_size, 
     get_allowed_file_types, AuditLogger
 )

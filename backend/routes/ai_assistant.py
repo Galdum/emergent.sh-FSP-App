@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List, Optional, Dict
-from backend.auth import get_current_user
-from backend.database import get_database
-from backend.models import UserInDB
-from backend.security import AuditLogger
+from auth import get_current_user
+from database import get_database
+from models import UserInDB
+from security import AuditLogger
 from datetime import datetime
 import google.generativeai as genai
 import os

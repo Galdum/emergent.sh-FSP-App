@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List, Dict
-from backend.models_billing import (
+from models_billing import (
     CheckoutSessionCreate, CheckoutSessionResponse, PaymentTransaction,
     SubscriptionPlan, AuditLog
 )
-from backend.auth import get_current_user
-from backend.database import get_database
-from backend.models import UserInDB
-from backend.services.stripe_service import stripe_service
+from auth import get_current_user
+from database import get_database
+from models import UserInDB
+from services.stripe_service import stripe_service
 import logging
 
 logger = logging.getLogger(__name__)

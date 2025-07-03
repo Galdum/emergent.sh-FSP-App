@@ -4,18 +4,18 @@ import secrets
 import json
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from backend.models import (
+from models import (
     UserCreate, UserLogin, Token, UserResponse, MessageResponse,
     ForgotPasswordRequest, ResetPasswordRequest
 )
-from backend.auth import (
+from auth import (
     authenticate_user, create_access_token, get_password_hash, 
     get_current_user, JWT_EXPIRE_MINUTES, validate_password_strength
 )
-from backend.database import get_database
-from backend.models import UserInDB, User
-from backend.security import AuditLogger, validate_email
-from backend.services.email_service import send_password_reset_email, send_welcome_email
+from database import get_database
+from models import UserInDB, User
+from security import AuditLogger, validate_email
+from services.email_service import send_password_reset_email, send_welcome_email
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -269,7 +269,7 @@ async def update_user_profile(
     
     # Validate bundesland if provided
     if "target_bundesland" in update_data:
-        from backend.security import validate_bundesland
+        from security import validate_bundesland
         if not validate_bundesland(update_data["target_bundesland"]):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -319,7 +319,7 @@ async def change_password(
 ):
     """Change user's password."""
     # Verify current password
-    from backend.auth import verify_password
+    from auth import verify_password
     if not verify_password(current_password, current_user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
