@@ -118,25 +118,26 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[80] p-4 animate-fade-in-fast">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md text-gray-800 p-6 relative transform animate-scale-in">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg text-gray-800 p-6 relative transform animate-scale-in">
+        <button onClick={onClose} className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10">
           <X size={24} />
         </button>
 
-        <div className="text-center mb-6">
-          {mode === 'forgot-password' && (
-            <button
-              onClick={() => setMode('login')}
-              className="absolute top-4 left-4 text-gray-400 hover:text-gray-800 transition-colors"
-            >
-              <ArrowLeft size={24} />
-            </button>
-          )}
-          
-          <h2 className="text-2xl font-bold mb-2">
+        {mode === 'forgot-password' && (
+          <button
+            onClick={() => setMode('login')}
+            className="absolute top-4 left-4 text-white/80 hover:text-white transition-colors z-10"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        )}
+
+        {/* Gradient Header */}
+        <div className="-mx-6 -mt-6 mb-6 p-6 rounded-t-2xl bg-gradient-to-r from-green-500 to-blue-600 text-center text-white">
+          <h2 className="text-2xl font-bold mb-1 tracking-tight">
             {getModalTitle()}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-sm opacity-90">
             {getModalSubtitle()}
           </p>
         </div>
