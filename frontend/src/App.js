@@ -2513,7 +2513,7 @@ const AppContent = () => {
     const [activeQuiz, setActiveQuiz] = useState(null);
     const [achievements, setAchievements] = useState([]);
     const [pointsAnimation, setPointsAnimation] = useState(null);
-    const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
+
     const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
     const [gdprConsentOpen, setGdprConsentOpen] = useState(false);
 
@@ -2906,98 +2906,7 @@ const AppContent = () => {
             {/* Feedback Widget */}
             <FeedbackWidget />
             
-            {/* Progress Mode Toggle - Bottom Left */}
-            <div className="fixed bottom-20 left-4 z-30">
-                <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border">
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-700">Progres:</span>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setProgressMode('progressive')}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    progressMode === 'progressive' 
-                                        ? 'bg-blue-500 text-white' 
-                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                }`}
-                            >
-                                🎯 Progresiv
-                            </button>
-                            <button
-                                onClick={() => setProgressMode('free')}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    progressMode === 'free' 
-                                        ? 'bg-green-500 text-white' 
-                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                }`}
-                            >
-                                🔓 Liber
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Progress Mode Toggle - Bottom Left */}
-            <div className="fixed bottom-20 left-4 z-30">
-                <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border">
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-700">Progres:</span>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setProgressMode('progressive')}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    progressMode === 'progressive' 
-                                        ? 'bg-blue-500 text-white' 
-                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                }`}
-                            >
-                                🎯 Progresiv
-                            </button>
-                            <button
-                                onClick={() => setProgressMode('free')}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    progressMode === 'free' 
-                                        ? 'bg-green-500 text-white' 
-                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                }`}
-                            >
-                                🔓 Liber
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Progress Mode Toggle - Bottom Left */}
-            <div className="fixed bottom-20 left-4 z-30">
-                <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border">
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-700">Progres:</span>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setProgressMode('progressive')}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    progressMode === 'progressive' 
-                                        ? 'bg-blue-500 text-white' 
-                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                }`}
-                            >
-                                🎯 Progresiv
-                            </button>
-                            <button
-                                onClick={() => setProgressMode('free')}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    progressMode === 'free' 
-                                        ? 'bg-green-500 text-white' 
-                                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                }`}
-                            >
-                                🔓 Liber
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     );
 };
