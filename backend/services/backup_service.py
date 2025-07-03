@@ -4,7 +4,7 @@ import subprocess
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Any
 import boto3
 from botocore.exceptions import ClientError
 
@@ -12,8 +12,15 @@ logger = logging.getLogger(__name__)
 
 class BackupService:
     def __init__(self):
-        self.backup_dir = Path("/app/backups")
-        self.backup_dir.mkdir(exist_ok=True)
+        # Use environment variable or fall back to local directory
+        backup_path = os.environ.get("BACKUP_DIR", "/workspace/backups")
+        self.backup_dir = Path(backup_path)
+        try:
+            self.backup_dir.mkdir(exist_ok=True, parents=True)
+            self._initialized = True
+        except PermissionError:
+            logger.warning(f"Cannot create backup directory at {backup_path} - backup functionality disabled")
+            self._initialized = False
         
         # AWS S3 configuration (optional for offsite backups)
         self.s3_bucket = os.environ.get("BACKUP_S3_BUCKET")
@@ -22,18 +29,28 @@ class BackupService:
         self.aws_region = os.environ.get("AWS_REGION", "us-east-1")
         
         if self.s3_bucket and self.aws_access_key:
-            self.s3_client = boto3.client(
-                's3',
-                aws_access_key_id=self.aws_access_key,
-                aws_secret_access_key=self.aws_secret_key,
-                region_name=self.aws_region
-            )
+            try:
+                self.s3_client = boto3.client(
+                    's3',
+                    aws_access_key_id=self.aws_access_key,
+                    aws_secret_access_key=self.aws_secret_key,
+                    region_name=self.aws_region
+                )
+                logger.info("S3 backup configured successfully")
+            except Exception as e:
+                logger.error(f"Failed to configure S3 client: {str(e)}")
+                self.s3_client = None
         else:
             self.s3_client = None
-            logger.warning("S3 backup not configured - using local backups only")
+            logger.info("S3 backup not configured - using local backups only")
+    
+    def _check_initialized(self):
+        if not self._initialized:
+            raise ValueError("Backup service not initialized - cannot create backup directory")
     
     async def create_database_backup(self) -> Dict[str, str]:
         """Create a MongoDB database backup."""
+        self._check_initialized()
         
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         backup_filename = f"mongodb_backup_{timestamp}.gz"
@@ -87,6 +104,7 @@ class BackupService:
     
     async def create_files_backup(self) -> Dict[str, str]:
         """Create a backup of uploaded files."""
+        self._check_initialized()
         
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         backup_filename = f"files_backup_{timestamp}.tar.gz"
@@ -162,6 +180,7 @@ class BackupService:
     
     async def cleanup_old_backups(self, keep_days: int = 30):
         """Clean up old backup files."""
+        self._check_initialized()
         
         cutoff_date = datetime.utcnow() - timedelta(days=keep_days)
         
@@ -182,6 +201,7 @@ class BackupService:
     
     async def restore_database(self, backup_filename: str) -> Dict[str, str]:
         """Restore database from backup."""
+        self._check_initialized()
         
         backup_path = self.backup_dir / backup_filename
         
@@ -227,8 +247,9 @@ class BackupService:
             logger.error(f"Database restore failed: {str(e)}")
             raise
     
-    async def get_backup_status(self) -> Dict[str, any]:
+    async def get_backup_status(self) -> Dict[str, Any]:
         """Get current backup status and statistics."""
+        self._check_initialized()
         
         try:
             backups = []
@@ -255,5 +276,11 @@ class BackupService:
             logger.error(f"Failed to get backup status: {str(e)}")
             raise
 
-# Global service instance
-backup_service = BackupService()
+# Global service instance - initialize conditionally  
+backup_service = None
+
+def get_backup_service():
+    global backup_service
+    if backup_service is None:
+        backup_service = BackupService()
+    return backup_service

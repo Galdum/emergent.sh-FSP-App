@@ -4,7 +4,7 @@ from backend.models_billing import AuditLog
 from backend.auth import get_current_user
 from backend.database import get_database
 from backend.models import UserInDB
-from backend.services.backup_service import backup_service
+from backend.services.backup_service import get_backup_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ async def create_database_backup(
     
     try:
         # Create backup in background
-        backup_result = await backup_service.create_database_backup()
+        backup_result = await get_backup_service().create_database_backup()
         
         # Log admin action
         audit_log = AuditLog(
@@ -61,7 +61,7 @@ async def create_files_backup(
     """Create a files backup."""
     
     try:
-        backup_result = await backup_service.create_files_backup()
+        backup_result = await get_backup_service().create_files_backup()
         
         # Log admin action
         audit_log = AuditLog(
@@ -87,7 +87,7 @@ async def get_backup_status(
     """Get backup status and list of available backups."""
     
     try:
-        return await backup_service.get_backup_status()
+        return await get_backup_service().get_backup_status()
         
     except Exception as e:
         logger.error(f"Failed to get backup status: {str(e)}")
@@ -105,7 +105,7 @@ async def restore_database(
     """Restore database from backup."""
     
     try:
-        restore_result = await backup_service.restore_database(backup_filename)
+        restore_result = await get_backup_service().restore_database(backup_filename)
         
         # Log admin action
         audit_log = AuditLog(
@@ -133,7 +133,7 @@ async def cleanup_old_backups(
     """Clean up old backup files."""
     
     try:
-        cleanup_result = await backup_service.cleanup_old_backups(keep_days)
+        cleanup_result = await get_backup_service().cleanup_old_backups(keep_days)
         
         # Log admin action
         audit_log = AuditLog(

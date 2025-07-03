@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from backend.models import Document, DocumentType, PersonalFile, PersonalFileResponse, MessageResponse
 from backend.auth import get_current_user
 from backend.database import get_database
@@ -167,7 +167,7 @@ async def get_user_documents(
 
 @router.post("/", response_model=Document)
 async def create_document(
-    document_data: Dict[str, any],
+    document_data: Dict[str, Any],
     current_user: UserInDB = Depends(get_current_user),
     db = Depends(get_database)
 ):

@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 # Mock for emergentintegrations
 class CheckoutSessionRequest:
     def __init__(self, stripe_price_id, quantity, success_url, cancel_url, metadata):
@@ -74,9 +74,17 @@ SUBSCRIPTION_PLANS = {
 class StripeService:
     def __init__(self):
         self.stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
-        if not self.stripe_api_key:
-            raise ValueError("STRIPE_SECRET_KEY environment variable is required")
-        self.stripe_checkout = StripeCheckout(api_key=self.stripe_api_key)
+        if self.stripe_api_key:
+            self.stripe_checkout = StripeCheckout(api_key=self.stripe_api_key)
+            self._initialized = True
+        else:
+            self.stripe_checkout = None
+            self._initialized = False
+            logger.warning("STRIPE_SECRET_KEY not found - Stripe functionality disabled")
+    
+    def _check_initialized(self):
+        if not self._initialized:
+            raise ValueError("Stripe service not initialized - missing STRIPE_SECRET_KEY environment variable")
     
     async def create_subscription_checkout(
         self, 
@@ -87,6 +95,7 @@ class StripeService:
         cancel_url: str = None
     ) -> Dict[str, str]:
         """Create a Stripe checkout session for subscription."""
+        self._check_initialized()
         
         if plan == SubscriptionPlan.FREE:
             raise ValueError("Cannot create checkout for free plan")
@@ -134,8 +143,9 @@ class StripeService:
             "transaction_id": transaction.id
         }
     
-    async def verify_payment(self, session_id: str) -> Dict[str, any]:
+    async def verify_payment(self, session_id: str) -> Dict[str, Any]:
         """Verify payment status and update records."""
+        self._check_initialized()
         
         # Get checkout status from Stripe
         checkout_status = await self.stripe_checkout.get_checkout_status(session_id)
@@ -222,5 +232,11 @@ class StripeService:
         await self._update_user_subscription(user_id, SubscriptionPlan.FREE)
         logger.info(f"Cancelled subscription for user {user_id}")
 
-# Global service instance
-stripe_service = StripeService()
+# Global service instance - initialize conditionally
+stripe_service = None
+
+def get_stripe_service():
+    global stripe_service
+    if stripe_service is None:
+        stripe_service = StripeService()
+    return stripe_service
