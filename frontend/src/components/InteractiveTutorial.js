@@ -133,14 +133,19 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     return overlayStyle;
   };
 
-  if (!isOpen) return null;
-
+  // Manage body scroll lock while tutorial is open
   useEffect(() => {
-    document.body.classList.add('overflow-hidden');
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
     return () => {
       document.body.classList.remove('overflow-hidden');
     };
-  }, []);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
