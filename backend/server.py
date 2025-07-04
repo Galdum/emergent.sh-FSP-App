@@ -59,6 +59,9 @@ async def lifespan(app: FastAPI):
         await db.documents.create_index("user_id")
         await db.fsp_progress.create_index("user_id")
         await db.subscriptions.create_index("user_id")
+        await db.badges.create_index("badge_id", unique=True)
+        await db.user_badges.create_index("user_id")
+        await db.user_badges.create_index([("user_id", 1), ("badge_id", 1)], unique=True)
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.info(f"Database indexes already exist or error: {e}")
@@ -124,6 +127,7 @@ from backend.routes.gdpr import router as gdpr_router
 
 # Import new ApprobMed specific routes
 from backend.routes.documents import router as documents_router
+from backend.routes.badges import router as badges_router
 try:
     from backend.routes.ai_assistant import router as ai_assistant_router
     AI_ROUTER_AVAILABLE = True
@@ -160,6 +164,7 @@ api_router.include_router(gdpr_router)
 
 # Include new ApprobMed routes
 api_router.include_router(documents_router)
+api_router.include_router(badges_router)
 if AI_ROUTER_AVAILABLE:
     api_router.include_router(ai_assistant_router)
 api_router.include_router(mongodb_example_router)

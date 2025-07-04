@@ -302,6 +302,58 @@ class UserStats(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Badge System Models
+class Badge(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    badge_id: str  # unique identifier like "first_upload", "profile_complete"
+    name: str
+    description: str
+    icon: str  # filename or SVG key e.g. "first_upload.svg"
+    criteria: str  # human-readable trigger description
+    icon_concept: str  # description of the icon for UI reference
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserBadge(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    badge_id: str  # reference to Badge.badge_id
+    awarded_at: datetime = Field(default_factory=datetime.utcnow)
+
+class BadgeResponse(BaseModel):
+    badge_id: str
+    name: str
+    description: str
+    icon: str
+    criteria: str
+    icon_concept: str
+    awarded_at: Optional[datetime] = None  # null if not earned
+    earned: bool = False
+
+class UserBadgeProgress(BaseModel):
+    user_id: str
+    badges_earned: List[str] = []  # list of badge_ids
+    total_badges: int = 0
+    badge_count: int = 0
+    
+    # Progress tracking for specific badges
+    documents_uploaded: int = 0
+    messages_sent: int = 0
+    checklist_tasks_completed: int = 0
+    emails_generated: int = 0
+    consecutive_days: int = 0
+    searches_performed: int = 0
+    feedback_submitted: int = 0
+    referrals_made: int = 0
+    facebook_groups_joined: int = 0
+    lander_applications: int = 0
+    fsp_simulations_passed: int = 0
+    
+    last_login_date: Optional[datetime] = None
+    login_streak_start: Optional[datetime] = None
+    profile_completed: bool = False
+    tutorial_completed: bool = False
+    hospitation_uploaded: bool = False
+
 class UtilInfoDocument(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
