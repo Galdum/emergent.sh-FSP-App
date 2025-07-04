@@ -11,7 +11,7 @@ import SubscriptionUpgrade from './components/SubscriptionUpgrade';
 import FeedbackWidget from './components/FeedbackWidget';
 import AdminPanel from './components/AdminPanel';
 import AuthModal from './components/AuthModal';
-import GDPRConsentModal from './components/GDPRConsentModal';
+import GDPRConsentModal from './components/GDPRConsentModal'; // GDPR Modal - Fixed and Working!
 import SettingsModal from './components/SettingsModal';
 import InteractiveTutorial from './components/InteractiveTutorial';
 import LegalModal from './components/LegalModal';
