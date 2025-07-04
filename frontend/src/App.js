@@ -2585,7 +2585,7 @@ Erstelle die komplette E-Mail. Sie soll perfekt korrekt sein, aber menschlich un
 };
 
 // --- Step Node Component ---
-const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
+const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobile = false }) => {
     const getStatusStyles = () => {
         if (!isAccessible) {
             return 'fill-gray-300 cursor-not-allowed';
@@ -2603,9 +2603,10 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
     };
 
     const getIcon = () => {
-        if (step.status === 'completed') return <Check size={24} />;
-        if (step.status === 'locked' || !isAccessible) return <Lock size={20} />;
-        return <step.icon size={20} />;
+        const iconSize = isMobile ? 18 : 24;
+        if (step.status === 'completed') return <Check size={iconSize} />;
+        if (step.status === 'locked' || !isAccessible) return <Lock size={isMobile ? 16 : 20} />;
+        return <step.icon size={isMobile ? 16 : 20} />;
     };
 
     const getIconColor = () => {
@@ -2628,38 +2629,65 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
         }
     };
 
+    const radius = isMobile ? 25 : 30;
+    const clickableRadius = isMobile ? 35 : 40;
+    const iconOffset = isMobile ? 10 : 12;
+    const iconSize = isMobile ? 20 : 24;
+    const textOffset = isMobile ? 42 : 50;
+
     return (
-        <g>
+        <g className={isMobile ? 'step-node-mobile' : ''}>
             {/* Larger invisible clickable area */}
             <circle
                 cx={position.x}
                 cy={position.y}
-                r="40"
+                r={clickableRadius}
                 className="fill-transparent cursor-pointer"
                 onClick={handleClick}
-                style={{ cursor: (isAccessible && step.status !== 'locked') ? 'pointer' : 'not-allowed' }}
+                style={{ 
+                    cursor: (isAccessible && step.status !== 'locked') ? 'pointer' : 'not-allowed',
+                    touchAction: isMobile ? 'manipulation' : 'auto'
+                }}
             />
             {/* Visible circle */}
             <circle
                 cx={position.x}
                 cy={position.y}
-                r="30"
-                className={`transition-all duration-300 ${getStatusStyles()}`}
+                r={radius}
+                className={`transition-all duration-300 ${getStatusStyles()} ${isMobile ? 'no-select-mobile' : ''}`}
                 style={{ pointerEvents: 'none' }}
             />
-            <foreignObject x={position.x - 12} y={position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
+            <foreignObject 
+                x={position.x - iconOffset} 
+                y={position.y - iconOffset} 
+                width={iconSize} 
+                height={iconSize} 
+                style={{ pointerEvents: 'none' }}
+            >
                 <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
                     {getIcon()}
                 </div>
             </foreignObject>
             {isAccessible && (
-                <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-700 text-sm font-semibold pointer-events-none">
-                    {step.title}
+                <text 
+                    x={position.x} 
+                    y={position.y + textOffset} 
+                    textAnchor="middle" 
+                    className={`fill-gray-700 ${isMobile ? 'text-xs' : 'text-sm'} font-semibold pointer-events-none`}
+                    style={{ userSelect: 'none' }}
+                >
+                    {isMobile && step.title.length > 12 ? step.title.substring(0, 12) + '...' : step.title}
                 </text>
             )}
             {!isAccessible && (
-                <text x={position.x} y={position.y + 50} textAnchor="middle" className="fill-gray-400 text-xs font-semibold pointer-events-none">
-                    {step.title}
+                <text 
+                    x={position.x} 
+                    y={position.y + textOffset} 
+                    textAnchor="middle" 
+                    className={`fill-gray-400 ${isMobile ? 'text-xs' : 'text-xs'} font-semibold pointer-events-none`}
+                    style={{ userSelect: 'none' }}
+                >
+                    {isMobile && step.title.length > 12 ? step.title.substring(0, 12) + '...' : step.title}
                 </text>
             )}
         </g>
@@ -2667,7 +2695,7 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
 };
 
 // --- Bonus Node Component ---
-const BonusNode = ({ node, isAccessible, onClick }) => {
+const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     const { hasAIAccess } = useSubscription();
     const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
     
@@ -2690,43 +2718,66 @@ const BonusNode = ({ node, isAccessible, onClick }) => {
         }
     };
 
+    const radius = isMobile ? 22 : 25;
+    const clickableRadius = isMobile ? 32 : 35;
+    const iconOffset = isMobile ? 10 : 12;
+    const iconSize = isMobile ? 20 : 24;
+    const textOffset = isMobile ? 35 : 40;
+
     return (
-        <g>
+        <g className={isMobile ? 'bonus-node-mobile' : ''}>
             {/* Larger invisible clickable area */}
             <circle
                 cx={node.position.x}
                 cy={node.position.y}
-                r="35"
+                r={clickableRadius}
                 className="fill-transparent cursor-pointer"
                 onClick={handleClick}
-                style={{ cursor: isAccessible ? 'pointer' : 'not-allowed' }}
+                style={{ 
+                    cursor: isAccessible ? 'pointer' : 'not-allowed',
+                    touchAction: isMobile ? 'manipulation' : 'auto'
+                }}
             />
             {/* Visible circle */}
             <circle
                 cx={node.position.x}
                 cy={node.position.y}
-                r="25"
-                className={`transition-all duration-300 ${getNodeColor()}`}
+                r={radius}
+                className={`transition-all duration-300 ${getNodeColor()} ${isMobile ? 'no-select-mobile' : ''}`}
                 style={{ pointerEvents: 'none' }}
             />
-            <foreignObject x={node.position.x - 12} y={node.position.y - 12} width="24" height="24" style={{ pointerEvents: 'none' }}>
+            <foreignObject 
+                x={node.position.x - iconOffset} 
+                y={node.position.y - iconOffset} 
+                width={iconSize} 
+                height={iconSize} 
+                style={{ pointerEvents: 'none' }}
+            >
                 <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
-                    <node.icon size={20} />
+                    <node.icon size={isMobile ? 16 : 20} />
                 </div>
             </foreignObject>
-            <text x={node.position.x} y={node.position.y + 40} textAnchor="middle" className={`text-xs font-semibold pointer-events-none ${isAccessible ? 'fill-gray-700' : 'fill-gray-400'}`}>
-                {node.title}
+            <text 
+                x={node.position.x} 
+                y={node.position.y + textOffset} 
+                textAnchor="middle" 
+                className={`${isMobile ? 'text-xs' : 'text-xs'} font-semibold pointer-events-none ${isAccessible ? 'fill-gray-700' : 'fill-gray-400'}`}
+                style={{ userSelect: 'none' }}
+            >
+                {isMobile && node.title.length > 10 ? node.title.substring(0, 10) + '...' : node.title}
             </text>
             {!isAccessible && (
-                <Lock 
-                    size={12} 
-                    className="pointer-events-none text-gray-400" 
-                    style={{ 
-                        position: 'absolute', 
-                        left: node.position.x + 15, 
-                        top: node.position.y - 15 
-                    }} 
-                />
+                <foreignObject 
+                    x={node.position.x + (isMobile ? 12 : 15)} 
+                    y={node.position.y - (isMobile ? 12 : 15)} 
+                    width={isMobile ? 10 : 12} 
+                    height={isMobile ? 10 : 12}
+                    style={{ pointerEvents: 'none' }}
+                >
+                    <div className="flex items-center justify-center w-full h-full">
+                        <Lock size={isMobile ? 8 : 12} className="text-gray-400" />
+                    </div>
+                </foreignObject>
             )}
         </g>
     );
@@ -3179,105 +3230,160 @@ const AppContent = () => {
     const currentStep = displayedSteps.find(step => step.status === 'unlocked');
     const progressPercentage = (steps.filter(s => s.tasks.every(t => t.completed)).length / steps.length) * 100;
 
+    // Mobile detection
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     return (
-        <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 prevent-horizontal-scroll">
             {confetti && <Confetti />}
             
-            {/* Subscription info and upgrade button */}
-            <div className="fixed top-4 left-4 z-40 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
-                <div className="text-sm font-semibold text-gray-700">
-                    Plan: <span className={`${subscriptionTier === 'FREE' ? 'text-gray-600' : subscriptionTier === 'BASIC' ? 'text-blue-600' : 'text-purple-600'}`}>
-                        {subscriptionTier === 'FREE' ? 'Free' : subscriptionTier === 'BASIC' ? 'Basic' : 'Premium'}
-                    </span>
-                </div>
-                {subscriptionTier !== 'PREMIUM' && (
-                    <button 
-                        onClick={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
-                        className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
-                    >
-                        Upgrade
-                    </button>
-                )}
-                {/* Developer Testing Buttons */}
-                <div className="mt-2 text-xs space-y-1">
-                    <div className="text-gray-500">Test Mode:</div>
-                    <div className="flex gap-1">
-                        <button 
-                            onClick={() => handleTestModeSubscription('FREE')}
-                            className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'FREE' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-600'}`}
-                        >
-                            Free
-                        </button>
-                        <button 
-                            onClick={() => handleTestModeSubscription('BASIC')}
-                            className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'BASIC' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
-                        >
-                            Basic
-                        </button>
-                        <button 
-                            onClick={() => handleTestModeSubscription('PREMIUM')}
-                            className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'PREMIUM' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}
-                        >
-                            Premium
-                        </button>
-                    </div>
-                    <button 
-                        onClick={() => {
-                            localStorage.removeItem('authToken');
-                            localStorage.removeItem('userRegistered');
-                            localStorage.removeItem('tutorialViewed');
-                            localStorage.removeItem('gdpr_consent');
-                            window.location.reload();
-                        }}
-                        className="mt-1 px-2 py-0.5 rounded text-xs bg-red-500 text-white hover:bg-red-600"
-                        title="Reset registration flow for testing"
-                    >
-                        Reset Flow
-                    </button>
-                </div>
-            </div>
-            
-            {/* Level/Experience bar - moved to top row */}
-            <div className="fixed top-4 right-4 z-30">
-                <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-xs">
-                    <div className="flex items-center gap-2 text-sm">
-                        <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 text-yellow-500" />
-                            <span className="font-semibold">Nivel {userStats.level}</span>
+            {/* Mobile Header Container */}
+            {isMobile ? (
+                <div className="mobile-header-container mobile-safe-area">
+                    {/* Left side - Subscription info */}
+                    <div className="subscription-info-mobile">
+                        <div className="text-xs font-semibold text-gray-700">
+                            <span className={`${subscriptionTier === 'FREE' ? 'text-gray-600' : subscriptionTier === 'BASIC' ? 'text-blue-600' : 'text-purple-600'}`}>
+                                {subscriptionTier === 'FREE' ? 'Free' : subscriptionTier === 'BASIC' ? 'Basic' : 'Premium'}
+                            </span>
                         </div>
-                        <div className="text-gray-500">•</div>
-                        <div className="text-purple-600 font-semibold">{userStats.points} XP</div>
-                        <div className="text-gray-500">•</div>
-                        <div className="flex items-center gap-1 text-orange-500">
-                            <Flame className="h-3 w-3" />
-                            <span className="text-xs">{userStats.streakDays}d</span>
+                        {subscriptionTier !== 'PREMIUM' && (
+                            <button 
+                                onClick={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
+                                className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-1 py-0.5 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
+                            >
+                                Upgrade
+                            </button>
+                        )}
+                    </div>
+                    
+                    {/* Right side - Level bar */}
+                    <div className="level-bar-mobile">
+                        <div className="flex items-center gap-1 text-xs">
+                            <Star className="h-3 w-3 text-yellow-500" />
+                            <span className="font-semibold">L{userStats.level}</span>
+                            <span className="text-purple-600">{userStats.points}XP</span>
+                            <Flame className="h-2 w-2 text-orange-500" />
+                            <span>{userStats.streakDays}d</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                            <div 
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full transition-all duration-500"
+                                style={{ width: `${userStats.experienceProgress}%` }}
+                            ></div>
                         </div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                        <div 
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-500"
-                            style={{ width: `${userStats.experienceProgress}%` }}
-                        ></div>
-                    </div>
                 </div>
-            </div>
+            ) : (
+                /* Desktop Header Layout */
+                <>
+                    {/* Subscription info and upgrade button */}
+                    <div className="fixed top-4 left-4 z-40 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
+                        <div className="text-sm font-semibold text-gray-700">
+                            Plan: <span className={`${subscriptionTier === 'FREE' ? 'text-gray-600' : subscriptionTier === 'BASIC' ? 'text-blue-600' : 'text-purple-600'}`}>
+                                {subscriptionTier === 'FREE' ? 'Free' : subscriptionTier === 'BASIC' ? 'Basic' : 'Premium'}
+                            </span>
+                        </div>
+                        {subscriptionTier !== 'PREMIUM' && (
+                            <button 
+                                onClick={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
+                                className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded mt-1 hover:from-purple-600 hover:to-pink-600 transition-colors"
+                            >
+                                Upgrade
+                            </button>
+                        )}
+                        {/* Developer Testing Buttons */}
+                        <div className="mt-2 text-xs space-y-1">
+                            <div className="text-gray-500">Test Mode:</div>
+                            <div className="flex gap-1">
+                                <button 
+                                    onClick={() => handleTestModeSubscription('FREE')}
+                                    className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'FREE' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                                >
+                                    Free
+                                </button>
+                                <button 
+                                    onClick={() => handleTestModeSubscription('BASIC')}
+                                    className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'BASIC' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                                >
+                                    Basic
+                                </button>
+                                <button 
+                                    onClick={() => handleTestModeSubscription('PREMIUM')}
+                                    className={`px-2 py-0.5 rounded text-xs ${subscriptionTier === 'PREMIUM' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                                >
+                                    Premium
+                                </button>
+                            </div>
+                            <button 
+                                onClick={() => {
+                                    localStorage.removeItem('authToken');
+                                    localStorage.removeItem('userRegistered');
+                                    localStorage.removeItem('tutorialViewed');
+                                    localStorage.removeItem('gdpr_consent');
+                                    window.location.reload();
+                                }}
+                                className="mt-1 px-2 py-0.5 rounded text-xs bg-red-500 text-white hover:bg-red-600"
+                                title="Reset registration flow for testing"
+                            >
+                                Reset Flow
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {/* Level/Experience bar - moved to top row */}
+                    <div className="fixed top-4 right-4 z-30">
+                        <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-xs">
+                            <div className="flex items-center gap-2 text-sm">
+                                <div className="flex items-center gap-1">
+                                    <Star className="h-4 w-4 text-yellow-500" />
+                                    <span className="font-semibold">Nivel {userStats.level}</span>
+                                </div>
+                                <div className="text-gray-500">•</div>
+                                <div className="text-purple-600 font-semibold">{userStats.points} XP</div>
+                                <div className="text-gray-500">•</div>
+                                <div className="flex items-center gap-1 text-orange-500">
+                                    <Flame className="h-3 w-3" />
+                                    <span className="text-xs">{userStats.streakDays}d</span>
+                                </div>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                                <div 
+                                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-500"
+                                    style={{ width: `${userStats.experienceProgress}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
 
-            {/* Three icons - moved below level bar */}
-            <div className="fixed top-24 right-4 z-40 flex flex-col gap-2">
+            {/* Action buttons - mobile optimized */}
+            <div className={`${isMobile ? 'action-buttons-mobile' : 'fixed top-24 right-4 z-40 flex flex-col gap-2'}`}>
                 <button 
                     onClick={() => setModalStates(prev => ({...prev, personalFileModal: true}))}
-                    className="bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
+                    className={`bg-purple-600 text-white ${isMobile ? 'touch-target-mobile' : 'w-14 h-14'} rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110 no-select-mobile`}
                     title="Dosarul Meu Personal"
                 >
-                    <FolderKanban size={28} />
+                    <FolderKanban size={isMobile ? 20 : 28} />
                 </button>
                 
                 <button 
                     onClick={() => setModalStates(prev => ({...prev, settings: true}))}
-                    className="bg-gray-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-transform duration-300 hover:scale-110"
+                    className={`bg-gray-600 text-white ${isMobile ? 'touch-target-mobile' : 'w-14 h-14'} rounded-full flex items-center justify-center shadow-lg hover:bg-gray-700 transition-transform duration-300 hover:scale-110 no-select-mobile`}
                     title="Setări"
                 >
-                    <Settings size={28} />
+                    <Settings size={isMobile ? 20 : 28} />
                 </button>
                 
                 <button 
@@ -3285,23 +3391,23 @@ const AppContent = () => {
                         localStorage.removeItem('tutorialViewed');
                         setModalStates(prev => ({...prev, tutorial: true}));
                     }}
-                    className="bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-transform duration-300 hover:scale-110"
+                    className={`bg-green-600 text-white ${isMobile ? 'touch-target-mobile' : 'w-14 h-14'} rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-transform duration-300 hover:scale-110 no-select-mobile`}
                     title="Tutorial"
                 >
-                    <Info size={28} />
+                    <Info size={isMobile ? 20 : 28} />
                 </button>
             </div>
             
-            {/* Progress toggle bar - moved above FeedbackWidget */}
-            <div className="fixed bottom-20 right-4 z-40 flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
-                <span className={`text-sm font-bold ${!freeMode ? 'text-blue-600' : 'text-gray-500'}`}>Progresiv</span>
-                <button onClick={() => setFreeMode(!freeMode)} className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${freeMode ? 'bg-green-500' : 'bg-gray-300'}`}>
-                    <span className={`block w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${freeMode ? 'translate-x-6' : 'translate-x-0'}`}></span>
+            {/* Progress toggle bar - mobile optimized */}
+            <div className={`${isMobile ? 'progress-toggle-mobile' : 'fixed bottom-20 right-4 z-40'} flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm`}>
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold ${!freeMode ? 'text-blue-600' : 'text-gray-500'}`}>Progresiv</span>
+                <button onClick={() => setFreeMode(!freeMode)} className={`${isMobile ? 'w-8 h-4' : 'w-12 h-6'} rounded-full p-1 transition-colors duration-300 ${freeMode ? 'bg-green-500' : 'bg-gray-300'}`}>
+                    <span className={`block ${isMobile ? 'w-2 h-2' : 'w-4 h-4'} bg-white rounded-full shadow-md transform transition-transform duration-300 ${freeMode ? (isMobile ? 'translate-x-4' : 'translate-x-6') : 'translate-x-0'}`}></span>
                 </button>
-                <span className={`text-sm font-bold ${freeMode ? 'text-green-600' : 'text-gray-500'}`}>Liber</span>
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold ${freeMode ? 'text-green-600' : 'text-gray-500'}`}>Liber</span>
             </div>
 
-            <div className="w-full max-w-md mx-auto">
+            <div className={`w-full max-w-md mx-auto ${isMobile ? 'mobile-main-content mobile-text-scale' : ''}`}>
                 <header className="text-center mb-6 bg-white/70 backdrop-blur-sm p-4 rounded-xl shadow-md">
                     <h1 className="text-3xl md:text-4xl font-black text-gray-800">Approbation în Germania</h1>
                     <p className="text-gray-500 mt-1">Ghidul tău interactiv pas cu pas.</p>
@@ -3313,16 +3419,43 @@ const AppContent = () => {
                 
 
                 
-                <main className="relative w-full h-[600px]">
-                    <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
-                    <Cloud style={{ top: '60%', right: '5%', width: '60px', height: '60px' }} />
+                <main className={`relative w-full h-[600px] ${isMobile ? 'journey-map-mobile smooth-scroll-mobile' : ''}`}>
+                    <Cloud style={{ top: '5%', left: '10%', width: isMobile ? '60px' : '80px', height: isMobile ? '60px' : '80px' }} />
+                    <Cloud style={{ top: '60%', right: '5%', width: isMobile ? '40px' : '60px', height: isMobile ? '40px' : '60px' }} />
                     
-                    <svg width="100%" height="100%" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" className="absolute top-0 left-0">
-                        <path d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" stroke="#d6a770" strokeWidth="8" fill="none" strokeLinecap="round" />
-                        <path d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="1 10" />
+                    <svg 
+                        width="100%" 
+                        height="100%" 
+                        viewBox={isMobile ? "0 0 400 650" : "0 0 400 600"} 
+                        preserveAspectRatio="xMidYMid meet" 
+                        className={`absolute top-0 left-0 ${isMobile ? 'no-select-mobile' : ''}`}
+                    >
+                        <path 
+                            d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" 
+                            stroke="#d6a770" 
+                            strokeWidth={isMobile ? "6" : "8"} 
+                            fill="none" 
+                            strokeLinecap="round" 
+                        />
+                        <path 
+                            d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" 
+                            stroke="white" 
+                            strokeWidth={isMobile ? "2" : "3"} 
+                            fill="none" 
+                            strokeLinecap="round" 
+                            strokeDasharray="1 10" 
+                        />
                         
                         {displayedSteps.map((step, index) => ( 
-                            <StepNode key={step.id} step={step} position={nodePositions[index]} onStepClick={handleStepClick} isCurrent={currentStep?.id === step.id} isAccessible={canAccessStep(index + 1)} /> 
+                            <StepNode 
+                                key={step.id} 
+                                step={step} 
+                                position={nodePositions[index]} 
+                                onStepClick={handleStepClick} 
+                                isCurrent={currentStep?.id === step.id} 
+                                isAccessible={canAccessStep(index + 1)}
+                                isMobile={isMobile}
+                            /> 
                         ))}
                         
                         {bonusNodes.map((node, index) => 
@@ -3331,6 +3464,7 @@ const AppContent = () => {
                                 node={node} 
                                 onClick={handleBonusNodeClick} 
                                 isAccessible={isBonusNodeAccessible(index)}
+                                isMobile={isMobile}
                             />
                         )}
                     </svg>
@@ -3405,28 +3539,49 @@ const AppContent = () => {
                 onClose={closeLegal}
             />
             
-            {/* Footer with Legal Links */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30">
+            {/* Footer with Legal Links - mobile optimized */}
+            <div className={`${isMobile ? 'footer-mobile mobile-safe-bottom' : 'fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30'}`}>
                 <div>© 2024 ApprobMed</div>
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => setModalStates(prev => ({...prev, legal: true}))}
-                        className="hover:text-gray-700 transition-colors"
-                    >
-                        Termeni și Condiții
-                    </button>
-                    <button
-                        onClick={() => setModalStates(prev => ({...prev, legal: true}))}
-                        className="hover:text-gray-700 transition-colors"
-                    >
-                        Politica de Confidențialitate
-                    </button>
-                    <span>contact@approbmed.com</span>
-                </div>
+                {!isMobile && (
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                            className="hover:text-gray-700 transition-colors"
+                        >
+                            Termeni și Condiții
+                        </button>
+                        <button
+                            onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                            className="hover:text-gray-700 transition-colors"
+                        >
+                            Politica de Confidențialitate
+                        </button>
+                        <span>contact@approbmed.com</span>
+                    </div>
+                )}
+                {isMobile && (
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                            className="hover:text-gray-700 transition-colors"
+                        >
+                            Termeni
+                        </button>
+                        <span>•</span>
+                        <button
+                            onClick={() => setModalStates(prev => ({...prev, legal: true}))}
+                            className="hover:text-gray-700 transition-colors"
+                        >
+                            Confidențialitate
+                        </button>
+                    </div>
+                )}
             </div>
 
-            {/* Feedback Widget */}
-            <FeedbackWidget />
+            {/* Feedback Widget - mobile positioned */}
+            <div className={isMobile ? 'feedback-widget-mobile' : ''}>
+                <FeedbackWidget />
+            </div>
             
 
         </div>
