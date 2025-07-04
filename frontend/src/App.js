@@ -832,7 +832,7 @@ const bonusNodes = [
 ];
 
 // --- Personal File Modal Component - Updated to use new API integration ---
-const PersonalFileModal = ({ isOpen, onClose }) => {
+const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
     const { files, loading, addFile, uploadFile, deleteFile, handleFileClick } = usePersonalFiles();
     const { hasAIAccess } = useSubscription();
     const [newItemType, setNewItemType] = useState(null);
@@ -1168,7 +1168,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                      Asistentul AI cu analiză de documente este disponibil doar pentru utilizatorii Premium.
                                  </p>
                                  <button
-                                     onClick={() => setSubscriptionUpgradeOpen(true)}
+                                     onClick={onSubscriptionUpgrade}
                                      className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
                                  >
                                      Upgrade la Premium
@@ -1348,7 +1348,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                          Asistentul AI cu analiză de documente este disponibil doar pentru utilizatorii Premium.
                                      </p>
                                      <button
-                                         onClick={() => setSubscriptionUpgradeOpen(true)}
+                                         onClick={onSubscriptionUpgrade}
                                          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
                                      >
                                          Upgrade la Premium
@@ -3326,7 +3326,11 @@ const AppContent = () => {
                     });
                 }}
             />
-            <PersonalFileModal isOpen={modalStates.personalFileModal} onClose={closePersonalFileModal} />
+                            <PersonalFileModal 
+                    isOpen={modalStates.personalFileModal} 
+                    onClose={closePersonalFileModal}
+                    onSubscriptionUpgrade={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
+                />
             <SubscriptionUpgrade 
                 isOpen={modalStates.subscriptionUpgrade} 
                 onClose={closeSubscriptionModal}
