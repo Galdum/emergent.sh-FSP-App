@@ -2602,11 +2602,18 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobi
         }
     };
 
+    // Define all size constants consistently
+    const radius = isMobile ? 25 : 30;
+    const clickableRadius = isMobile ? 35 : 40;
+    const iconContainerSize = isMobile ? 20 : 24;
+    const iconOffset = iconContainerSize / 2; // Half of container size for proper centering
+    const iconSize = isMobile ? 16 : 20; // Actual icon size, smaller than container for padding
+    const textOffset = isMobile ? 42 : 50;
+
     const getIcon = () => {
-        const iconSize = isMobile ? 18 : 24;
         if (step.status === 'completed') return <Check size={iconSize} />;
-        if (step.status === 'locked' || !isAccessible) return <Lock size={isMobile ? 16 : 20} />;
-        return <step.icon size={isMobile ? 16 : 20} />;
+        if (step.status === 'locked' || !isAccessible) return <Lock size={iconSize} />;
+        return <step.icon size={iconSize} />;
     };
 
     const getIconColor = () => {
@@ -2628,12 +2635,6 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobi
             onStepClick(step);
         }
     };
-
-    const radius = isMobile ? 25 : 30;
-    const clickableRadius = isMobile ? 35 : 40;
-    const iconOffset = isMobile ? 10 : 12;
-    const iconSize = isMobile ? 20 : 24;
-    const textOffset = isMobile ? 42 : 50;
 
     return (
         <g className={isMobile ? 'step-node-mobile' : ''}>
@@ -2660,8 +2661,8 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobi
             <foreignObject 
                 x={position.x - iconOffset} 
                 y={position.y - iconOffset} 
-                width={iconSize} 
-                height={iconSize} 
+                width={iconContainerSize} 
+                height={iconContainerSize} 
                 style={{ pointerEvents: 'none' }}
             >
                 <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
@@ -2718,10 +2719,12 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
         }
     };
 
+    // Define all size constants consistently for bonus nodes
     const radius = isMobile ? 22 : 25;
     const clickableRadius = isMobile ? 32 : 35;
-    const iconOffset = isMobile ? 10 : 12;
-    const iconSize = isMobile ? 20 : 24;
+    const iconContainerSize = isMobile ? 20 : 24;
+    const iconOffset = iconContainerSize / 2; // Half of container size for proper centering
+    const iconSize = isMobile ? 16 : 20; // Actual icon size, consistent with step nodes
     const textOffset = isMobile ? 35 : 40;
 
     return (
@@ -2749,12 +2752,12 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
             <foreignObject 
                 x={node.position.x - iconOffset} 
                 y={node.position.y - iconOffset} 
-                width={iconSize} 
-                height={iconSize} 
+                width={iconContainerSize} 
+                height={iconContainerSize} 
                 style={{ pointerEvents: 'none' }}
             >
                 <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
-                    <node.icon size={isMobile ? 16 : 20} />
+                    <node.icon size={iconSize} />
                 </div>
             </foreignObject>
             <text 
@@ -2768,14 +2771,14 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
             </text>
             {!isAccessible && (
                 <foreignObject 
-                    x={node.position.x + (isMobile ? 12 : 15)} 
-                    y={node.position.y - (isMobile ? 12 : 15)} 
-                    width={isMobile ? 10 : 12} 
-                    height={isMobile ? 10 : 12}
+                    x={node.position.x + (radius * 0.6)} 
+                    y={node.position.y - (radius * 0.6)} 
+                    width={iconSize * 0.75} 
+                    height={iconSize * 0.75}
                     style={{ pointerEvents: 'none' }}
                 >
                     <div className="flex items-center justify-center w-full h-full">
-                        <Lock size={isMobile ? 8 : 12} className="text-gray-400" />
+                        <Lock size={iconSize * 0.6} className="text-gray-400" />
                     </div>
                 </foreignObject>
             )}
@@ -3541,7 +3544,7 @@ const AppContent = () => {
             
             {/* Footer with Legal Links - mobile optimized */}
             <div className={`${isMobile ? 'footer-mobile mobile-safe-bottom' : 'fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30'}`}>
-                <div>© 2024 ApprobMed</div>
+                <div>© 2024 FSP Navigator</div>
                 {!isMobile && (
                     <div className="flex items-center gap-4">
                         <button
@@ -3556,7 +3559,7 @@ const AppContent = () => {
                         >
                             Politica de Confidențialitate
                         </button>
-                        <span>contact@approbmed.com</span>
+                        <span>contact@fspnavigator.com</span>
                     </div>
                 )}
                 {isMobile && (
