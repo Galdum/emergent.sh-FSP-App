@@ -3407,7 +3407,7 @@ const AppContent = () => {
             
             {/* Footer with Legal Links */}
             <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30">
-                <div>© 2024 ApprobMed</div>
+                <div>© 2024 FSP Navigator</div>
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => setModalStates(prev => ({...prev, legal: true}))}
@@ -3421,7 +3421,7 @@ const AppContent = () => {
                     >
                         Politica de Confidențialitate
                     </button>
-                    <span>contact@approbmed.com</span>
+                    <span>contact@fspnavigator.com</span>
                 </div>
             </div>
 

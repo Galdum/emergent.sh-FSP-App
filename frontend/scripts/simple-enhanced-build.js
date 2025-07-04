@@ -499,5 +499,5 @@ console.log('');
 console.log('📁 Files created:');
 execSync('ls -la build/', { cwd: path.dirname(buildDir), stdio: 'inherit' });
 console.log('');
-console.log('🌐 Ready for emergent.sh deployment!');
+console.log('🌐 Ready for production deployment!');
 console.log('💡 All enhanced features are functional and visible in the preview');

@@ -129,7 +129,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'my-approbmed-data.json';
+      a.download = 'my-fsp-navigator-data.json';
       a.click();
       URL.revokeObjectURL(url);
       setMessage('Datele au fost exportate cu succes');

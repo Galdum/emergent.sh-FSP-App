@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# ApprobMed Preview Script - Simplified for testing
+# FSP Navigator Preview Script - Simplified for testing
 
 echo "==================================="
-echo "ApprobMed Backend Preview"
+echo "FSP Navigator Backend Preview"
 echo "==================================="
 
 # Check if we're in the right directory
@@ -82,8 +82,8 @@ JWT_SECRET = os.environ.get("JWT_SECRET", "preview-secret")
 JWT_ALGORITHM = "HS256"
 
 app = FastAPI(
-    title="ApprobMed Preview API",
-    description="Preview version of ApprobMed - AI-powered medical license guide for Germany",
+    title="FSP Navigator Preview API",
+    description="Preview version of FSP Navigator - AI-powered medical license guide for Germany",
     version="1.0.0-preview"
 )
 
@@ -127,7 +127,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to ApprobMed Preview",
+        "message": "Welcome to FSP Navigator Preview",
         "docs": "Visit /docs for API documentation",
         "status": "preview_mode"
     }
@@ -230,7 +230,7 @@ app.add_middleware(
 
 if __name__ == "__main__":
     import uvicorn
-    print("\n🚀 Starting ApprobMed Preview Server...")
+    print("\n🚀 Starting FSP Navigator Preview Server...")
     print("📚 API Documentation: http://localhost:8000/docs")
     print("🔧 This is a preview version with mock data\n")
     uvicorn.run(app, host="0.0.0.0", port=8000)
@@ -238,7 +238,7 @@ EOF
 
 # Try to run the main server first
 echo ""
-echo "Starting ApprobMed Preview Server..."
+echo "Starting FSP Navigator Preview Server..."
 echo "==================================="
 
 # Check if we can import the main server

@@ -79,7 +79,7 @@ async def lifespan(app: FastAPI):
 
 # Create the main app with lifespan
 app = FastAPI(
-    title="ApprobMed API", 
+    title="FSP Navigator API", 
     version="1.0.0",
     description="AI-powered platform for medical graduates seeking Approbation in Germany",
     lifespan=lifespan
@@ -130,7 +130,7 @@ from backend.routes.backup import router as backup_router
 from backend.routes.deployment import router as deployment_router
 from backend.routes.gdpr import router as gdpr_router
 
-# Import new ApprobMed specific routes
+    # Import new FSP Navigator specific routes
 from backend.routes.documents import router as documents_router
 from backend.routes.badges import router as badges_router
 try:
@@ -167,7 +167,7 @@ api_router.include_router(backup_router)
 api_router.include_router(deployment_router)
 api_router.include_router(gdpr_router)
 
-# Include new ApprobMed routes
+    # Include new FSP Navigator routes
 api_router.include_router(documents_router)
 api_router.include_router(badges_router)
 if AI_ROUTER_AVAILABLE:
@@ -180,7 +180,7 @@ api_router.include_router(mongodb_example_router)
 @api_router.get("/")
 async def root():
     return {
-        "message": "ApprobMed API", 
+        "message": "FSP Navigator API", 
         "version": "1.0.0",
         "description": "AI-powered platform for medical graduates seeking Approbation in Germany"
     }
