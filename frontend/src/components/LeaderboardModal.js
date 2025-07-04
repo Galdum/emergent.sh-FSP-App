@@ -19,7 +19,7 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
   const miniGamesData = {
     fachbegriffe: {
       title: "⚡ Fachbegriffe Flash",
-      timeLimit: 0.5, // 30 seconds
+      timeLimit: 0.5, // 0.5 minutes = 30 seconds
       questions: [
         {
           question: "Ce înseamnă 'Schmerzen' în română?",
