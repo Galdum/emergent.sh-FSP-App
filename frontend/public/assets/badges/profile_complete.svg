@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle background -->
+  <circle cx="32" cy="32" r="28" fill="#14B8A6"/>
+  <circle cx="32" cy="32" r="25" fill="#0D9488"/>
+  
+  <!-- User silhouette -->
+  <circle cx="32" cy="24" r="8" fill="white"/>
+  <path d="M18 52C18 42 24 38 32 38S46 42 46 52" fill="white"/>
+  
+  <!-- Checkmark overlay -->
+  <circle cx="48" cy="16" r="8" fill="#10B981"/>
+  <path d="M44 16L47 19L52 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

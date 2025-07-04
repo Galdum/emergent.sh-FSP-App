@@ -5,6 +5,10 @@ from backend.auth import get_current_user
 from backend.database import get_database
 from backend.models import UserInDB
 from datetime import datetime
+import logging
+
+# Import badge awarding functionality
+from backend.routes.badges import check_and_award_badges
 
 router = APIRouter(prefix="/progress", tags=["progress"])
 
@@ -104,6 +108,12 @@ async def update_progress(
         progress.dict(),
         upsert=True
     )
+    
+    # Check and award badges for progress updates
+    try:
+        await check_and_award_badges(db, current_user.id)
+    except Exception as e:
+        logging.warning(f"Failed to check badges after progress update: {e}")
     
     return MessageResponse(message="Progress updated successfully")
 

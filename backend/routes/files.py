@@ -15,6 +15,9 @@ import aiofiles
 import hashlib
 import logging
 
+# Import badge awarding functionality
+from backend.routes.badges import check_and_award_badges
+
 router = APIRouter(prefix="/files", tags=["personal_files"])
 
 # Create uploads directory if it doesn't exist
@@ -189,6 +192,12 @@ async def upload_file(
         },
         ip_address=request.client.host if request.client else None
     )
+    
+    # Check and award badges for file upload
+    try:
+        await check_and_award_badges(db, current_user.id)
+    except Exception as e:
+        logger.warning(f"Failed to check badges after file upload: {e}")
     
     return PersonalFileResponse(**personal_file.dict())
 

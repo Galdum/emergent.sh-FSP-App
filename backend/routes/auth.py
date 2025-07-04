@@ -17,6 +17,9 @@ from backend.models import UserInDB, User
 from backend.security import AuditLogger, validate_email
 from backend.services.email_service import send_password_reset_email, send_welcome_email
 
+# Import badge functions for login streak tracking
+from backend.routes.badges import update_login_streak, check_and_award_badges
+
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
 @router.post("/register", response_model=Token)
@@ -146,6 +149,13 @@ async def login(
         }}
     )
     
+    # Update login streak and check for badges
+    try:
+        current_streak = await update_login_streak(db, user.id)
+        await check_and_award_badges(db, user.id)
+    except Exception as e:
+        print(f"Failed to update login streak or check badges: {e}")
+    
     # Log successful login
     audit_logger = AuditLogger(db)
     await audit_logger.log_action(
@@ -213,6 +223,13 @@ async def google_login(
         else:
             # Convert existing user
             user_response = User(**user_data)
+        
+        # Update login streak and check for badges
+        try:
+            current_streak = await update_login_streak(db, user_response.id)
+            await check_and_award_badges(db, user_response.id)
+        except Exception as e:
+            print(f"Failed to update login streak or check badges: {e}")
         
         # Log successful login
         audit_logger = AuditLogger(db)
@@ -299,6 +316,12 @@ async def update_user_profile(
     
     # Get updated user
     updated_user = await db.users.find_one({"id": current_user.id})
+    
+    # Check for badges after profile update (profile completion badge)
+    try:
+        await check_and_award_badges(db, current_user.id)
+    except Exception as e:
+        print(f"Failed to check badges after profile update: {e}")
     
     # Log profile update
     audit_logger = AuditLogger(db)
