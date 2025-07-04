@@ -6,7 +6,7 @@ frontend:
   output_directory: "build"
   install_command: "npm install"
   dev_command: "npm start"
-  node_version: "18"
+  node_version: "16"
 backend:
   type: "fastapi"
   main_file: "server.py"
