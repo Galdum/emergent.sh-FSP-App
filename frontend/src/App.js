@@ -2991,7 +2991,33 @@ const AppContent = () => {
                 </div>
             </div>
             
-            <div className="fixed top-4 right-4 z-40 flex flex-col gap-2">
+            {/* Level/Experience bar - moved to top row */}
+            <div className="fixed top-4 right-4 z-30">
+                <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-xs">
+                    <div className="flex items-center gap-2 text-sm">
+                        <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 text-yellow-500" />
+                            <span className="font-semibold">Nivel {userStats.level}</span>
+                        </div>
+                        <div className="text-gray-500">•</div>
+                        <div className="text-purple-600 font-semibold">{userStats.points} XP</div>
+                        <div className="text-gray-500">•</div>
+                        <div className="flex items-center gap-1 text-orange-500">
+                            <Flame className="h-3 w-3" />
+                            <span className="text-xs">{userStats.streakDays}d</span>
+                        </div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                        <div 
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-500"
+                            style={{ width: `${userStats.experienceProgress}%` }}
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Three icons - moved below level bar */}
+            <div className="fixed top-24 right-4 z-40 flex flex-col gap-2">
                 <button 
                     onClick={() => setModalStates(prev => ({...prev, personalFileModal: true}))}
                     className="bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-700 transition-transform duration-300 hover:scale-110"
@@ -3020,7 +3046,8 @@ const AppContent = () => {
                 </button>
             </div>
             
-            <div className="fixed bottom-4 right-4 z-40 flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
+            {/* Progress toggle bar - moved above FeedbackWidget */}
+            <div className="fixed bottom-20 right-4 z-40 flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm">
                 <span className={`text-sm font-bold ${!freeMode ? 'text-blue-600' : 'text-gray-500'}`}>Progresiv</span>
                 <button onClick={() => setFreeMode(!freeMode)} className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${freeMode ? 'bg-green-500' : 'bg-gray-300'}`}>
                     <span className={`block w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${freeMode ? 'translate-x-6' : 'translate-x-0'}`}></span>
@@ -3038,30 +3065,7 @@ const AppContent = () => {
                     </div>
                 </header>
                 
-                {/* Discrete Gamification Panel */}
-                <div className="fixed top-20 right-4 z-30">
-                    <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-xs">
-                        <div className="flex items-center gap-2 text-sm">
-                            <div className="flex items-center gap-1">
-                                <Star className="h-4 w-4 text-yellow-500" />
-                                <span className="font-semibold">Nivel {userStats.level}</span>
-                            </div>
-                            <div className="text-gray-500">•</div>
-                            <div className="text-purple-600 font-semibold">{userStats.points} XP</div>
-                            <div className="text-gray-500">•</div>
-                            <div className="flex items-center gap-1 text-orange-500">
-                                <Flame className="h-3 w-3" />
-                                <span className="text-xs">{userStats.streakDays}d</span>
-                            </div>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                            <div 
-                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-500"
-                                style={{ width: `${userStats.experienceProgress}%` }}
-                            ></div>
-                        </div>
-                    </div>
-                </div>
+
                 
                 <main className="relative w-full h-[600px]">
                     <Cloud style={{ top: '5%', left: '10%', width: '80px', height: '80px' }} />
