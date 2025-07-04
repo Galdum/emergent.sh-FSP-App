@@ -26,8 +26,19 @@ cat > package.json << 'EOF'
   },
   "scripts": {
     "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
-    "build": "SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build",
-    "build:production": "SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false BUILD_PATH=dist react-scripts build"
+    "build": "node scripts/simple-enhanced-build.js",
+    "build:react": "GENERATE_SOURCEMAP=false react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "build:clean": "rm -rf build && npm run build",
+    "build:production": "npm run build:clean",
+    "postinstall": "patch-package"
+  },
+  "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@craco/types": "^7.1.0",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0"
   },
   "overrides": {
     "shell-quote": "^1.8.1",
