@@ -15,8 +15,8 @@ import os
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-# Add new import for the UtilInfoDocument model
-from backend.models import UtilInfoDocument
+# Add new import for the UtilInfoDocument models
+from backend.models import UtilInfoDocument, UtilInfoDocumentCreate, UtilInfoDocumentUpdate
 
 @router.get("/stats", response_model=AdminStatsResponse)
 async def get_admin_stats(
@@ -500,25 +500,17 @@ async def get_util_info_docs(
 
 @router.post("/util-info-docs")
 async def create_util_info_doc(
-    doc_data: Dict[str, Any],
+    doc_data: UtilInfoDocumentCreate,
     admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Create a new utility information document."""
     
-    # Validate required fields
-    required_fields = ["title", "category", "content_type"]
-    for field in required_fields:
-        if field not in doc_data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Missing required field: {field}"
-            )
-    
-    # Create document
+    # Create document with system-controlled fields set securely
     util_doc = UtilInfoDocument(
-        **doc_data,
-        created_by=admin_user.id
+        **doc_data.dict(),
+        created_by=admin_user.id,
+        created_at=datetime.utcnow()
     )
     
     await db.util_info_documents.insert_one(util_doc.dict())
@@ -536,7 +528,7 @@ async def create_util_info_doc(
 @router.put("/util-info-docs/{doc_id}")
 async def update_util_info_doc(
     doc_id: str,
-    doc_data: Dict[str, Any],
+    doc_data: UtilInfoDocumentUpdate,
     admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
@@ -550,9 +542,19 @@ async def update_util_info_doc(
             detail="Document not found"
         )
     
-    # Update document
+    # Only include non-None fields in the update (exclude_unset=True)
+    update_fields = doc_data.dict(exclude_unset=True)
+    
+    # Ensure we only update if there are fields to update
+    if not update_fields:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No valid fields provided for update"
+        )
+    
+    # Add system-controlled fields securely
     update_data = {
-        **doc_data,
+        **update_fields,
         "updated_by": admin_user.id,
         "updated_at": datetime.utcnow()
     }
@@ -567,7 +569,7 @@ async def update_util_info_doc(
     await audit_logger.log_action(
         user_id=admin_user.id,
         action="admin_update_util_info_doc",
-        details={"doc_id": doc_id, "changes": list(doc_data.keys())}
+        details={"doc_id": doc_id, "changes": list(update_fields.keys())}
     )
     
     return {"message": "Document updated successfully"}
