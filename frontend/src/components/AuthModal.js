@@ -48,12 +48,35 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
           : await register(email, password);
 
         if (result.success) {
+          // Mark user as registered and authenticated
+          localStorage.setItem('userRegistered', 'true');
+          if (mode === 'register') {
+            // Store GDPR consent from checkboxes
+            localStorage.setItem('gdpr_consent', JSON.stringify({
+              terms: acceptedTerms,
+              privacy: acceptedPrivacy,
+              timestamp: new Date().toISOString()
+            }));
+          }
+          
           onClose();
+          
           // Reset form
           setEmail('');
           setPassword('');
           setConfirmPassword('');
+          setAcceptedTerms(false);
+          setAcceptedPrivacy(false);
           setMode('login');
+          
+          // For new registrations, trigger tutorial after a brief delay
+          if (mode === 'register') {
+            setTimeout(() => {
+              // This will be handled by the App.js useEffect when it detects 
+              // authToken exists but tutorial hasn't been viewed
+              window.location.reload(); // Simple way to trigger the flow
+            }, 500);
+          }
         } else {
           setError(result.error);
         }

@@ -2528,19 +2528,23 @@ const AppContent = () => {
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
 
     useEffect(() => {
-        // Enhanced registration process - Show tutorial first, then GDPR if needed
+        // Enhanced registration process - Check if user is authenticated
+        const authToken = localStorage.getItem('authToken');
+        const userRegistered = localStorage.getItem('userRegistered');
         const tutorialViewed = localStorage.getItem('tutorialViewed');
-        const gdprConsent = localStorage.getItem('gdpr_consent');
         
-        if (!tutorialViewed) {
-            // Show tutorial first in the enhanced registration process
+        if (!authToken && !userRegistered) {
+            // Show auth modal for new users (registration/login)
+            setTimeout(() => {
+                setModalStates(prev => ({...prev, authModal: true}));
+            }, 500);
+        } else if (authToken && !tutorialViewed) {
+            // Show tutorial for registered users who haven't seen it
             setTimeout(() => {
                 setModalStates(prev => ({...prev, tutorial: true}));
             }, 500);
-        } else if (!gdprConsent) {
-            // Only show GDPR after tutorial is completed
-            setModalStates(prev => ({...prev, gdprConsent: true}));
         }
+        // If both auth and tutorial are done, show main interface
     }, []);
 
     const handleGDPRAccept = (consentData) => {
@@ -2768,15 +2772,13 @@ const AppContent = () => {
     const closeSubscriptionModal = () => setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
     const closeEmailVerificationModal = () => setModalStates(prev => ({...prev, emailVerification: false}));
     const closeSettingsModal = () => setModalStates(prev => ({...prev, settings: false}));
+    const closeAuthModal = () => setModalStates(prev => ({...prev, authModal: false}));
     const closeTutorial = () => {
         setModalStates(prev => ({...prev, tutorial: false}));
-        // After tutorial completion, check if GDPR consent is needed
-        const gdprConsent = localStorage.getItem('gdpr_consent');
-        if (!gdprConsent) {
-            setTimeout(() => {
-                setModalStates(prev => ({...prev, gdprConsent: true}));
-            }, 500);
-        }
+        // Mark tutorial as viewed
+        localStorage.setItem('tutorialViewed', 'true');
+        // Tutorial completion leads directly to main interface - no GDPR modal needed
+        // since GDPR consent is handled during registration
     };
     const closeLegal = () => setModalStates(prev => ({...prev, legal: false}));
 
@@ -2834,6 +2836,19 @@ const AppContent = () => {
                             Premium
                         </button>
                     </div>
+                    <button 
+                        onClick={() => {
+                            localStorage.removeItem('authToken');
+                            localStorage.removeItem('userRegistered');
+                            localStorage.removeItem('tutorialViewed');
+                            localStorage.removeItem('gdpr_consent');
+                            window.location.reload();
+                        }}
+                        className="mt-1 px-2 py-0.5 rounded text-xs bg-red-500 text-white hover:bg-red-600"
+                        title="Reset registration flow for testing"
+                    >
+                        Reset Flow
+                    </button>
                 </div>
             </div>
             
@@ -2971,13 +2986,14 @@ const AppContent = () => {
             />
             <AuthModal 
                 isOpen={modalStates.authModal} 
-                onClose={() => setModalStates(prev => ({...prev, authModal: false}))}
+                onClose={closeAuthModal}
             />
-            <GDPRConsentModal 
+            {/* GDPR Consent is now handled during registration process */}
+            {/* <GDPRConsentModal 
                 isOpen={modalStates.gdprConsent}
                 onAccept={handleGDPRAccept}
                 onDecline={handleGDPRDecline}
-            />
+            /> */}
             <SettingsModal 
                 isOpen={modalStates.settings}
                 onClose={closeSettingsModal}
