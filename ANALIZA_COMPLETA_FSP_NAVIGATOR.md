@@ -123,18 +123,19 @@ npm start
 - Upload pentru 5 documente
 - Progres tracking de bază
 
-#### 💎 Nivelul Premium (€29.99/lună)
-- **AI Tutor German Medical** illimitat
-- **Management documente** complet
-- **Simulări FSP** personalizate
-- **Suport prioritar**
-- **Funcții avansate de gamificare**
+#### 💎 Nivelul Basic (€10/lună)
+- **AI Tutor German Medical** cu limită de utilizare
+- **Management documente** extins (15 documente)
+- **Simulări FSP** de bază
+- **Suport email**
+- **Funcții de gamificare**
 
-#### 🏆 Nivelul Pro (€49.99/lună)
-- Toate funcțiile Premium
-- **Consultanță personalizată** cu experți
+#### 🏆 Nivelul Pro (€30/lună)
+- **AI Tutor German Medical** illimitat
+- **Management documente** complet (illimitat)
+- **Simulări FSP** avansate și personalizate
+- **Suport prioritar**
 - **Template-uri documente** premium
-- **Alerte automatizate** pentru deadline-uri
 - **Acces la comunitatea exclusivă**
 
 ### 💰 Proiecții Financiare
@@ -144,11 +145,12 @@ npm start
 - **Rata de conversie estimată**: 5-8% la Premium
 - **Valoarea pe viață a clientului**: €200-400
 
-#### Proiecții An 1
-- **Utilizatori înregistrați**: 2,000
-- **Utilizatori Premium**: 100-160 (5-8%)
-- **Venituri lunare**: €3,000-€8,000
-- **Venituri anuale**: €36,000-€96,000
+#### Proiecții An 1 (Realiste)
+- **Utilizatori înregistrați**: 400-500
+- **Utilizatori Basic (€10/lună)**: 20-25 utilizatori
+- **Utilizatori Pro (€30/lună)**: 5-8 utilizatori
+- **Venituri lunare**: €250-€300
+- **Venituri anuale**: €3,000
 
 #### Potențial de Scalare
 - **Extindere geografică**: Polonia, Bulgaria, Ungaria
@@ -305,19 +307,18 @@ response.headers["Strict-Transport-Security"] = "max-age=31536000"
 
 ## 💼 Analiza Investiției
 
-### 💸 Costuri de Dezvoltare Estimate
-- **Dezvoltare aplicație**: €120,000-€150,000
-- **Design și UX**: €20,000-€30,000
-- **Integrări AI și Plăți**: €15,000-€25,000
-- **Testing și QA**: €10,000-€20,000
-- **Marketing și Lansare**: €30,000-€50,000
+### 💸 Costuri de Dezvoltare Reale
+- **Dezvoltare aplicație**: €7,000
+- **Design și UX**: €1,500
+- **Integrări AI și Plăți**: €1,000
+- **Testing și setup**: €500
 
-**Total investiție estimată**: €195,000-€275,000
+**Total investiție reală**: €10,000
 
 ### 📊 ROI și Break-even
-- **Break-even**: Lună 18-24 cu 200+ utilizatori Premium
-- **ROI la 3 ani**: 250-400%
-- **Valuare estimată după 2 ani**: €2-5 milioane
+- **Break-even**: Lună 40-42 (€10,000 / €250 venituri lunare)
+- **ROI la 3 ani**: 900% (€3,000 x 3 = €9,000 profit după 3 ani)
+- **Payback period**: 3.3 ani pentru recuperarea investiției
 
 ### 🎯 Riscuri și Mitigare
 **Risc**: Competiție de la aplicații similare
@@ -374,7 +375,7 @@ response.headers["Strict-Transport-Security"] = "max-age=31536000"
 
 ## 📞 Next Steps și Contact
 
-**FSP Navigator reprezintă o investiție de €150,000+ în dezvoltare, livrat ca o aplicație production-ready, completă și optimizată pentru thousands de doctori români care caută să-și urmeze cariera în Germania.**
+**FSP Navigator reprezintă o investiție de €10,000 în dezvoltare, livrat ca o aplicație production-ready, completă și optimizată pentru doctorii români care caută să-și urmeze cariera în Germania.**
 
 **🚀 Gata pentru lansare și scalare către o piață de €50M+ în Europa de Est!**
 
@@ -389,5 +390,6 @@ response.headers["Strict-Transport-Security"] = "max-age=31536000"
 
 *Raport generat pe: 17 Decembrie 2024*  
 *Status aplicație: ✅ Production Ready*  
-*Investiție dezvoltare: €150,000+*  
-*ROI projectat: 250-400% în 3 ani*
+*Investiție dezvoltare: €10,000*  
+*Venituri An 1: €3,000*  
+*Break-even: 40-42 luni*
