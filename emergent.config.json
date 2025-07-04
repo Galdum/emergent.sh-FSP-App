@@ -1,0 +1,16 @@
+{
+  "name": "fsp-navigator",
+  "build": {
+    "frontend": {
+      "buildCommand": "cd frontend && npm install --force && npm run build:production",
+      "outputDirectory": "frontend/build"
+    },
+    "backend": {
+      "startCommand": "cd backend && python -m uvicorn server:app --host 0.0.0.0 --port 8000"
+    }
+  },
+  "routes": [
+    {"src": "/api/(.*)", "dest": "/backend/$1"},
+    {"src": "/(.*)", "dest": "/frontend/$1"}
+  ]
+}

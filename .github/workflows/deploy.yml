@@ -1,0 +1,35 @@
+name: 🚀 FSP Navigator Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  fix-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Fix All Issues & Build
+      run: |
+        # Make the automated fix script executable
+        chmod +x cursor-auto-fix.sh
+        
+        # Run the complete automated fix script that includes:
+        # - React 18 upgrade with all dependencies
+        # - PayPal, Google OAuth, Axios, Lucide, Framer Motion, React Router
+        # - Mobile optimizations
+        # - SEO improvements  
+        # - Dependency conflict resolutions
+        # - Production build
+        ./cursor-auto-fix.sh
+        
+    - name: Deploy Ready
+      run: echo "✅ Ready for Emergent.sh deployment!"
