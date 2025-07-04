@@ -1,5 +1,5 @@
 User-agent: *
-Disallow: /api/
 Allow: /
 
+# Enhanced FSP Navigator
 Sitemap: https://sneak-peek-3.preview.emergentagent.com/sitemap.xml

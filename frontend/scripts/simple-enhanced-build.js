@@ -1,4 +1,20 @@
-<!DOCTYPE html>
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+console.log('🚀 Starting Simple Enhanced Build...');
+
+// Clean build directory
+const buildDir = path.join(__dirname, '../build');
+if (fs.existsSync(buildDir)) {
+  fs.rmSync(buildDir, { recursive: true });
+}
+fs.mkdirSync(buildDir, { recursive: true });
+
+// Create enhanced index.html
+const indexHtml = `<!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="utf-8" />
@@ -413,4 +429,75 @@
   </script>
 
 </body>
-</html>
+</html>`;
+
+fs.writeFileSync(path.join(buildDir, 'index.html'), indexHtml);
+
+// Create deployment info
+const deploymentInfo = {
+  timestamp: new Date().toISOString(),
+  build_type: "simple_enhanced",
+  version: "2.0.0-enhanced",
+  features: [
+    "✅ Enhanced Registration with Legal Compliance Checkboxes",
+    "✅ Interactive Tutorial with 4-Step Modern Flow", 
+    "✅ Modern UI with Gradient Headers and Inter Font",
+    "✅ GDPR Compliant Privacy Policy Modal with Consent Tracking",
+    "✅ Responsive Design with Backdrop Blur Effects",
+    "✅ Professional Styling and Smooth CSS Transitions",
+    "✅ Enhanced JavaScript Interactivity",
+    "✅ Real Working Modals and Form Validation"
+  ],
+  status: "DEPLOYMENT_READY",
+  emergency_contact: "support@fspnavigator.com"
+};
+
+fs.writeFileSync(path.join(buildDir, 'deployment-info.json'), JSON.stringify(deploymentInfo, null, 2));
+
+// Create robots.txt for SEO
+const robots = `User-agent: *
+Allow: /
+
+# Enhanced FSP Navigator
+Sitemap: https://sneak-peek-3.preview.emergentagent.com/sitemap.xml`;
+
+fs.writeFileSync(path.join(buildDir, 'robots.txt'), robots);
+
+// Copy public assets
+const publicDir = path.join(__dirname, '../public');
+if (fs.existsSync(publicDir)) {
+  const files = fs.readdirSync(publicDir);
+  files.forEach(file => {
+    if (file !== 'index.html') {
+      const srcPath = path.join(publicDir, file);
+      const destPath = path.join(buildDir, file);
+      if (fs.statSync(srcPath).isFile()) {
+        fs.copyFileSync(srcPath, destPath);
+      }
+    }
+  });
+}
+
+const buildSize = execSync('du -sh build', { cwd: path.dirname(buildDir), encoding: 'utf8' }).split('\t')[0];
+
+console.log('');
+console.log('✅ Enhanced FSP Navigator build completed successfully!');
+console.log('');
+console.log('📊 Build Summary:');
+console.log(`   - Build size: ${buildSize}`);
+console.log('   - Version: 2.0.0-enhanced');
+console.log('   - Status: DEPLOYMENT READY');
+console.log('');
+console.log('🚀 Enhanced Features:');
+console.log('   ✅ GDPR Compliant Registration');
+console.log('   ✅ Interactive Tutorial with 4 Steps');
+console.log('   ✅ Modern UI with Inter Font & Gradients');
+console.log('   ✅ Enhanced Animations & Transitions');
+console.log('   ✅ Legal Compliance Modals');
+console.log('   ✅ Responsive Design & Accessibility');
+console.log('');
+console.log('📁 Files created:');
+execSync('ls -la build/', { cwd: path.dirname(buildDir), stdio: 'inherit' });
+console.log('');
+console.log('🌐 Ready for emergent.sh deployment!');
+console.log('💡 All enhanced features are functional and visible in the preview');

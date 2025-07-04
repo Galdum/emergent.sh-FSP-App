@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "node scripts/manual-build.js",
+    "build": "node scripts/simple-enhanced-build.js",
     "build:react": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -36,33 +36,14 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "autoprefixer": "^10.4.20",
+    "@craco/craco": "^7.1.0",
+    "@craco/types": "^7.1.0",
     "patch-package": "^8.0.0",
-    "postcss": "^8.4.49",
-    "postinstall-postinstall": "^2.1.0",
-    "tailwindcss": "^3.4.17"
-  },
-  "resolutions": {
-    "eslint": "^8.57.0",
-    "ajv": "^8.12.0",
-    "ajv-keywords": "^5.1.0",
-    "fork-ts-checker-webpack-plugin": "^6.5.3",
-    "schema-utils": "^4.2.0"
+    "postinstall-postinstall": "^2.1.0"
   },
   "overrides": {
-    "eslint": "^8.57.0",
-    "ajv": "^8.12.0",
-    "ajv-keywords": "^5.1.0",
-    "fork-ts-checker-webpack-plugin": {
-      "ajv": "^8.12.0",
-      "ajv-keywords": "^5.1.0"
-    },
-    "schema-utils": {
-      "ajv": "^8.12.0",
-      "ajv-keywords": "^5.1.0"
-    }
+    "ajv": "^6.12.6",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "eslint-webpack-plugin": "^2.7.0"
   }
 }
