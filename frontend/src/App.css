@@ -477,6 +477,170 @@ textarea:focus {
     100% { background-position: 200% 0; }
 }
 
+/* Chat Modal Enhancements */
+.chat-modal {
+    /* Custom variables for better control */
+    --chat-modal-padding: 1rem;
+    --chat-modal-max-width: 28rem;
+    --chat-modal-max-height: 95vh;
+}
+
+@media (min-width: 768px) {
+    .chat-modal {
+        --chat-modal-padding: 1.5rem;
+        --chat-modal-max-width: 112rem; /* 7xl */
+        --chat-modal-max-height: 95vh;
+    }
+}
+
+@media (min-width: 1024px) {
+    .chat-modal {
+        --chat-modal-max-width: 112rem; /* 7xl - Large screens get full width advantage */
+    }
+}
+
+/* Chat message animations */
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-enter {
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+/* Smooth scrolling for chat */
+.chat-container {
+    scroll-behavior: smooth;
+}
+
+/* Enhanced mobile chat experience */
+@media (max-width: 768px) {
+    /* Full screen modal on mobile for better chat experience */
+    .chat-modal-mobile {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Better chat message widths on mobile */
+    .chat-message-mobile {
+        max-width: 90% !important;
+    }
+    
+    /* Improved input area for mobile */
+    .chat-input-mobile {
+        padding: 0.75rem !important;
+        min-height: 60px;
+    }
+    
+    /* Larger touch targets for mobile */
+    .chat-send-button-mobile {
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px !important;
+        min-height: 48px !important;
+    }
+    
+    /* Avatar adjustments for mobile */
+    .chat-avatar-mobile {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    /* Better spacing on mobile */
+    .chat-message-spacing-mobile {
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Focus enhancement for chat input */
+.chat-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Better loading animation */
+.chat-loading-dots {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.chat-loading-dots > div {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #9ca3af;
+    animation: loading-pulse 1.4s ease-in-out infinite both;
+}
+
+.chat-loading-dots > div:nth-child(1) { animation-delay: -0.32s; }
+.chat-loading-dots > div:nth-child(2) { animation-delay: -0.16s; }
+.chat-loading-dots > div:nth-child(3) { animation-delay: 0s; }
+
+@keyframes loading-pulse {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Chat empty state styling */
+.chat-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Responsive text sizing in chat */
+@media (max-width: 640px) {
+    .chat-text-sm {
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+    
+    .chat-text-base {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+}
+
+/* Better button states for chat */
+.chat-send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.chat-send-button:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.chat-send-button:not(:disabled):active {
+    transform: scale(0.95);
+}
+
 /* Touch device optimizations */
 @media (pointer: coarse) {
     /* All interactive elements larger for touch */
@@ -497,6 +661,15 @@ textarea:focus {
     .tutorial-highlight {
         outline-width: 4px !important;
         outline-offset: 6px !important;
+    }
+    
+    /* Chat specific touch optimizations */
+    .chat-send-button:hover {
+        transform: none !important;
+    }
+    
+    .chat-input {
+        font-size: 16px; /* Prevents zoom on iOS */
     }
 }
 

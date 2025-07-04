@@ -824,7 +824,7 @@ const bonusNodes = [
 ];
 
 // --- Personal File Modal Component - Updated to use new API integration ---
-const PersonalFileModal = ({ isOpen, onClose }) => {
+const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
     const { files, loading, addFile, uploadFile, deleteFile, handleFileClick } = usePersonalFiles();
     const { hasAIAccess } = useSubscription();
     const [newItemType, setNewItemType] = useState(null);
@@ -1175,22 +1175,63 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                      Asistentul AI cu analiză de documente este disponibil doar pentru utilizatorii Premium.
                                  </p>
                                  <button
-                                     onClick={() => setSubscriptionUpgradeOpen(true)}
+                                     onClick={onSubscriptionUpgrade}
                                      className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
                                  >
                                      Upgrade la Premium
                                  </button>
                              </div>
                          ) : (
-                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: 'min(400px, calc(50vh - 150px))', maxHeight: 'calc(95vh - 300px)'}}>
+                         <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 overflow-y-auto mb-4 border shadow-inner min-h-0" style={{minHeight: 'min(300px, calc(60vh - 150px))', maxHeight: 'calc(85vh - 200px)'}}>
+                            {history.length === 0 && (
+                                <div className="flex items-center justify-center h-full text-center">
+                                    <div className="text-gray-500">
+                                        <Sparkles size={40} className="mx-auto mb-3 text-purple-400" />
+                                        <p className="font-medium mb-1">Asistentul tău AI</p>
+                                        <p className="text-xs">Pune întrebări sau încarcă documente pentru analiză</p>
+                                    </div>
+                                </div>
+                            )}
+                            
                             {history.map((msg, index) => (
-                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
-                                     <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
-                                         {msg.role === 'user' ? msg.parts[0].text : renderMarkdown(msg.parts[0].text)}
+                                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
+                                     <div className={`max-w-[80%] ${msg.role === 'user' ? 'order-2' : 'order-1'}`}>
+                                         <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${msg.role === 'user' ? 'bg-purple-600' : 'bg-gradient-to-br from-purple-600 to-indigo-600'}`}>
+                                                 {msg.role === 'user' ? 'Tu' : 'AI'}
+                                             </div>
+                                             <div className={`px-3 py-2 rounded-xl shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white rounded-br-sm' : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm'}`}>
+                                                 <div className="prose prose-sm max-w-none">
+                                                     {msg.role === 'user' ? 
+                                                         <div className="text-white text-sm">{msg.parts[0].text}</div> : 
+                                                         <div className="text-sm">{renderMarkdown(msg.parts[0].text)}</div>
+                                                     }
+                                                 </div>
+                                             </div>
+                                         </div>
                                      </div>
                                  </div>
                              ))}
-                             {chatLoading && <div className="text-center"><div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-600 border-t-transparent mx-auto"></div></div>}
+                             
+                             {chatLoading && (
+                                 <div className="flex justify-start mb-4">
+                                     <div className="flex items-end gap-2">
+                                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                                             AI
+                                         </div>
+                                         <div className="bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl rounded-bl-sm shadow-sm">
+                                             <div className="flex items-center gap-2">
+                                                 <div className="chat-loading-dots">
+                                                     <div></div>
+                                                     <div></div>
+                                                     <div></div>
+                                                 </div>
+                                                 <span className="text-xs text-gray-500">Procesez...</span>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                             )}
                              <div ref={chatEndRef} />
                          </div>
                          )}
@@ -1218,17 +1259,41 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                              </div>
                          )}
                          
-                         <div className="flex items-center flex-shrink-0">
-                             <button
-                                 onClick={() => imageInputRef.current?.click()}
-                                 disabled={uploadingImage}
-                                 className="bg-gray-500 text-white p-3 border hover:bg-gray-600 disabled:bg-gray-400 flex items-center justify-center"
-                                 title="Adaugă imagine sau document"
-                             >
-                                 {uploadingImage ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
-                             </button>
-                             <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare sau încarcă o imagine..." />
-                             <button onClick={handleSend} disabled={chatLoading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
+                         <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm">
+                             <div className="flex items-center p-2 gap-2">
+                                 <button
+                                     onClick={() => imageInputRef.current?.click()}
+                                     disabled={uploadingImage}
+                                     className="w-10 h-10 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center transition-colors"
+                                     title="Adaugă imagine sau document"
+                                 >
+                                     {uploadingImage ? <RefreshCw className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                                 </button>
+                                 <input 
+                                     type="text" 
+                                     value={prompt} 
+                                     onChange={(e) => setPrompt(e.target.value)} 
+                                     onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} 
+                                     className="flex-grow p-2 border-0 focus:outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm min-h-[36px] chat-input" 
+                                     placeholder="Pune o întrebare sau încarcă o imagine..." 
+                                     disabled={chatLoading}
+                                 />
+                                 <button 
+                                     onClick={handleSend} 
+                                     disabled={chatLoading || !prompt.trim()} 
+                                     className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all chat-send-button ${
+                                         chatLoading || !prompt.trim() 
+                                             ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                                             : 'bg-purple-600 text-white hover:bg-purple-700 shadow-sm'
+                                     }`}
+                                 >
+                                     {chatLoading ? (
+                                         <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                     ) : (
+                                         <Send size={16} />
+                                     )}
+                                 </button>
+                             </div>
                          </div>
                          </>
                          )}
@@ -1290,22 +1355,63 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                          Asistentul AI cu analiză de documente este disponibil doar pentru utilizatorii Premium.
                                      </p>
                                      <button
-                                         onClick={() => setSubscriptionUpgradeOpen(true)}
+                                         onClick={onSubscriptionUpgrade}
                                          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
                                      >
                                          Upgrade la Premium
                                      </button>
                                  </div>
                              ) : (
-                             <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: 'max(200px, calc(95vh - 350px))', maxHeight: 'calc(95vh - 250px)'}}>
+                             <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 overflow-y-auto mb-4 border shadow-inner min-h-0 chat-container" style={{minHeight: 'max(250px, calc(80vh - 280px))', maxHeight: 'calc(85vh - 200px)'}}>
+                                {history.length === 0 && (
+                                    <div className="flex items-center justify-center h-full text-center">
+                                        <div className="text-gray-500">
+                                            <Sparkles size={36} className="mx-auto mb-3 text-purple-400" />
+                                            <p className="font-medium mb-1 text-sm">Asistentul tău AI</p>
+                                            <p className="text-xs">Pune întrebări sau încarcă documente</p>
+                                        </div>
+                                    </div>
+                                )}
+                                
                                 {history.map((msg, index) => (
-                                     <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
-                                         <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
-                                             {msg.role === 'user' ? msg.parts[0].text : renderMarkdown(msg.parts[0].text)}
+                                     <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-4 chat-message-spacing-mobile`}>
+                                         <div className={`max-w-[85%] chat-message-mobile ${msg.role === 'user' ? 'order-2' : 'order-1'}`}>
+                                             <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                                 <div className={`w-7 h-7 chat-avatar-mobile rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${msg.role === 'user' ? 'bg-purple-600' : 'bg-gradient-to-br from-purple-600 to-indigo-600'}`}>
+                                                     {msg.role === 'user' ? 'Tu' : 'AI'}
+                                                 </div>
+                                                 <div className={`px-3 py-2 rounded-xl shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white rounded-br-sm' : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm'}`}>
+                                                     <div className="prose prose-sm max-w-none chat-text-sm">
+                                                         {msg.role === 'user' ? 
+                                                             <div className="text-white">{msg.parts[0].text}</div> : 
+                                                             <div>{renderMarkdown(msg.parts[0].text)}</div>
+                                                         }
+                                                     </div>
+                                                 </div>
+                                             </div>
                                          </div>
                                      </div>
                                  ))}
-                                 {chatLoading && <div className="text-center"><div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-600 border-t-transparent mx-auto"></div></div>}
+                                 
+                                 {chatLoading && (
+                                     <div className="flex justify-start mb-4">
+                                         <div className="flex items-end gap-2">
+                                             <div className="w-7 h-7 chat-avatar-mobile rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                                                 AI
+                                             </div>
+                                             <div className="bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl rounded-bl-sm shadow-sm">
+                                                 <div className="flex items-center gap-2">
+                                                     <div className="chat-loading-dots">
+                                                         <div></div>
+                                                         <div></div>
+                                                         <div></div>
+                                                     </div>
+                                                     <span className="text-xs text-gray-500">Procesez...</span>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 )}
                                  <div ref={chatEndRef} />
                              </div>
                              )}
@@ -1333,17 +1439,41 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                  </div>
                              )}
                              
-                             <div className="flex items-center flex-shrink-0">
-                                 <button
-                                     onClick={() => imageInputRef.current?.click()}
-                                     disabled={uploadingImage}
-                                     className="bg-gray-500 text-white p-3 border hover:bg-gray-600 disabled:bg-gray-400 flex items-center justify-center"
-                                     title="Adaugă imagine sau document"
-                                 >
-                                     {uploadingImage ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
-                                 </button>
-                                 <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare sau încarcă o imagine..." />
-                                 <button onClick={handleSend} disabled={chatLoading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
+                             <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm chat-input-mobile">
+                                 <div className="flex items-center p-3 gap-3">
+                                     <button
+                                         onClick={() => imageInputRef.current?.click()}
+                                         disabled={uploadingImage}
+                                         className="w-12 h-12 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center transition-colors"
+                                         title="Adaugă imagine sau document"
+                                     >
+                                         {uploadingImage ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+                                     </button>
+                                     <input 
+                                         type="text" 
+                                         value={prompt} 
+                                         onChange={(e) => setPrompt(e.target.value)} 
+                                         onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} 
+                                         className="flex-grow p-3 border-0 focus:outline-none text-gray-700 placeholder-gray-400 bg-transparent min-h-[44px] chat-input" 
+                                         placeholder="Pune o întrebare sau încarcă o imagine..." 
+                                         disabled={chatLoading}
+                                     />
+                                     <button 
+                                         onClick={handleSend} 
+                                         disabled={chatLoading || !prompt.trim()} 
+                                         className={`w-12 h-12 chat-send-button-mobile rounded-xl flex items-center justify-center transition-all chat-send-button ${
+                                             chatLoading || !prompt.trim() 
+                                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                                                 : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md'
+                                         }`}
+                                     >
+                                         {chatLoading ? (
+                                             <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                         ) : (
+                                             <Send size={20} />
+                                         )}
+                                     </button>
+                                 </div>
                              </div>
                              </>
                              )}
@@ -1926,15 +2056,15 @@ Regeln:
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
-            <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-1 md:p-4 animate-fade-in-fast">
+            <div ref={modalRef} className="bg-white rounded-lg md:rounded-2xl shadow-2xl w-full max-w-full md:max-w-7xl text-gray-800 p-3 md:p-6 relative transform animate-scale-in flex flex-col h-[100vh] md:h-auto md:max-h-[95vh] chat-modal">
                 <button onClick={
                     view === 'chat' ? handleBackToMenu : 
                     view === 'case_selection' ? () => setView('menu') : 
                     onClose
-                } className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                } className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-800 transition-colors z-10 p-1"><X size={24} /></button>
                 
-                <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 md:mb-6 flex items-center justify-center gap-2 pr-8">
                     <MessageCircle className="text-blue-600"/> Tutor FSP AI
                 </h2>
 
@@ -2017,41 +2147,100 @@ Regeln:
 
                 {view === 'chat' && (
                     <div className="flex flex-col flex-grow min-h-0">
-                        <div className="flex items-center mb-4">
-                            <button onClick={handleBackToMenu} className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors">
-                                <ChevronLeft size={24} />
+                        <div className="flex items-center mb-3 md:mb-4 flex-shrink-0">
+                            <button onClick={handleBackToMenu} className="mr-3 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                                <ChevronLeft size={20} />
                             </button>
-                            <h3 className="text-lg font-semibold">
+                            <h3 className="text-base md:text-lg font-semibold text-gray-700 truncate">
                                 {uploadedCase ? `Evaluare Caz: ${uploadedCase.name}` : 
                                  selectedMedicalCase ? `Caz Medical: ${selectedMedicalCase}` : 'Sesiune de Pregătire FSP'}
                             </h3>
                         </div>
                         
-                        <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4 border">
+                        {/* Chat Area - Optimized for maximum space */}
+                        <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 md:p-4 overflow-y-auto mb-3 md:mb-4 border shadow-inner min-h-0" style={{maxHeight: 'calc(90vh - 180px)'}}>
+                            {history.length === 0 && (
+                                <div className="flex items-center justify-center h-full text-center">
+                                    <div className="text-gray-500">
+                                        <MessageCircle size={48} className="mx-auto mb-4 text-gray-300" />
+                                        <p className="text-lg font-medium mb-2">Bună! Sunt asistentul tău FSP AI</p>
+                                        <p className="text-sm">Începe conversația scriind o întrebare sau selectând un caz medical.</p>
+                                    </div>
+                                </div>
+                            )}
+                            
                             {history.map((msg, index) => (
-                                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
-                                    <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'}`}>
-                                        <div>{msg.role === 'user' ? <div className="prose max-w-none">{renderMarkdown(msg.parts[0].text)}</div> : renderMarkdown(msg.parts[0].text)}</div>
+                                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-4 md:mb-6`}>
+                                    <div className={`max-w-[85%] md:max-w-[75%] lg:max-w-[70%] ${msg.role === 'user' ? 'order-2' : 'order-1'}`}>
+                                        {/* Avatar */}
+                                        <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gradient-to-br from-purple-600 to-blue-600'}`}>
+                                                {msg.role === 'user' ? 'Tu' : 'AI'}
+                                            </div>
+                                            <div className={`px-4 py-3 rounded-2xl shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md'}`}>
+                                                <div className="prose prose-sm max-w-none">
+                                                    {msg.role === 'user' ? 
+                                                        <div className="text-white">{renderMarkdown(msg.parts[0].text)}</div> : 
+                                                        renderMarkdown(msg.parts[0].text)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
-                            {loading && <div className="flex justify-start"><div className="p-3 rounded-lg bg-white text-gray-800 border">Se gândește...</div></div>}
+                            
+                            {loading && (
+                                <div className="flex justify-start mb-4">
+                                    <div className="flex items-end gap-2">
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+                                            AI
+                                        </div>
+                                        <div className="bg-white text-gray-800 border border-gray-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex gap-1">
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.1s'}}></div>
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                                                </div>
+                                                <span className="text-sm text-gray-500">Se gândește...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             <div ref={chatEndRef} />
                         </div>
                         
-                        <div className="flex items-center">
-                            <input
-                                type="text"
-                                value={prompt}
-                                onChange={(e) => setPrompt(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
-                                className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder={uploadedCase ? "Întreabă despre cazul tău..." : 
-                                           selectedMedicalCase ? "Pune întrebări pacientului..." : "Scrie mesajul tău aici..."}
-                            />
-                            <button onClick={handleSend} disabled={loading} className="bg-blue-600 text-white p-3 rounded-r-lg hover:bg-blue-700 disabled:bg-blue-400">
-                                <Send />
-                            </button>
+                        {/* Input Area - Modern design */}
+                        <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm">
+                            <div className="flex items-end p-3 gap-3">
+                                <input
+                                    type="text"
+                                    value={prompt}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
+                                    className="flex-grow p-3 border-0 focus:outline-none resize-none text-gray-700 placeholder-gray-400 bg-transparent min-h-[44px]"
+                                    placeholder={uploadedCase ? "Întreabă despre cazul tău..." : 
+                                               selectedMedicalCase ? "Pune întrebări pacientului..." : "Scrie mesajul tău aici..."}
+                                    disabled={loading}
+                                />
+                                <button 
+                                    onClick={handleSend} 
+                                    disabled={loading || !prompt.trim()} 
+                                    className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all transform ${
+                                        loading || !prompt.trim() 
+                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 active:scale-95 shadow-md'
+                                    }`}
+                                >
+                                    {loading ? (
+                                        <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <Send size={20} />
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -3179,7 +3368,11 @@ const AppContent = () => {
                     });
                 }}
             />
-            <PersonalFileModal isOpen={modalStates.personalFileModal} onClose={closePersonalFileModal} />
+                            <PersonalFileModal 
+                    isOpen={modalStates.personalFileModal} 
+                    onClose={closePersonalFileModal}
+                    onSubscriptionUpgrade={() => setModalStates(prev => ({...prev, subscriptionUpgrade: true}))}
+                />
             <SubscriptionUpgrade 
                 isOpen={modalStates.subscriptionUpgrade} 
                 onClose={closeSubscriptionModal}
