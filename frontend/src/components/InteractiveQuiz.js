@@ -119,7 +119,13 @@ export const InteractiveQuiz = ({
                 <span className="font-semibold">Întrebări:</span> {quizData.questions.length}
               </div>
               <div>
-                <span className="font-semibold">Timp:</span> {quizData.timeLimit ? `${quizData.timeLimit} min` : 'Nelimitat'}
+                <span className="font-semibold">Timp:</span> {
+                  quizData.timeLimit 
+                    ? quizData.timeLimit < 1 
+                      ? `${quizData.timeLimit * 60} sec` 
+                      : `${quizData.timeLimit} min`
+                    : 'Nelimitat'
+                }
               </div>
               <div>
                 <span className="font-semibold">Puncte:</span> {quizData.questions.length * 20}
