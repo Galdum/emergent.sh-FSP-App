@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from backend.models_billing import (
     AdminUserResponse, AdminStatsResponse, AuditLog, ErrorReport,
     PaymentTransaction, SubscriptionPlan
@@ -14,6 +14,9 @@ import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+# Add new import for the UtilInfoDocument model
+from backend.models import UtilInfoDocument
 
 @router.get("/stats", response_model=AdminStatsResponse)
 async def get_admin_stats(
@@ -474,3 +477,166 @@ async def initialize_admin(
     )
     
     return {"message": "Admin user initialized successfully"}
+
+@router.get("/util-info-docs")
+async def get_util_info_docs(
+    admin_user: UserInDB = Depends(get_current_admin_user),
+    db = Depends(get_database)
+):
+    """Get all utility information documents for admin management."""
+    
+    docs_cursor = db.util_info_documents.find({}).sort("order_priority", 1)
+    docs_data = await docs_cursor.to_list(None)
+    
+    # Log admin access
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_view_util_info_docs",
+        details={"count": len(docs_data)}
+    )
+    
+    return [UtilInfoDocument(**doc) for doc in docs_data]
+
+@router.post("/util-info-docs")
+async def create_util_info_doc(
+    doc_data: Dict[str, Any],
+    admin_user: UserInDB = Depends(get_current_admin_user),
+    db = Depends(get_database)
+):
+    """Create a new utility information document."""
+    
+    # Validate required fields
+    required_fields = ["title", "category", "content_type"]
+    for field in required_fields:
+        if field not in doc_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Missing required field: {field}"
+            )
+    
+    # Create document
+    util_doc = UtilInfoDocument(
+        **doc_data,
+        created_by=admin_user.id
+    )
+    
+    await db.util_info_documents.insert_one(util_doc.dict())
+    
+    # Log admin action
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_create_util_info_doc",
+        details={"doc_id": util_doc.id, "title": util_doc.title}
+    )
+    
+    return util_doc
+
+@router.put("/util-info-docs/{doc_id}")
+async def update_util_info_doc(
+    doc_id: str,
+    doc_data: Dict[str, Any],
+    admin_user: UserInDB = Depends(get_current_admin_user),
+    db = Depends(get_database)
+):
+    """Update an existing utility information document."""
+    
+    # Check if document exists
+    existing_doc = await db.util_info_documents.find_one({"id": doc_id})
+    if not existing_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    
+    # Update document
+    update_data = {
+        **doc_data,
+        "updated_by": admin_user.id,
+        "updated_at": datetime.utcnow()
+    }
+    
+    result = await db.util_info_documents.update_one(
+        {"id": doc_id},
+        {"$set": update_data}
+    )
+    
+    # Log admin action
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_update_util_info_doc",
+        details={"doc_id": doc_id, "changes": list(doc_data.keys())}
+    )
+    
+    return {"message": "Document updated successfully"}
+
+@router.delete("/util-info-docs/{doc_id}")
+async def delete_util_info_doc(
+    doc_id: str,
+    admin_user: UserInDB = Depends(get_current_admin_user),
+    db = Depends(get_database)
+):
+    """Delete a utility information document."""
+    
+    # Check if document exists
+    existing_doc = await db.util_info_documents.find_one({"id": doc_id})
+    if not existing_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    
+    # Delete document
+    result = await db.util_info_documents.delete_one({"id": doc_id})
+    
+    # If document had an associated file, optionally delete it too
+    if existing_doc.get("file_id"):
+        await db.personal_files.delete_one({"id": existing_doc["file_id"]})
+    
+    # Log admin action
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_delete_util_info_doc",
+        details={"doc_id": doc_id, "title": existing_doc.get("title")}
+    )
+    
+    return {"message": "Document deleted successfully"}
+
+@router.patch("/util-info-docs/{doc_id}/reorder")
+async def reorder_util_info_doc(
+    doc_id: str,
+    new_order: int,
+    admin_user: UserInDB = Depends(get_current_admin_user),
+    db = Depends(get_database)
+):
+    """Update the order priority of a utility information document."""
+    
+    result = await db.util_info_documents.update_one(
+        {"id": doc_id},
+        {
+            "$set": {
+                "order_priority": new_order,
+                "updated_by": admin_user.id,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    
+    # Log admin action
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=admin_user.id,
+        action="admin_reorder_util_info_doc",
+        details={"doc_id": doc_id, "new_order": new_order}
+    )
+    
+    return {"message": "Document order updated successfully"}

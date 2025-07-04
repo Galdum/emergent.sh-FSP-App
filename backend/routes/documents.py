@@ -11,6 +11,9 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
 
+# Add import for the new model
+from backend.models import UtilInfoDocument
+
 # Bundesland-specific document requirements
 BUNDESLAND_REQUIREMENTS = {
     "baden-wuerttemberg": {
@@ -484,3 +487,55 @@ async def verify_document(
     )
     
     return {"message": "Document verified successfully", "status": "verified"}
+
+@router.get("/util-info")
+async def get_public_util_info_docs(
+    category: Optional[str] = None,
+    db = Depends(get_database)
+):
+    """Get public utility information documents (no auth required)."""
+    
+    query = {"is_active": True}
+    if category:
+        query["category"] = category
+    
+    docs_cursor = db.util_info_documents.find(query).sort("order_priority", 1)
+    docs_data = await docs_cursor.to_list(None)
+    
+    # Transform for public consumption (hide admin fields)
+    public_docs = []
+    for doc_data in docs_data:
+        public_doc = {
+            "id": doc_data["id"],
+            "title": doc_data["title"],
+            "description": doc_data.get("description"),
+            "category": doc_data["category"],
+            "content_type": doc_data["content_type"],
+            "external_url": doc_data.get("external_url"),
+            "rich_content": doc_data.get("rich_content"),
+            "icon_emoji": doc_data.get("icon_emoji"),
+            "color_theme": doc_data.get("color_theme"),
+            "order_priority": doc_data.get("order_priority", 0)
+        }
+        # Include file download URL if it's a file type
+        if doc_data.get("file_id"):
+            public_doc["download_url"] = f"/api/files/download/{doc_data['file_id']}"
+        
+        public_docs.append(public_doc)
+    
+    return public_docs
+
+@router.get("/util-info/categories")
+async def get_util_info_categories(db = Depends(get_database)):
+    """Get all available categories for utility information documents."""
+    
+    pipeline = [
+        {"$match": {"is_active": True}},
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+        {"$sort": {"_id": 1}}
+    ]
+    
+    categories_cursor = db.util_info_documents.aggregate(pipeline)
+    categories_data = await categories_cursor.to_list(None)
+    
+    return [{"category": cat["_id"], "count": cat["count"]} for cat in categories_data]
