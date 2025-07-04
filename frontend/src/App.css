@@ -44,6 +44,39 @@ body {
     animation-timing-function: linear; 
 }
 
+/* Tutorial-specific enhancements */
+.tutorial-modal-responsive {
+    position: fixed !important;
+    max-width: min(384px, calc(100vw - 40px)) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    z-index: 101 !important;
+}
+
+/* Ensure tutorial is visible at all zoom levels */
+@media screen and (min-zoom: 1) {
+    .tutorial-modal-responsive {
+        font-size: 14px;
+        padding: 20px;
+    }
+}
+
+@media screen and (min-zoom: 1.25) {
+    .tutorial-modal-responsive {
+        font-size: 12px;
+        padding: 16px;
+        max-width: min(320px, calc(100vw - 32px)) !important;
+    }
+}
+
+@media screen and (min-zoom: 1.5) {
+    .tutorial-modal-responsive {
+        font-size: 11px;
+        padding: 12px;
+        max-width: min(280px, calc(100vw - 24px)) !important;
+    }
+}
+
 /* SVG interactive elements */
 .step-node {
     transition: all 0.3s ease;
@@ -56,6 +89,16 @@ body {
 
 .step-node.locked {
     cursor: not-allowed;
+}
+
+/* Enhanced bonus node visibility for tutorial */
+.bonus-node {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.bonus-node:hover {
+    transform: scale(1.1);
 }
 
 /* Modal transitions */
@@ -128,15 +171,114 @@ body {
     100% { transform: scale(1); }
 }
 
-/* Responsive design helpers */
+/* Enhanced responsive design for tutorial */
 @media (max-width: 768px) {
+    /* Modal improvements for mobile */
     .modal-content {
         margin: 1rem;
         max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+        max-width: calc(100vw - 2rem);
     }
     
-    .step-title {
+    /* Tutorial modal adjustments */
+    .tutorial-modal-responsive {
+        max-width: calc(100vw - 20px) !important;
+        margin: 10px !important;
+        font-size: 14px !important;
+        padding: 16px !important;
+    }
+    
+    /* Journey map scaling */
+    .journey-map {
+        transform: scale(0.8);
+        transform-origin: center top;
+    }
+    
+    /* Step nodes touch-friendly */
+    .step-node, .bonus-node {
+        min-width: 60px;
+        min-height: 60px;
+        touch-action: manipulation;
+    }
+    
+    /* Header adjustments */
+    .fixed.top-4.left-4 {
+        top: 10px;
+        left: 10px;
+        font-size: 0.75rem;
+    }
+    
+    .fixed.top-4.right-4 {
+        top: 10px;
+        right: 10px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .fixed.top-20.right-4 {
+        top: 70px;
+        right: 10px;
+        font-size: 0.75rem;
+    }
+    
+    /* Bottom controls */
+    .fixed.bottom-4.right-4,
+    .fixed.bottom-20.left-4 {
+        font-size: 0.75rem;
+        padding: 8px;
+    }
+    
+    /* Reduce text sizes */
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+    
+    /* Form improvements */
+    input, button, textarea {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Modal headers */
+    .modal h2 {
+        font-size: 1.25rem;
+    }
+    
+    .modal p {
         font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .modal-content {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+    }
+    
+    .tutorial-modal-responsive {
+        max-width: calc(100vw - 16px) !important;
+        margin: 8px !important;
+        font-size: 13px !important;
+        padding: 12px !important;
+    }
+    
+    .journey-map {
+        transform: scale(0.7);
+    }
+    
+    .step-node, .bonus-node {
+        min-width: 50px;
+        min-height: 50px;
+    }
+    
+    /* Stack layout for very small screens */
+    .flex {
+        flex-direction: column;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -335,102 +477,6 @@ textarea:focus {
     100% { background-position: 200% 0; }
 }
 
-/* Mobile Responsive Design */
-@media (max-width: 768px) {
-    /* Modal improvements for mobile */
-    .modal-content {
-        margin: 20px;
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
-        max-width: calc(100vw - 40px);
-    }
-    
-    /* Journey map scaling */
-    .journey-map {
-        transform: scale(0.8);
-        transform-origin: center top;
-    }
-    
-    /* Step nodes touch-friendly */
-    .step-node {
-        min-width: 60px;
-        min-height: 60px;
-        touch-action: manipulation;
-    }
-    
-    /* Header adjustments */
-    .fixed.top-4.left-4 {
-        top: 10px;
-        left: 10px;
-        font-size: 0.75rem;
-    }
-    
-    .fixed.top-4.right-4 {
-        top: 10px;
-        right: 10px;
-        width: 50px;
-        height: 50px;
-    }
-    
-    .fixed.top-20.right-4 {
-        top: 70px;
-        right: 10px;
-        font-size: 0.75rem;
-    }
-    
-    /* Bottom controls */
-    .fixed.bottom-4.right-4,
-    .fixed.bottom-20.left-4 {
-        font-size: 0.75rem;
-        padding: 8px;
-    }
-    
-    /* Reduce text sizes */
-    h1 { font-size: 1.5rem; }
-    h2 { font-size: 1.25rem; }
-    
-    /* Form improvements */
-    input, button, textarea {
-        min-height: 44px;
-        font-size: 16px; /* Prevents zoom on iOS */
-    }
-    
-    /* Modal headers */
-    .modal h2 {
-        font-size: 1.25rem;
-    }
-    
-    .modal p {
-        font-size: 0.875rem;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Extra small screens */
-    .modal-content {
-        margin: 10px;
-        max-height: calc(100vh - 20px);
-    }
-    
-    .journey-map {
-        transform: scale(0.7);
-    }
-    
-    .step-node {
-        min-width: 50px;
-        min-height: 50px;
-    }
-    
-    /* Stack layout for very small screens */
-    .flex {
-        flex-direction: column;
-    }
-    
-    .grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 /* Touch device optimizations */
 @media (pointer: coarse) {
     /* All interactive elements larger for touch */
@@ -445,6 +491,12 @@ textarea:focus {
     .bonus-node:hover,
     button:hover {
         transform: none;
+    }
+    
+    /* Enhanced tutorial highlighting for touch devices */
+    .tutorial-highlight {
+        outline-width: 4px !important;
+        outline-offset: 6px !important;
     }
 }
 
@@ -523,4 +575,11 @@ select {
     z-index: 1000;
     overflow-y: auto;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Tutorial-specific viewport adjustments */
+@supports (height: 100dvh) {
+    .tutorial-modal-responsive {
+        max-height: calc(100dvh - 40px) !important;
+    }
 }
