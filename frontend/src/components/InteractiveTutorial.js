@@ -1,10 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { X, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { X, ArrowRight, ArrowLeft, Check, ArrowDown, ArrowUp, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Spotlight component for highlighting elements
+const TutorialSpotlight = ({ elementPosition, isVisible }) => {
+  if (!isVisible || !elementPosition) return null;
+
+  const spotlightStyle = {
+    '--spotlight-x': `${elementPosition.centerX}px`,
+    '--spotlight-y': `${elementPosition.centerY}px`,
+    '--spotlight-radius': `${Math.max(elementPosition.width, elementPosition.height) / 2 + 20}px`,
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="tutorial-spotlight"
+      style={spotlightStyle}
+    />
+  );
+};
 
 const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [elementPosition, setElementPosition] = useState(null);
+  const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
   const tutorialSteps = [
     {
@@ -12,52 +36,159 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       content: 'În următoarele secunde îți arătăm locurile cheie din aplicație pentru un start rapid.',
       target: null,
       position: 'center',
+      action: null,
+      showSpotlight: false,
     },
     {
       title: 'Manager Documente',
-      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal.',
+      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Click pe iconul mov de sus-dreapta.',
       target: '[title="Dosarul Meu Personal"]',
       position: 'left',
+      action: 'highlight_personal_files',
+      showSpotlight: true,
     },
     {
       title: 'Asistent AI',
-      content: 'Întreabă orice despre Approbation & FSP. Asistentul AI îți răspunde instant.',
+      content: 'Întreabă orice despre Approbation & FSP. Asistentul AI îți răspunde instant. Găsește-l în nodurile orange.',
       target: '.bonus-node',
       position: 'top',
+      action: 'highlight_ai_assistant',
+      showSpotlight: true,
     },
     {
       title: 'Progres & Checklist',
-      content: 'Urmărește aici fiecare pas finalizat şi ce mai ai de făcut.',
+      content: 'Urmărește aici fiecare pas finalizat şi ce mai ai de făcut. Click pe oricare dintre nodurile albastre.',
       target: '.step-node',
       position: 'bottom',
+      action: 'highlight_progress_steps',
+      showSpotlight: true,
     },
     {
       title: 'Totul pregătit!',
       content: 'Succes! Poţi relua tutorialul din meniu oricând 🥳',
       target: null,
       position: 'center',
+      action: null,
+      showSpotlight: false,
     },
   ];
 
   const currentStepData = tutorialSteps[currentStep];
 
+  // Update viewport size on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+      // Recalculate element position on resize
+      if (currentStepData.target) {
+        updateElementPosition();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentStepData.target]);
+
+  // Enhanced element highlighting and interaction
+  const handleStepAction = useCallback((action) => {
+    if (!action) return;
+    
+    // Remove any existing highlights first
+    document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
+      el.classList.remove('tutorial-highlight', 'tutorial-ring');
+    });
+
+    switch (action) {
+      case 'highlight_personal_files':
+        const personalFileBtn = document.querySelector('[title="Dosarul Meu Personal"]');
+        if (personalFileBtn) {
+          personalFileBtn.classList.add('tutorial-highlight');
+          personalFileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Add pulse effect
+          personalFileBtn.style.animation = 'pulse 2s infinite';
+        }
+        break;
+        
+      case 'highlight_ai_assistant':
+        const bonusNodes = document.querySelectorAll('.bonus-node');
+        bonusNodes.forEach((node, index) => {
+          node.classList.add('tutorial-highlight');
+          // Stagger the animations
+          setTimeout(() => {
+            if (node.style) {
+              node.style.animation = 'pulse 2s infinite';
+            }
+          }, index * 200);
+        });
+        if (bonusNodes.length > 0) {
+          bonusNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        break;
+        
+      case 'highlight_progress_steps':
+        const stepNodes = document.querySelectorAll('.step-node');
+        stepNodes.forEach((node, index) => {
+          node.classList.add('tutorial-highlight');
+          // Stagger the animations
+          setTimeout(() => {
+            if (node.style) {
+              node.style.animation = 'pulse 2s infinite';
+            }
+          }, index * 100);
+        });
+        if (stepNodes.length > 0) {
+          stepNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        break;
+    }
+  }, []);
+
+  // Calculate element position and update state
+  const updateElementPosition = useCallback(() => {
+    if (!currentStepData.target) {
+      setElementPosition(null);
+      return;
+    }
+    
+    const element = document.querySelector(currentStepData.target);
+    if (!element) {
+      setElementPosition(null);
+      return;
+    }
+    
+    const rect = element.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    setElementPosition({
+      top: rect.top + scrollTop,
+      left: rect.left + scrollLeft,
+      width: rect.width,
+      height: rect.height,
+      centerX: rect.left + scrollLeft + rect.width / 2,
+      centerY: rect.top + scrollTop + rect.height / 2,
+    });
+  }, [currentStepData.target]);
+
   useEffect(() => {
     if (isOpen && currentStepData.target) {
-      const element = document.querySelector(currentStepData.target);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        element.classList.add('tutorial-ring');
-        element.style.zIndex = 110;
-        element.style.position = 'relative';
-
-        return () => {
-          element.classList.remove('tutorial-ring');
-          element.style.zIndex = '';
-          element.style.position = '';
-        };
-      }
+      // Add a small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        updateElementPosition();
+        handleStepAction(currentStepData.action);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Clean up highlights when no target
+      document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
+        el.classList.remove('tutorial-highlight', 'tutorial-ring');
+        if (el.style) {
+          el.style.animation = '';
+        }
+      });
     }
-  }, [currentStep, isOpen, currentStepData.target]);
+  }, [currentStep, isOpen, currentStepData.target, currentStepData.action, updateElementPosition, handleStepAction]);
 
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
@@ -82,66 +213,170 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   };
 
   const handleComplete = () => {
+    // Clean up highlights and animations
+    document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
+      el.classList.remove('tutorial-highlight', 'tutorial-ring');
+      if (el.style) {
+        el.style.animation = '';
+      }
+    });
+    
     localStorage.setItem('tutorialViewed', 'true');
     onComplete?.();
     onClose();
   };
 
   const handleSkip = () => {
+    // Clean up highlights and animations
+    document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
+      el.classList.remove('tutorial-highlight', 'tutorial-ring');
+      if (el.style) {
+        el.style.animation = '';
+      }
+    });
+    
     localStorage.setItem('tutorialViewed', 'true');
     onClose();
   };
 
-  const getOverlayPosition = () => {
-    if (!currentStepData.target) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+  const getModalPosition = () => {
+    const padding = 20;
+    const modalWidth = Math.min(384, viewportSize.width - padding * 2); // max-w-sm = 384px
+    const modalHeight = 300; // approximate modal height
     
-    const element = document.querySelector(currentStepData.target);
-    if (!element) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+    if (!elementPosition || !currentStepData.target) {
+      // Center positioning for steps without targets
+      return {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: `${modalWidth}px`,
+        maxWidth: `calc(100vw - ${padding * 2}px)`,
+      };
+    }
     
-    const rect = element.getBoundingClientRect();
     const { position } = currentStepData;
-    
-    const overlayStyle = {};
+    let modalStyle = {
+      position: 'fixed',
+      width: `${modalWidth}px`,
+      maxWidth: `calc(100vw - ${padding * 2}px)`,
+    };
     
     switch (position) {
       case 'top':
-        overlayStyle.top = rect.top - 20;
-        overlayStyle.left = rect.left + (rect.width / 2);
-        overlayStyle.transform = 'translate(-50%, -100%)';
+        modalStyle.top = Math.max(padding, elementPosition.top - modalHeight - 20);
+        modalStyle.left = Math.max(padding, Math.min(
+          elementPosition.centerX - modalWidth / 2,
+          viewportSize.width - modalWidth - padding
+        ));
         break;
+        
       case 'bottom':
-        overlayStyle.top = rect.bottom + 20;
-        overlayStyle.left = rect.left + (rect.width / 2);
-        overlayStyle.transform = 'translate(-50%, 0%)';
+        modalStyle.top = Math.min(
+          viewportSize.height - modalHeight - padding,
+          elementPosition.top + elementPosition.height + 20
+        );
+        modalStyle.left = Math.max(padding, Math.min(
+          elementPosition.centerX - modalWidth / 2,
+          viewportSize.width - modalWidth - padding
+        ));
         break;
+        
       case 'left':
-        overlayStyle.top = rect.top + (rect.height / 2);
-        overlayStyle.left = rect.left - 20;
-        overlayStyle.transform = 'translate(-100%, -50%)';
+        modalStyle.top = Math.max(padding, Math.min(
+          elementPosition.centerY - modalHeight / 2,
+          viewportSize.height - modalHeight - padding
+        ));
+        modalStyle.left = Math.max(padding, elementPosition.left - modalWidth - 20);
+        // If no space on the left, put it on the right
+        if (modalStyle.left < padding) {
+          modalStyle.left = Math.min(
+            elementPosition.left + elementPosition.width + 20,
+            viewportSize.width - modalWidth - padding
+          );
+        }
         break;
+        
       case 'right':
-        overlayStyle.top = rect.top + (rect.height / 2);
-        overlayStyle.left = rect.right + 20;
-        overlayStyle.transform = 'translate(0%, -50%)';
+        modalStyle.top = Math.max(padding, Math.min(
+          elementPosition.centerY - modalHeight / 2,
+          viewportSize.height - modalHeight - padding
+        ));
+        modalStyle.left = Math.min(
+          elementPosition.left + elementPosition.width + 20,
+          viewportSize.width - modalWidth - padding
+        );
         break;
+        
       default:
-        overlayStyle.top = '50%';
-        overlayStyle.left = '50%';
-        overlayStyle.transform = 'translate(-50%, -50%)';
+        modalStyle.top = '50%';
+        modalStyle.left = '50%';
+        modalStyle.transform = 'translate(-50%, -50%)';
     }
     
-    return overlayStyle;
+    return modalStyle;
+  };
+
+  const getArrowComponent = () => {
+    if (!elementPosition || !currentStepData.target) return null;
+    
+    const { position } = currentStepData;
+    const arrowProps = { size: 24, className: "text-blue-600 animate-bounce" };
+    
+    switch (position) {
+      case 'top': return <ArrowDown {...arrowProps} />;
+      case 'bottom': return <ArrowUp {...arrowProps} />;
+      case 'left': return <ArrowRight {...arrowProps} />;
+      case 'right': return <ArrowLeft {...arrowProps} />;
+      default: return null;
+    }
   };
 
   // Manage body scroll lock while tutorial is open
   useEffect(() => {
     if (isOpen) {
-      document.body.classList.add('overflow-hidden');
+      document.body.classList.add('tutorial-open');
+      // Add custom CSS for tutorial overlay
+      const style = document.createElement('style');
+      style.textContent = `
+        .tutorial-open {
+          overflow: hidden;
+        }
+        .tutorial-highlight {
+          position: relative !important;
+          z-index: 105 !important;
+          outline: 3px solid #3b82f6 !important;
+          outline-offset: 4px !important;
+          border-radius: 12px !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+          animation: tutorialHighlight 2s infinite !important;
+        }
+        @keyframes tutorialHighlight {
+          0%, 100% { outline-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.3); }
+          50% { outline-color: #1d4ed8; box-shadow: 0 0 0 6px rgba(29, 78, 216, 0.3), 0 0 30px rgba(29, 78, 216, 0.4); }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+      `;
+      style.id = 'tutorial-styles';
+      document.head.appendChild(style);
     } else {
-      document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove('tutorial-open');
+      const existingStyle = document.getElementById('tutorial-styles');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
     }
+    
     return () => {
-      document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove('tutorial-open');
+      const existingStyle = document.getElementById('tutorial-styles');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
     };
   }, [isOpen]);
 
@@ -155,16 +390,22 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center"
+        className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
       >
+        {/* Add spotlight effect */}
+        <TutorialSpotlight 
+          elementPosition={elementPosition} 
+          isVisible={currentStepData.showSpotlight && !!elementPosition} 
+        />
+        
         <motion.div
           key={currentStep}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="absolute bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4"
-          style={getOverlayPosition()}
+          className="bg-white rounded-xl shadow-2xl p-6 tutorial-modal-responsive"
+          style={getModalPosition()}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
@@ -172,6 +413,11 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
               <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
                 {currentStep + 1} / {tutorialSteps.length}
               </span>
+              {getArrowComponent() && (
+                <div className="ml-2">
+                  {getArrowComponent()}
+                </div>
+              )}
             </div>
             <button
               onClick={handleSkip}
