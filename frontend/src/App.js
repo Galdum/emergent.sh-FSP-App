@@ -1546,7 +1546,8 @@ const InfoHubModal = ({ isOpen, onClose, fromStepModal = false }) => {
                 if (view === 'detail') {
                     handleBack(); // Go back to list view
                 } else {
-                    onClose(); // Close completely (back to main app or step modal)
+                    // When in list view, close InfoHub (which will either go back to step modal or main app)
+                    handleSmartClose();
                 }
             }
         };
@@ -1575,12 +1576,20 @@ const InfoHubModal = ({ isOpen, onClose, fromStepModal = false }) => {
         onClose();
     };
 
+    const handleSmartClose = () => {
+        // If opened from step modal, just close InfoHub and return to step modal
+        // If opened from main interface, close completely
+        setView('list');
+        setSelectedDoc(null);
+        onClose();
+    };
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
             <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
-                <button onClick={view === 'detail' ? handleBack : handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                <button onClick={view === 'detail' ? handleBack : handleSmartClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
                 
                 {view === 'list' && (
                     <>
@@ -1630,11 +1639,11 @@ const GeminiFspTutorModal = ({ onClose }) => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
                 if (view === 'chat') {
-                    handleBackToMenu(); // Go back to appropriate previous view
+                    handleBackToMenu(); // Go back to menu view
                 } else if (view === 'case_selection') {
                     setView('menu'); // Go back to menu
                 } else {
-                    onClose(); // Close completely from menu
+                    onClose(); // Close completely from menu (goes back to step modal or main interface)
                 }
             }
         };
@@ -1877,7 +1886,11 @@ Regeln:
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
             <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
-                <button onClick={view === 'chat' ? handleBackToMenu : view === 'case_selection' ? () => setView('menu') : onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                <button onClick={
+                    view === 'chat' ? handleBackToMenu : 
+                    view === 'case_selection' ? () => setView('menu') : 
+                    onClose
+                } className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
                 
                 <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
                     <MessageCircle className="text-blue-600"/> Tutor FSP AI
@@ -2023,7 +2036,7 @@ const GeminiEmailModal = ({ onClose }) => {
                 } else if (view === 'form') {
                     setView('menu'); // Go back to menu
                 } else {
-                    onClose(); // Close completely from menu
+                    onClose(); // Close completely from menu (goes back to step modal or main interface)
                 }
             }
         };
@@ -2592,8 +2605,8 @@ const ContentModal = ({ content, onClose, onBackToStep }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
-                // Close current content modal first, then let step modal handle its own closing
-                onClose();
+                // Go back to step modal instead of closing everything
+                onBackToStep();
             }
         };
 
@@ -2647,6 +2660,7 @@ const AppContent = () => {
         personalFileModal: false,
         subscriptionUpgrade: false,
         infoHub: false,
+        infoHubFromStep: false, // Track if InfoHub was opened from a step modal
         recommender: false,
         authModal: !isAuthenticated,
         adminPanel: false,
@@ -2850,7 +2864,9 @@ const AppContent = () => {
                 break;
                 
             case 'info_hub':
-                setModalStates(prev => ({...prev, infoHub: true}));
+                // Check if we're opening from a step modal to pass context
+                const fromStepModal = modalStates.selectedStep !== null;
+                setModalStates(prev => ({...prev, infoHub: true, infoHubFromStep: fromStepModal}));
                 break;
                 
             case 'leaderboard':
@@ -2905,7 +2921,7 @@ const AppContent = () => {
     const backToStepFromContent = () => setModalStates(prev => ({...prev, activeContent: null}));
     const closeGeminiModal = () => setModalStates(prev => ({...prev, activeGeminiModal: null}));
     const closeRecommenderModal = () => setModalStates(prev => ({...prev, recommender: false}));
-    const closeInfoHubModal = () => setModalStates(prev => ({...prev, infoHub: false}));
+    const closeInfoHubModal = () => setModalStates(prev => ({...prev, infoHub: false, infoHubFromStep: false}));
     const closeLeaderboardModal = () => setModalStates(prev => ({...prev, leaderboard: false}));
     const closePersonalFileModal = () => setModalStates(prev => ({...prev, personalFileModal: false}));
     const closeSubscriptionModal = () => setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
@@ -3096,7 +3112,11 @@ const AppContent = () => {
             {modalStates.activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
             {modalStates.activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}
             {modalStates.recommender && <BundeslandRecommenderModal onClose={closeRecommenderModal} />}
-            <InfoHubModal isOpen={modalStates.infoHub} onClose={closeInfoHubModal} />
+            <InfoHubModal 
+                isOpen={modalStates.infoHub} 
+                onClose={closeInfoHubModal} 
+                fromStepModal={modalStates.infoHubFromStep} 
+            />
             <LeaderboardModal isOpen={modalStates.leaderboard} onClose={closeLeaderboardModal} />
             <EmailVerificationModal 
                 isOpen={modalStates.emailVerification} 
