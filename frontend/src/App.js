@@ -847,6 +847,9 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
     
     // Mobile tab state
     const [activeTab, setActiveTab] = useState('documents');
+    
+    // Delete confirmation state
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     // Handle image upload
     const handleImageUpload = async (e) => {
@@ -955,13 +958,25 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
         }
     };
     
-    const handleDeleteItem = async (id) => {
+    const handleDeleteItem = (id) => {
+        const item = files.find(f => f.id === id);
+        setItemToDelete(item);
+    };
+
+    const confirmDelete = async () => {
+        if (!itemToDelete) return;
+        
         try {
-            await deleteFile(id);
+            await deleteFile(itemToDelete.id);
+            setItemToDelete(null);
         } catch (error) {
             console.error('Failed to delete item:', error);
             alert('Failed to delete item. Please try again.');
         }
+    };
+
+    const cancelDelete = () => {
+        setItemToDelete(null);
     };
 
     const callGeminiAssistantAPI = async (currentPrompt) => {
@@ -1335,6 +1350,41 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                         </div>
                     )}
                 </div>
+                
+                {/* Delete Confirmation Modal */}
+                {itemToDelete && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
+                        <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 transform animate-scale-in">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <Trash2 className="h-5 w-5 text-red-500" />
+                                Confirmare ștergere
+                            </h3>
+                            <p className="text-gray-600 mb-6">
+                                Ești sigur că vrei să ștergi acest element?
+                                <br />
+                                <span className="font-medium text-gray-800 mt-2 block">
+                                    {itemToDelete.type === 'note' && `Notița: "${itemToDelete.content?.substring(0, 50)}${itemToDelete.content?.length > 50 ? '...' : ''}"`}
+                                    {itemToDelete.type === 'link' && `Link: "${itemToDelete.title}"`}
+                                    {itemToDelete.type === 'file' && `Fișier: "${itemToDelete.title}"`}
+                                </span>
+                            </p>
+                            <div className="flex gap-3 justify-end">
+                                <button 
+                                    onClick={cancelDelete}
+                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                                >
+                                    Nu
+                                </button>
+                                <button 
+                                    onClick={confirmDelete}
+                                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                                >
+                                    Da, șterge
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
