@@ -2426,18 +2426,17 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible }) => {
 const BonusNode = ({ node, isAccessible, onClick }) => {
     const { hasAIAccess } = useSubscription();
     const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
-    const hasFullAIAccess = hasAIAccess();
     
     // Color logic based on AI access and subscription
     const getNodeColor = () => {
         if (!isAccessible) return 'fill-gray-300';
-        if (needsAIAccess && !hasFullAIAccess) return 'fill-gray-400 hover:fill-gray-500';
+        if (needsAIAccess && !hasAIAccess()) return 'fill-gray-400 hover:fill-gray-500';
         return 'fill-orange-500 hover:fill-orange-600';
     };
     
     const getIconColor = () => {
         if (!isAccessible) return 'text-gray-400';
-        if (needsAIAccess && !hasFullAIAccess) return 'text-gray-500';
+        if (needsAIAccess && !hasAIAccess()) return 'text-gray-500';
         return 'text-white';
     };
 
