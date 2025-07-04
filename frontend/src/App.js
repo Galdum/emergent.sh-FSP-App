@@ -1082,7 +1082,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
-            <div ref={modalRef} className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[95vh] overflow-hidden">
+            <div ref={modalRef} className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[95vh] overflow-y-auto">
                 {/* Hidden inputs accessible from both layouts */}
                 <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
                 <input
@@ -1115,7 +1115,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                 </div>
                 
                 {/* Desktop Layout - Grid visible on medium screens and up */}
-                <div className="hidden md:grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2" style={{minHeight: '600px'}}>
+                <div className="hidden md:grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2" style={{minHeight: 'min(600px, calc(95vh - 200px))'}}>
                     {/* Left Column: File Management */}
                     <div className="flex flex-col bg-gray-200 p-4 rounded-lg min-h-0">
                         <h3 className="text-lg font-bold mb-3 flex-shrink-0 text-gray-700">Resurse Personale</h3>
@@ -1140,7 +1140,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                         )}
-                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: '400px'}}>
+                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: 'min(400px, calc(50vh - 150px))', maxHeight: 'calc(95vh - 300px)'}}>
                              {loading ? (
                                 <div className="text-center text-gray-500 pt-10">Se încarcă...</div>
                              ) : files.length > 0 ? files.map(renderItem) : (
@@ -1175,7 +1175,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                  </button>
                              </div>
                          ) : (
-                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: '400px'}}>
+                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: 'min(400px, calc(50vh - 150px))', maxHeight: 'calc(95vh - 300px)'}}>
                             {history.map((msg, index) => (
                                  <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                                      <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
@@ -1229,7 +1229,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                 </div>
                 
                 {/* Mobile Layout - Single column based on active tab */}
-                <div className="md:hidden flex-grow min-h-0 p-6 pt-2">
+                <div className="md:hidden flex-grow min-h-0 p-6 pt-2" style={{minHeight: 'calc(95vh - 180px)'}}>
                     {activeTab === 'documents' && (
                         <div className="flex flex-col bg-gray-200 p-4 rounded-lg h-full">
                             <h3 className="text-lg font-bold mb-3 flex-shrink-0 text-gray-700">Resurse Personale</h3>
@@ -1254,7 +1254,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                     </div>
                                 </div>
                             )}
-                            <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: '350px'}}>
+                                                         <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: 'max(200px, calc(95vh - 350px))', maxHeight: 'calc(95vh - 250px)'}}>
                                  {loading ? (
                                     <div className="text-center text-gray-500 pt-10">Se încarcă...</div>
                                  ) : files.length > 0 ? files.map(renderItem) : (
@@ -1290,7 +1290,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                      </button>
                                  </div>
                              ) : (
-                             <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: '350px'}}>
+                             <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: 'max(200px, calc(95vh - 350px))', maxHeight: 'calc(95vh - 250px)'}}>
                                 {history.map((msg, index) => (
                                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                                          <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
