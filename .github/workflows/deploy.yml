@@ -17,29 +17,19 @@ jobs:
       with:
         node-version: '18'
         
-    - name: Fix All Issues
+    - name: Fix All Issues & Build
       run: |
-        cd frontend
-        cat > package.json << 'EOF'
-        {
-          "name": "fsp-navigator",
-          "version": "1.0.0",
-          "dependencies": {
-            "react": "^18.2.0",
-            "react-dom": "^18.2.0",
-            "react-scripts": "5.0.1"
-          },
-          "scripts": {
-            "build": "SKIP_PREFLIGHT_CHECK=true react-scripts build"
-          }
-        }
-        EOF
+        # Make the automated fix script executable
+        chmod +x cursor-auto-fix.sh
         
-    - name: Build
-      run: |
-        cd frontend
-        npm install --force
-        npm run build
+        # Run the complete automated fix script that includes:
+        # - React 18 upgrade with all dependencies
+        # - PayPal, Google OAuth, Axios, Lucide, Framer Motion, React Router
+        # - Mobile optimizations
+        # - SEO improvements  
+        # - Dependency conflict resolutions
+        # - Production build
+        ./cursor-auto-fix.sh
         
     - name: Deploy Ready
       run: echo "✅ Ready for Emergent.sh deployment!"
