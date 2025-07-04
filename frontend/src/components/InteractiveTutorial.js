@@ -8,32 +8,32 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
 
   const tutorialSteps = [
     {
-      title: 'Bine ai venit la FSP Navigator! 👋',
-      content: 'În următoarele secunde îți arătăm locurile cheie din aplicație pentru un start rapid.',
+      title: 'Bine ai venit la FSP Navigator Enhanced! �',
+      content: 'În următoarele secunde îți arătăm funcționalitățile îmbunătățite ale aplicației pentru o experiență optimă.',
       target: null,
       position: 'center',
     },
     {
-      title: 'Manager Documente',
-      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal.',
+      title: 'Manager Documente Enhanced 📋',
+      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal securizat cu backup cloud și organizare inteligentă.',
       target: '[title="Dosarul Meu Personal"]',
       position: 'left',
     },
     {
-      title: 'Asistent AI',
-      content: 'Întreabă orice despre Approbation & FSP. Asistentul AI îți răspunde instant.',
+      title: 'Asistent AI Enhanced 🤖',
+      content: 'Întreabă orice despre Approbation & FSP. Asistentul AI îmbunătățit îți răspunde instant cu tehnologie avansată.',
       target: '.bonus-node',
       position: 'top',
     },
     {
-      title: 'Progres & Checklist',
-      content: 'Urmărește aici fiecare pas finalizat şi ce mai ai de făcut.',
+      title: 'Progres & Conformitate GDPR 🎯',
+      content: 'Urmărește aici fiecare pas finalizat cu gamification și asigură-te de conformitatea GDPR completă.',
       target: '.step-node',
       position: 'bottom',
     },
     {
-      title: 'Totul pregătit!',
-      content: 'Succes! Poţi relua tutorialul din meniu oricând 🥳',
+      title: 'Totul pregătit pentru Enhanced Experience! 🥳',
+      content: 'Succes! Acum ai acces la toate funcționalitățile îmbunătățite. Poți relua tutorialul din meniu oricând.',
       target: null,
       position: 'center',
     },
@@ -46,12 +46,12 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       const element = document.querySelector(currentStepData.target);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        element.classList.add('tutorial-ring');
+        element.classList.add('tutorial-ring-enhanced');
         element.style.zIndex = 110;
         element.style.position = 'relative';
 
         return () => {
-          element.classList.remove('tutorial-ring');
+          element.classList.remove('tutorial-ring-enhanced');
           element.style.zIndex = '';
           element.style.position = '';
         };
@@ -82,13 +82,22 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('tutorialViewed', 'true');
+    localStorage.setItem('tutorialViewed', JSON.stringify({
+      viewed: true,
+      date: new Date().toISOString(),
+      version: 'enhanced-v2.0'
+    }));
     onComplete?.();
     onClose();
   };
 
   const handleSkip = () => {
-    localStorage.setItem('tutorialViewed', 'true');
+    localStorage.setItem('tutorialViewed', JSON.stringify({
+      viewed: true,
+      skipped: true,
+      date: new Date().toISOString(),
+      version: 'enhanced-v2.0'
+    }));
     onClose();
   };
 
@@ -155,95 +164,119 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center"
+        className="fixed inset-0 z-[100] bg-gradient-to-br from-black/50 to-purple-900/50 backdrop-blur-sm flex items-center justify-center"
       >
         <motion.div
           key={currentStep}
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="absolute bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4"
+          initial={{ scale: 0.8, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.8, opacity: 0, y: -20 }}
+          transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
+          className="absolute bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border border-blue-200"
           style={getOverlayPosition()}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
-                {currentStep + 1} / {tutorialSteps.length}
-              </span>
+          {/* Enhanced Header with Gradient */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-r from-green-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+              >
+                Enhanced {currentStep + 1} / {tutorialSteps.length}
+              </motion.div>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={handleSkip}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
             >
               <X size={20} />
-            </button>
+            </motion.button>
           </div>
 
-          {/* Content */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          {/* Enhanced Content */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-8"
+          >
+            <h3 className="text-xl font-bold text-gray-800 mb-4 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               {currentStepData.title}
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
               {currentStepData.content}
             </p>
-          </div>
+          </motion.div>
 
-          {/* Navigation */}
+          {/* Enhanced Navigation */}
           <div className="flex items-center justify-between">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handlePrevious}
               disabled={currentStep === 0}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100"
             >
               <ArrowLeft size={16} />
               Înapoi
-            </button>
+            </motion.button>
 
-            <div className="flex space-x-1">
+            <div className="flex space-x-2">
               {tutorialSteps.map((_, index) => (
-                <div
+                <motion.div
                   key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.1 * index }}
+                  className={`w-2 h-2 rounded-full transition-all duration-500 ${
                     index === currentStep 
-                      ? 'bg-blue-600 w-6' 
+                      ? 'bg-gradient-to-r from-green-500 to-blue-600 w-8 shadow-lg' 
                       : index < currentStep 
-                      ? 'bg-blue-300' 
+                      ? 'bg-green-400 shadow-md' 
                       : 'bg-gray-300'
                   }`}
                 />
               ))}
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleNext}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white rounded-lg font-semibold transition-all shadow-lg"
             >
               {currentStep === tutorialSteps.length - 1 ? (
                 <>
                   <Check size={16} />
-                  Finalizează
+                  Finalizează Enhanced
                 </>
               ) : (
                 <>
-                  Următorul
+                  Următorul Enhanced
                   <ArrowRight size={16} />
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
 
-          {/* Skip option */}
-          <div className="text-center mt-4">
+          {/* Enhanced Skip option */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-center mt-6"
+          >
             <button
               onClick={handleSkip}
-              className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-xs text-gray-500 hover:text-gray-700 transition-colors underline"
             >
-              Sari peste tutorial
+              Sari peste tutorialul enhanced
             </button>
-          </div>
+          </motion.div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
