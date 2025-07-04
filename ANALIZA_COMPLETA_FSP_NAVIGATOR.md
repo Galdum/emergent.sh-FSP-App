@@ -118,25 +118,28 @@ npm start
 ### 📈 Strategia Freemium
 
 #### 🆓 Nivelul Gratuit
-- Accesul la ghidul de bază pentru Approbation
-- Informații despre fiecare Bundesland (stat german)
-- Upload pentru 5 documente
-- Progres tracking de bază
+- **Acces la primele 2 noduri** din procesul Approbation
+- Informații de bază despre Bundesland-uri
+- Upload pentru 3 documente
+- **Fără acces la AI Tutor**
+- Progres tracking limitat
 
 #### 💎 Nivelul Basic (€10/lună)
-- **AI Tutor German Medical** cu limită de utilizare
+- **Acces la toate nodurile** procesului Approbation
+- Informații complete despre toate Bundesland-urile
 - **Management documente** extins (15 documente)
-- **Simulări FSP** de bază
-- **Suport email**
-- **Funcții de gamificare**
+- Template-uri de bază pentru documente
+- **Fără acces la AI Tutor**
+- Funcții de gamificare complete
 
 #### 🏆 Nivelul Pro (€30/lună)
+- **Acces la toate nodurile** procesului Approbation
 - **AI Tutor German Medical** illimitat
 - **Management documente** complet (illimitat)
-- **Simulări FSP** avansate și personalizate
-- **Suport prioritar**
-- **Template-uri documente** premium
-- **Acces la comunitatea exclusivă**
+- **Simulări FSP** personalizate cu AI
+- Template-uri premium pentru documente
+- Suport prioritar
+- Acces la comunitatea exclusivă
 
 ### 💰 Proiecții Financiare
 
