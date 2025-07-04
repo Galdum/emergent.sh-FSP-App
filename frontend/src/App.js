@@ -852,6 +852,9 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadingImage, setUploadingImage] = useState(false);
     const imageInputRef = useRef(null);
+    
+    // Mobile tab state
+    const [activeTab, setActiveTab] = useState('documents');
 
     // Handle image upload
     const handleImageUpload = async (e) => {
@@ -1079,11 +1082,40 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
-            <div ref={modalRef} className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[90vh] overflow-hidden">
+            <div ref={modalRef} className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[95vh] overflow-y-auto">
+                {/* Hidden inputs accessible from both layouts */}
+                <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
+                <input
+                    type="file"
+                    ref={imageInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                />
+                
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-20"><X size={28} /></button>
                 <h2 className="text-2xl md:text-3xl font-bold p-6 pb-2 text-center md:text-left flex-shrink-0">Dosarul Meu & Asistent Personal</h2>
                 
-                <div className="grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2">
+                {/* Mobile Tab Navigation - Only visible on small screens */}
+                <div className="md:hidden flex-shrink-0 px-6">
+                    <div className="flex bg-gray-300 rounded-lg p-1">
+                        <button 
+                            onClick={() => setActiveTab('documents')}
+                            className={`flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-all ${activeTab === 'documents' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-600'}`}
+                        >
+                            📄 Documente
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('chat')}
+                            className={`flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-all ${activeTab === 'chat' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-600'}`}
+                        >
+                            💬 Chat
+                        </button>
+                    </div>
+                </div>
+                
+                {/* Desktop Layout - Grid visible on medium screens and up */}
+                <div className="hidden md:grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2" style={{minHeight: 'min(600px, calc(95vh - 200px))'}}>
                     {/* Left Column: File Management */}
                     <div className="flex flex-col bg-gray-200 p-4 rounded-lg min-h-0">
                         <h3 className="text-lg font-bold mb-3 flex-shrink-0 text-gray-700">Resurse Personale</h3>
@@ -1097,7 +1129,6 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                             <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-purple-100 text-purple-800 shadow-sm transition-colors">
                                <Upload size={18}/> Fișier
                             </button>
-                            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
                         </div>
                         {newItemType && (
                              <div className="bg-white p-3 rounded-lg mb-3 border border-gray-300 flex-shrink-0">
@@ -1109,7 +1140,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                         )}
-                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2">
+                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: 'min(400px, calc(50vh - 150px))', maxHeight: 'calc(95vh - 300px)'}}>
                              {loading ? (
                                 <div className="text-center text-gray-500 pt-10">Se încarcă...</div>
                              ) : files.length > 0 ? files.map(renderItem) : (
@@ -1144,7 +1175,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                  </button>
                              </div>
                          ) : (
-                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300">
+                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: 'min(400px, calc(50vh - 150px))', maxHeight: 'calc(95vh - 300px)'}}>
                             {history.map((msg, index) => (
                                  <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                                      <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
@@ -1160,14 +1191,6 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                          {/* Image Upload Section - only for Premium */}
                          {hasAIAccess() && (
                          <>
-                         <input
-                             type="file"
-                             ref={imageInputRef}
-                             onChange={handleImageUpload}
-                             accept="image/*,application/pdf"
-                             className="hidden"
-                         />
-                         
                          {/* Display uploaded images */}
                          {uploadedImages.length > 0 && (
                              <div className="mb-3 flex flex-wrap gap-2">
@@ -1203,6 +1226,122 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                          </>
                          )}
                     </div>
+                </div>
+                
+                {/* Mobile Layout - Single column based on active tab */}
+                <div className="md:hidden flex-grow min-h-0 p-6 pt-2" style={{minHeight: 'calc(95vh - 180px)'}}>
+                    {activeTab === 'documents' && (
+                        <div className="flex flex-col bg-gray-200 p-4 rounded-lg h-full">
+                            <h3 className="text-lg font-bold mb-3 flex-shrink-0 text-gray-700">Resurse Personale</h3>
+                            <div className="flex-shrink-0 flex flex-wrap justify-center gap-2 mb-3 p-2 bg-gray-300 rounded-lg">
+                                <button onClick={() => setNewItemType('note')} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-yellow-100 text-yellow-800 shadow-sm transition-colors">
+                                    <StickyNote size={18}/> Notiță
+                                </button>
+                                <button onClick={() => setNewItemType('link')} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-blue-100 text-blue-800 shadow-sm transition-colors">
+                                    <LinkIcon size={18}/> Link
+                                </button>
+                                <button onClick={() => fileInputRef.current?.click()} className="flex-1 text-sm flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white hover:bg-purple-100 text-purple-800 shadow-sm transition-colors">
+                                   <Upload size={18}/> Fișier
+                                </button>
+                            </div>
+                            {newItemType && (
+                                 <div className="bg-white p-3 rounded-lg mb-3 border border-gray-300 flex-shrink-0">
+                                    {newItemType === 'note' && <textarea value={noteContent} onChange={e => setNoteContent(e.target.value)} placeholder="Scrie notița aici..." className="w-full p-2 border rounded-md" rows="3"/>}
+                                    {newItemType === 'link' && (<div className="space-y-2"><input type="text" value={linkTitle} onChange={e => setLinkTitle(e.target.value)} placeholder="Titlu (opțional)" className="w-full p-2 border rounded-md" /><input type="url" value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder="https://exemplu.com" className="w-full p-2 border rounded-md" /></div>)}
+                                    <div className="flex justify-end gap-2 mt-2">
+                                        <button onClick={() => setNewItemType(null)} className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">Anulează</button>
+                                        <button onClick={handleAddItem} className="px-3 py-1 text-sm rounded-md bg-green-500 text-white hover:bg-green-600">Salvează</button>
+                                    </div>
+                                </div>
+                            )}
+                                                         <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: 'max(200px, calc(95vh - 350px))', maxHeight: 'calc(95vh - 250px)'}}>
+                                 {loading ? (
+                                    <div className="text-center text-gray-500 pt-10">Se încarcă...</div>
+                                 ) : files.length > 0 ? files.map(renderItem) : (
+                                    <div className="text-center text-gray-500 pt-10">
+                                        <p>Dosarul tău este gol.</p>
+                                        <p className="text-sm">Folosește butoanele de mai sus pentru a adăuga elemente.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {activeTab === 'chat' && (
+                        <div className="flex flex-col bg-gray-200 p-4 rounded-lg h-full">
+                            <h3 className="text-lg font-bold mb-3 flex items-center flex-shrink-0 text-gray-700">
+                                 <Sparkles className="text-purple-600 mr-2"/> 
+                                 Asistent Approbation
+                                 {!hasAIAccess() && <Lock className="h-4 w-4 ml-2 text-gray-500" />}
+                             </h3>
+                             
+                             {!hasAIAccess() ? (
+                                 <div className="flex-grow bg-gray-100 rounded-lg p-6 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center">
+                                     <Lock className="h-12 w-12 text-gray-400 mb-3" />
+                                     <h4 className="text-lg font-semibold text-gray-700 mb-2">Funcție Premium</h4>
+                                     <p className="text-gray-500 mb-4 text-sm">
+                                         Asistentul AI cu analiză de documente este disponibil doar pentru utilizatorii Premium.
+                                     </p>
+                                     <button
+                                         onClick={() => setSubscriptionUpgradeOpen(true)}
+                                         className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                                     >
+                                         Upgrade la Premium
+                                     </button>
+                                 </div>
+                             ) : (
+                             <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: 'max(200px, calc(95vh - 350px))', maxHeight: 'calc(95vh - 250px)'}}>
+                                {history.map((msg, index) => (
+                                     <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
+                                         <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
+                                             {msg.role === 'user' ? msg.parts[0].text : renderMarkdown(msg.parts[0].text)}
+                                         </div>
+                                     </div>
+                                 ))}
+                                 {chatLoading && <div className="text-center"><div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-600 border-t-transparent mx-auto"></div></div>}
+                                 <div ref={chatEndRef} />
+                             </div>
+                             )}
+                             
+                             {/* Image Upload Section - only for Premium */}
+                             {hasAIAccess() && (
+                             <>
+                             {/* Display uploaded images */}
+                             {uploadedImages.length > 0 && (
+                                 <div className="mb-3 flex flex-wrap gap-2">
+                                     {uploadedImages.map(image => (
+                                         <div key={image.id} className="relative bg-gray-100 p-2 rounded-lg border">
+                                             <div className="flex items-center gap-2">
+                                                 <ImageIcon className="h-4 w-4 text-blue-600" />
+                                                 <span className="text-sm text-gray-700 truncate max-w-[120px]">{image.name}</span>
+                                                 <button
+                                                     onClick={() => handleImageRemove(image.id)}
+                                                     className="text-red-500 hover:text-red-700"
+                                                 >
+                                                     <X className="h-4 w-4" />
+                                                 </button>
+                                             </div>
+                                         </div>
+                                     ))}
+                                 </div>
+                             )}
+                             
+                             <div className="flex items-center flex-shrink-0">
+                                 <button
+                                     onClick={() => imageInputRef.current?.click()}
+                                     disabled={uploadingImage}
+                                     className="bg-gray-500 text-white p-3 border hover:bg-gray-600 disabled:bg-gray-400 flex items-center justify-center"
+                                     title="Adaugă imagine sau document"
+                                 >
+                                     {uploadingImage ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+                                 </button>
+                                 <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} className="flex-grow p-3 border focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Pune o întrebare sau încarcă o imagine..." />
+                                 <button onClick={handleSend} disabled={chatLoading} className="bg-purple-600 text-white p-3 rounded-r-lg hover:bg-purple-700 disabled:bg-purple-400"><Send /></button>
+                             </div>
+                             </>
+                             )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
