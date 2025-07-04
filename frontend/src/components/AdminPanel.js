@@ -167,6 +167,12 @@ const AdminPanel = ({ isOpen, onClose }) => {
   };
 
   const handleToggleAdminStatus = async (userId, isAdmin) => {
+    // Prevent self-demotion
+    if (userId === user?.id && !isAdmin) {
+      addNotification('Cannot remove your own admin privileges', 'error');
+      return;
+    }
+
     try {
       await api.patch(`/admin/users/${userId}/admin-status`, { is_admin: isAdmin });
       setUsers(users.map(u => u.id === userId ? { ...u, is_admin: isAdmin } : u));
@@ -552,7 +558,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
                           <p className="text-green-100 text-sm font-medium">Active Subscriptions</p>
                           <p className="text-3xl font-bold">{currentStats.active_subscriptions}</p>
                           <p className="text-xs text-green-100 mt-1">
-                            {(currentStats.active_subscriptions / currentStats.total_users * 100).toFixed(1)}% conversion
+                            {currentStats.total_users > 0 ? (currentStats.active_subscriptions / currentStats.total_users * 100).toFixed(1) : '0'}% conversion
                           </p>
                         </div>
                         <div className="bg-white bg-opacity-20 rounded-lg p-3">
@@ -567,7 +573,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
                           <p className="text-purple-100 text-sm font-medium">Total Revenue</p>
                           <p className="text-3xl font-bold">€{currentStats.total_revenue?.toFixed(2) || '0.00'}</p>
                           <p className="text-xs text-purple-100 mt-1">
-                            €{(currentStats.total_revenue / currentStats.total_users).toFixed(2)} per user
+                            €{currentStats.total_users > 0 ? (currentStats.total_revenue / currentStats.total_users).toFixed(2) : '0.00'} per user
                           </p>
                         </div>
                         <div className="bg-white bg-opacity-20 rounded-lg p-3">
@@ -601,7 +607,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
                           <p className="text-3xl font-bold text-gray-900">{count}</p>
                           <p className="text-sm text-gray-600 capitalize font-medium">{plan.toLowerCase()}</p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {((count / currentStats.total_users) * 100).toFixed(1)}%
+                            {currentStats.total_users > 0 ? ((count / currentStats.total_users) * 100).toFixed(1) : '0'}%
                           </p>
                         </div>
                       ))}
@@ -854,6 +860,346 @@ const AdminPanel = ({ isOpen, onClose }) => {
               </div>
             </div>
           )}
+
+          {activeTab === 'transactions' && (
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">Transaction History</h3>
+                  <p className="text-gray-600">Monitor all payment transactions and revenue</p>
+                </div>
+                <button 
+                  onClick={() => exportData('transactions')}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Download size={16} />
+                  Export Transactions
+                </button>
+              </div>
+              
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {transactions.map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                            {transaction.id?.slice(0, 8)}...
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="font-medium text-gray-900">{transaction.user_email || 'N/A'}</p>
+                            <p className="text-sm text-gray-500">ID: {transaction.user_id?.slice(0, 8)}...</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-lg font-bold text-gray-900">€{transaction.amount?.toFixed(2) || '0.00'}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                              transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              transaction.status === 'failed' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {transaction.status || 'unknown'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {transaction.created_at ? new Date(transaction.created_at).toLocaleDateString() : 'N/A'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <button 
+                              className="text-blue-600 hover:text-blue-800 p-1"
+                              title="View transaction details"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'content' && (
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">Content Management</h3>
+                  <p className="text-gray-600">Manage utility documents and informational content</p>
+                </div>
+                <button 
+                  onClick={() => setNewUtilDoc({ 
+                    title: '', 
+                    description: '', 
+                    category: 'general',
+                    content_type: 'rich-content',
+                    rich_content: '',
+                    is_active: true,
+                    order_priority: 0
+                  })}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  <Plus size={16} />
+                  New Document
+                </button>
+              </div>
+              
+              {utilDocs.length === 0 && !newUtilDoc && (
+                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                  <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500 text-lg mb-2">No documents found</p>
+                  <p className="text-gray-400 text-sm">Add your first document to get started!</p>
+                </div>
+              )}
+
+              <div className="grid gap-6">
+                {utilDocs.map((doc) => (
+                  <div key={doc.id} className="bg-white rounded-xl shadow-lg border p-6 hover:shadow-xl transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h5 className="text-xl font-semibold text-gray-900">{doc.title}</h5>
+                          <span className="text-2xl">{doc.icon_emoji || '📄'}</span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            doc.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {doc.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-2">{doc.description}</p>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span className="capitalize">Category: {doc.category}</span>
+                          <span>Type: {doc.content_type}</span>
+                          <span>Order: {doc.order_priority}</span>
+                          <span>Updated: {new Date(doc.updated_at || doc.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setEditingUtilDoc(doc)}
+                          className="text-blue-600 hover:text-blue-800 p-2"
+                          title="Edit document"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteUtilDoc(doc.id)}
+                          className="text-red-600 hover:text-red-800 p-2"
+                          title="Delete document"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {doc.content_type === 'rich-content' && doc.rich_content && (
+                      <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 max-h-32 overflow-y-auto">
+                        <div dangerouslySetInnerHTML={{ __html: doc.rich_content.slice(0, 200) + (doc.rich_content.length > 200 ? '...' : '') }} />
+                      </div>
+                    )}
+                    
+                    {doc.content_type === 'link' && doc.external_url && (
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <a 
+                          href={doc.external_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+                        >
+                          <ExternalLink size={16} />
+                          {doc.external_url}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {editingUtilDoc && (
+                  <div className="bg-white rounded-xl shadow-lg border p-6">
+                    <h5 className="text-lg font-semibold text-gray-900 mb-4">Edit Document</h5>
+                    <div className="grid gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={editingUtilDoc.title}
+                            onChange={(e) => setEditingUtilDoc({ ...editingUtilDoc, title: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                          <select
+                            value={editingUtilDoc.category}
+                            onChange={(e) => setEditingUtilDoc({ ...editingUtilDoc, category: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="general">General</option>
+                            <option value="land-specific">Land Specific</option>
+                            <option value="alternatives">Alternatives</option>
+                            <option value="support-groups">Support Groups</option>
+                            <option value="youtube">YouTube Resources</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input
+                          type="text"
+                          value={editingUtilDoc.description}
+                          onChange={(e) => setEditingUtilDoc({ ...editingUtilDoc, description: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                      
+                      {editingUtilDoc.content_type === 'rich-content' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                          <textarea
+                            value={editingUtilDoc.rich_content}
+                            onChange={(e) => setEditingUtilDoc({ ...editingUtilDoc, rich_content: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            rows="6"
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-end gap-3 mt-6">
+                        <button
+                          onClick={() => setEditingUtilDoc(null)}
+                          className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => handleUpdateUtilDoc(editingUtilDoc.id, editingUtilDoc)}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {newUtilDoc && (
+                  <div className="bg-white rounded-xl shadow-lg border p-6">
+                    <h5 className="text-lg font-semibold text-gray-900 mb-4">Create New Document</h5>
+                    <div className="grid gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={newUtilDoc.title}
+                            onChange={(e) => setNewUtilDoc({ ...newUtilDoc, title: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Document title"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                          <select
+                            value={newUtilDoc.category}
+                            onChange={(e) => setNewUtilDoc({ ...newUtilDoc, category: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="general">General</option>
+                            <option value="land-specific">Land Specific</option>
+                            <option value="alternatives">Alternatives</option>
+                            <option value="support-groups">Support Groups</option>
+                            <option value="youtube">YouTube Resources</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input
+                          type="text"
+                          value={newUtilDoc.description}
+                          onChange={(e) => setNewUtilDoc({ ...newUtilDoc, description: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Brief description"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Type</label>
+                        <select
+                          value={newUtilDoc.content_type}
+                          onChange={(e) => setNewUtilDoc({ ...newUtilDoc, content_type: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="rich-content">Rich Content</option>
+                          <option value="link">External Link</option>
+                          <option value="file">File Upload</option>
+                        </select>
+                      </div>
+                      
+                      {newUtilDoc.content_type === 'rich-content' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                          <textarea
+                            value={newUtilDoc.rich_content}
+                            onChange={(e) => setNewUtilDoc({ ...newUtilDoc, rich_content: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            rows="6"
+                            placeholder="Document content (HTML supported)"
+                          />
+                        </div>
+                      )}
+                      
+                      {newUtilDoc.content_type === 'link' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">External URL</label>
+                          <input
+                            type="url"
+                            value={newUtilDoc.external_url || ''}
+                            onChange={(e) => setNewUtilDoc({ ...newUtilDoc, external_url: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="https://example.com"
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-end gap-3 mt-6">
+                        <button
+                          onClick={() => setNewUtilDoc(null)}
+                          className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => handleCreateUtilDoc(newUtilDoc)}
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                          disabled={!newUtilDoc.title || !newUtilDoc.category}
+                        >
+                          Create Document
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'errors' && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
