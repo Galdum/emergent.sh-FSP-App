@@ -98,10 +98,10 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
   const getModalTitle = () => {
     switch(mode) {
-      case 'login': return 'Autentificare Enhanced';
-      case 'register': return 'Cont Nou Enhanced';
-      case 'forgot-password': return 'Recuperare Parolă';
-      default: return 'Autentificare Enhanced';
+      case 'login': return 'Autentificare Enhanced 🚀';
+      case 'register': return 'Cont Nou Enhanced 🎯';
+      case 'forgot-password': return 'Recuperare Parolă 🔑';
+      default: return 'Autentificare Enhanced 🚀';
     }
   };
 

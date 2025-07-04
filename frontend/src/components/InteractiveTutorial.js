@@ -8,7 +8,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
 
   const tutorialSteps = [
     {
-      title: 'Bine ai venit la FSP Navigator Enhanced! �',
+      title: 'Bine ai venit la FSP Navigator Enhanced! 🚀',
       content: 'În următoarele secunde îți arătăm funcționalitățile îmbunătățite ale aplicației pentru o experiență optimă.',
       target: null,
       position: 'center',

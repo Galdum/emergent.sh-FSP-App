@@ -109,10 +109,10 @@ const AppContent = () => {
       {/* Enhanced Welcome Message */}
       {showWelcomeMessage && (
         <div className="fixed top-4 right-4 z-50 animate-fade-in-down">
-          <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
-            <h3 className="font-semibold">🎉 Bine ai venit la FSP Navigator Enhanced!</h3>
-            <p className="text-sm opacity-90">Experiență îmbunătățită cu funcții avansate</p>
-          </div>
+                     <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
+             <h3 className="font-semibold">🎉 Bine ai venit la FSP Navigator Enhanced v2.0!</h3>
+             <p className="text-sm opacity-90">Experiență îmbunătățită cu funcții avansate și GDPR compliance</p>
+           </div>
         </div>
       )}
 
