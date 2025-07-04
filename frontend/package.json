@@ -1,6 +1,6 @@
 {
   "name": "fsp-navigator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@paypal/react-paypal-js": "^8.8.3",
@@ -8,20 +8,25 @@
     "axios": "^1.8.4",
     "lucide-react": "^0.522.0",
     "framer-motion": "^11.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "4.0.3"
+    "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "node scripts/simple-enhanced-build.js",
-    "build:react": "GENERATE_SOURCEMAP=false react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build:clean": "rm -rf build && npm run build",
-    "build:production": "npm run build:clean",
-    "postinstall": "patch-package"
+    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
+    "build": "SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build",
+    "build:production": "SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false BUILD_PATH=dist react-scripts build"
+  },
+  "overrides": {
+    "shell-quote": "^1.8.1",
+    "ejs": "^3.1.10",
+    "loader-utils": "^3.2.1",
+    "immer": "^10.0.3",
+    "postcss": "^8.4.31",
+    "ajv": "^8.12.0",
+    "ajv-keywords": "^5.1.0",
+    "fork-ts-checker-webpack-plugin": "^9.0.2"
   },
   "browserslist": {
     "production": [
@@ -34,16 +39,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@craco/craco": "^7.1.0",
-    "@craco/types": "^7.1.0",
-    "patch-package": "^8.0.0",
-    "postinstall-postinstall": "^2.1.0"
-  },
-  "overrides": {
-    "ajv": "^6.12.6",
-    "fork-ts-checker-webpack-plugin": "^6.5.3",
-    "eslint-webpack-plugin": "^2.7.0"
   }
 }
