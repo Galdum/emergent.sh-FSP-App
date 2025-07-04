@@ -22,8 +22,57 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
         """Handle GET requests"""
         path = urlparse(self.path).path
         
-        # Serve the preview HTML file
-        if path == "/" or path == "/preview.html":
+        # Serve the React application
+        if path == "/" or path == "/index.html":
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            
+            build_index = os.path.join("frontend", "build", "index.html")
+            if os.path.exists(build_index):
+                with open(build_index, "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self.wfile.write(b"<h1>ApprobMed Preview</h1><p>React build not found. Please run 'npm run build' in frontend directory.</p>")
+            return
+        
+        # Serve static assets from React build
+        if path.startswith("/static/"):
+            static_path = os.path.join("frontend", "build", path[1:])  # Remove leading slash
+            if os.path.exists(static_path):
+                # Determine content type
+                if path.endswith('.js'):
+                    content_type = "application/javascript"
+                elif path.endswith('.css'):
+                    content_type = "text/css"
+                elif path.endswith('.map'):
+                    content_type = "application/json"
+                else:
+                    content_type = "application/octet-stream"
+                
+                self.send_response(200)
+                self.send_header("Content-type", content_type)
+                self.end_headers()
+                
+                with open(static_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+        
+        # Serve the clear storage utility
+        if path == "/clear":
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            
+            if os.path.exists("clear_storage.html"):
+                with open("clear_storage.html", "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self.wfile.write(b"<h1>Clear Storage</h1><script>localStorage.clear(); window.location.href='/';</script>")
+            return
+        
+        # Serve the preview HTML file for legacy compatibility
+        if path == "/preview.html":
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
@@ -120,6 +169,20 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
             else:
                 self.send_error(401, "Unauthorized")
         
+        elif path.startswith("/api/gdpr/privacy-policy"):
+            self.send_json({
+                "version": "1.0",
+                "effective_date": "2025-01-01",
+                "content": "<h1>Politica de Confidențialitate</h1><p>Această aplicație colectează și procesează datele dumneavoastră personale în conformitate cu Regulamentul General privind Protecția Datelor (GDPR).</p><h2>Datele colectate</h2><p>Colectăm următoarele tipuri de date:</p><ul><li>Informații de contact (email)</li><li>Progres în aplicație</li><li>Preferințe de utilizare</li></ul><h2>Utilizarea datelor</h2><p>Datele sunt utilizate pentru:</p><ul><li>Furnizarea serviciilor aplicației</li><li>Îmbunătățirea experienței utilizatorului</li><li>Comunicări importante despre serviciu</li></ul>"
+            })
+        
+        elif path.startswith("/api/gdpr/terms-of-service"):
+            self.send_json({
+                "version": "1.0", 
+                "effective_date": "2025-01-01",
+                "content": "<h1>Termeni și Condiții</h1><p>Prin utilizarea acestei aplicații, acceptați următorii termeni și condiții.</p><h2>Utilizarea Serviciului</h2><p>Această aplicație este destinată exclusiv scopurilor educaționale și informative pentru medicii care doresc să lucreze în Germania.</p><h2>Limitarea Răspunderii</h2><p>Informațiile furnizate sunt doar în scop informativ și nu constituie consiliere juridică sau profesională.</p><h2>Modificări</h2><p>Ne rezervăm dreptul de a modifica acești termeni în orice moment.</p>"
+            })
+        
         else:
             self.send_error(404, "Not Found")
     
@@ -193,6 +256,14 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
             else:
                 self.send_error(401, "Unauthorized")
         
+        elif path == "/api/gdpr/consent":
+            # Record GDPR consent
+            self.send_json({
+                "status": "success",
+                "message": "Consent recorded successfully",
+                "consent_id": str(uuid.uuid4())
+            })
+        
         else:
             self.send_error(404, "Not Found")
     
@@ -201,6 +272,8 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-type", "application/json")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
         self.end_headers()
         self.wfile.write(json.dumps(data).encode())
     

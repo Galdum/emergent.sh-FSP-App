@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Bell, Shield, CreditCard, Globe, Trash2, Download, Eye, EyeOff, Save, Settings as SettingsIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import { api } from '../services/api';
 
 const SettingsModal = ({ isOpen, onClose }) => {
   const { user, updateUser } = useAuth();

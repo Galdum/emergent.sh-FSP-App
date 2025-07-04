@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Storage & Reload</title>
+</head>
+<body>
+    <h1>Clearing storage and reloading...</h1>
+    <script>
+        // Clear all localStorage
+        localStorage.clear();
+        
+        // Clear sessionStorage too
+        sessionStorage.clear();
+        
+        // Redirect to the main app after a short delay
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1000);
+    </script>
+</body>
+</html>
