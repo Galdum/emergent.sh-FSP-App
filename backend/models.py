@@ -301,3 +301,54 @@ class UserStats(BaseModel):
     last_activity_date: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UtilInfoDocument(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: Optional[str] = None
+    category: str  # e.g., "land-specific", "alternatives", "youtube", "support-groups", etc.
+    content_type: str  # "file", "link", "rich-content"
+    file_id: Optional[str] = None  # If it's an uploaded file
+    external_url: Optional[str] = None  # If it's an external link
+    rich_content: Optional[str] = None  # HTML/Markdown content
+    icon_emoji: Optional[str] = None
+    color_theme: Optional[str] = None  # For UI styling
+    order_priority: int = 0  # For sorting
+    is_active: bool = True
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_by: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
+class UtilInfoDocumentCreate(BaseModel):
+    """Model for creating a new utility information document - excludes system-controlled fields."""
+    title: str
+    description: Optional[str] = None
+    category: str
+    content_type: str  # "file", "link", "rich-content"
+    file_id: Optional[str] = None
+    external_url: Optional[str] = None
+    rich_content: Optional[str] = None
+    icon_emoji: Optional[str] = None
+    color_theme: Optional[str] = None
+    order_priority: int = 0
+    is_active: bool = True
+
+class UtilInfoDocumentUpdate(BaseModel):
+    """Model for updating a utility information document - excludes system-controlled fields."""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    content_type: Optional[str] = None
+    file_id: Optional[str] = None
+    external_url: Optional[str] = None
+    rich_content: Optional[str] = None
+    icon_emoji: Optional[str] = None
+    color_theme: Optional[str] = None
+    order_priority: Optional[int] = None
+    is_active: Optional[bool] = None
