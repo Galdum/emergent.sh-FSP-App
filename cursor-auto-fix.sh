@@ -34,7 +34,22 @@ cat > package.json << 'EOF'
     "ejs": "^3.1.10",
     "loader-utils": "^3.2.1",
     "immer": "^10.0.3",
-    "postcss": "^8.4.31"
+    "postcss": "^8.4.31",
+    "ajv": "^8.12.0",
+    "ajv-keywords": "^5.1.0",
+    "fork-ts-checker-webpack-plugin": "^9.0.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
 EOF
