@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ApprobMed Preview Server - Standalone version for quick testing
+FSP Navigator Preview Server - Standalone version for quick testing
 """
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -17,7 +17,7 @@ USERS = {}
 TOKENS = {}
 DOCUMENTS = {}
 
-class ApprobMedHandler(SimpleHTTPRequestHandler):
+class FSPNavigatorHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         """Handle GET requests"""
         path = urlparse(self.path).path
@@ -32,12 +32,12 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
                 with open("preview.html", "rb") as f:
                     self.wfile.write(f.read())
             else:
-                self.wfile.write(b"<h1>ApprobMed Preview</h1><p>preview.html not found</p>")
+                self.wfile.write(b"<h1>FSP Navigator Preview</h1><p>preview.html not found</p>")
             return
         
         # API endpoints
         if path == "/api":
-            self.send_json({"message": "ApprobMed API Preview", "version": "1.0.0"})
+            self.send_json({"message": "FSP Navigator API Preview", "version": "1.0.0"})
         elif path == "/docs":
             self.send_response(200)
             self.send_header("Content-type", "text/html")
@@ -210,7 +210,7 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
         <!DOCTYPE html>
         <html>
         <head>
-            <title>ApprobMed API Documentation</title>
+            <title>FSP Navigator API Documentation</title>
             <style>
                 body { font-family: Arial, sans-serif; margin: 40px; }
                 h1 { color: #667eea; }
@@ -219,8 +219,8 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
             </style>
         </head>
         <body>
-            <h1>ApprobMed API Documentation</h1>
-            <p>Preview API for the ApprobMed medical license guide platform.</p>
+                    <h1>FSP Navigator API Documentation</h1>
+        <p>Preview API for the FSP Navigator medical license guide platform.</p>
             
             <h2>Authentication Endpoints</h2>
             <div class="endpoint">
@@ -270,11 +270,11 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
 def main():
     port = 8000
     server_address = ('', port)
-    httpd = HTTPServer(server_address, ApprobMedHandler)
+    httpd = HTTPServer(server_address, FSPNavigatorHandler)
     
     print(f"""
 ╔══════════════════════════════════════════════════════╗
-║          ApprobMed Preview Server                      ║
+    ║          FSP Navigator Preview Server                  ║
 ╠══════════════════════════════════════════════════════╣
 ║  🚀 Server running at: http://localhost:{port}         ║
 ║  📚 API Docs at: http://localhost:{port}/docs         ║

@@ -11,13 +11,13 @@ const LegalModal = ({ isOpen, onClose, initialTab = 'terms' }) => {
   ];
 
   const termsContent = `
-# Termeni și Condiții de Utilizare - ApprobMed
+# Termeni și Condiții de Utilizare - FSP Navigator
 
 ## 1. Acceptarea Termenilor
-Prin utilizarea serviciilor ApprobMed, confirmați că ați citit, înțeles și acceptat acești termeni și condiții în întregime.
+Prin utilizarea serviciilor FSP Navigator, confirmați că ați citit, înțeles și acceptat acești termeni și condiții în întregime.
 
 ## 2. Descrierea Serviciului
-ApprobMed este o platformă digitală care oferă ghidare și resurse pentru medicii care doresc să obțină Approbation în Germania. Serviciile includ:
+FSP Navigator este o platformă digitală care oferă ghidare și resurse pentru medicii care doresc să obțină Approbation în Germania. Serviciile includ:
 - Ghiduri pas-cu-pas pentru procesul de Approbation
 - Tutor AI pentru învățarea germanei medicale
 - Management documente
@@ -46,7 +46,7 @@ NU este permis să:
 - Politicile de rambursare sunt disponibile la solicitare
 
 ## 7. Limitarea Răspunderii
-ApprobMed nu garantează:
+FSP Navigator nu garantează:
 - Obținerea Approbation-ului
 - Exactitatea completă a informațiilor oficiale
 - Funcționarea neîntreruptă a serviciilor
@@ -58,13 +58,13 @@ Ne rezervăm dreptul de a modifica acești termeni. Modificările vor fi comunic
 Acești termeni sunt guvernați de legislația română și cea germană aplicabilă.
 
 ## Contact
-Pentru întrebări: contact@approbmed.com
+Pentru întrebări: contact@fspnavigator.com
 
 Data ultimei actualizări: Decembrie 2024
   `;
 
   const privacyContent = `
-# Politica de Confidențialitate - ApprobMed
+# Politica de Confidențialitate - FSP Navigator
 
 ## 1. Informații Generale
 Această politică explică cum colectăm, folosim și protejăm datele dvs. personale în conformitate cu GDPR.
@@ -96,7 +96,7 @@ Această politică explică cum colectăm, folosim și protejăm datele dvs. per
 ## 4. Cum Folosim Datele
 
 ### Finalități Primare:
-- Furnizarea serviciilor ApprobMed
+- Furnizarea serviciilor FSP Navigator
 - Personalizarea experienței
 - Suport tehnic și comunicare
 
@@ -152,8 +152,8 @@ Vezi Politica separată de Cookie-uri pentru detalii complete.
 Serviciile nu sunt destinate persoanelor sub 16 ani fără consimțământul părinților.
 
 ## 12. DPO și Contact
-**Data Protection Officer**: dpo@approbmed.com
-**Contact general**: privacy@approbmed.com
+**Data Protection Officer**: dpo@fspnavigator.com
+**Contact general**: privacy@fspnavigator.com
 
 ## 13. Autoritatea de Supraveghere
 Puteți depune plângeri la:
@@ -164,7 +164,7 @@ Data ultimei actualizări: Decembrie 2024
   `;
 
   const cookiesContent = `
-# Politica Cookie-uri - ApprobMed
+# Politica Cookie-uri - FSP Navigator
 
 ## 1. Ce sunt Cookie-urile?
 Cookie-urile sunt fișiere mici stocate pe dispozitivul dvs. pentru a îmbunătăți experiența de navigare.
@@ -213,7 +213,7 @@ Cookie-urile sunt fișiere mici stocate pe dispozitivul dvs. pentru a îmbunăt�
 - **Safari**: Preferences > Privacy
 - **Edge**: Settings > Privacy & Security
 
-### În ApprobMed:
+### În FSP Navigator:
 - Accesați setările din aplicație
 - Modificați preferințele de cookie-uri
 - Ștergeți cookie-urile existente
@@ -239,7 +239,7 @@ Această politică poate fi actualizată. Modificările vor fi comunicate prin:
 - Banner de notificare
 
 ## Contact
-Pentru întrebări despre cookie-uri: cookies@approbmed.com
+Pentru întrebări despre cookie-uri: cookies@fspnavigator.com
 
 Data ultimei actualizări: Decembrie 2024
   `;
@@ -263,7 +263,7 @@ Data ultimei actualizări: Decembrie 2024
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `approbmed-${activeTab}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `fsp-navigator-${activeTab}-${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -403,15 +403,15 @@ Data ultimei actualizări: Decembrie 2024
         {/* Footer */}
         <div className="border-t p-4 bg-gray-50 flex items-center justify-between">
           <div className="text-xs text-gray-500">
-            © 2024 ApprobMed. Toate drepturile rezervate.
+            © 2024 FSP Navigator. Toate drepturile rezervate.
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">Contact legal:</span>
             <a
-              href="mailto:legal@approbmed.com"
+              href="mailto:legal@fspnavigator.com"
               className="text-xs text-blue-600 hover:text-blue-700 transition-colors"
             >
-              legal@approbmed.com
+              legal@fspnavigator.com
             </a>
           </div>
         </div>

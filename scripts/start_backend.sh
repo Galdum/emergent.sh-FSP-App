@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ApprobMed Backend Startup Script
+# FSP Navigator Backend Startup Script
 
-echo "Starting ApprobMed Backend Server..."
+echo "Starting FSP Navigator Backend Server..."
 
 # Check if we're in the right directory
 if [ ! -f "backend/server.py" ]; then
