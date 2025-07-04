@@ -1182,7 +1182,7 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                                  </button>
                              </div>
                          ) : (
-                         <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 overflow-y-auto mb-4 border shadow-inner min-h-0" style={{minHeight: 'min(300px, calc(60vh - 150px))', maxHeight: 'calc(85vh - 200px)'}}>
+                         <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 overflow-y-auto mb-2 border shadow-inner min-h-0" style={{minHeight: 'min(350px, calc(65vh - 120px))', maxHeight: 'calc(88vh - 160px)'}}>
                             {history.length === 0 && (
                                 <div className="flex items-center justify-center h-full text-center">
                                     <div className="text-gray-500">
@@ -1260,11 +1260,11 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                          )}
                          
                          <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm">
-                             <div className="flex items-center p-2 gap-2">
+                             <div className="flex items-center p-1.5 gap-2">
                                  <button
                                      onClick={() => imageInputRef.current?.click()}
                                      disabled={uploadingImage}
-                                     className="w-10 h-10 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center transition-colors"
+                                     className="w-9 h-9 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center transition-colors"
                                      title="Adaugă imagine sau document"
                                  >
                                      {uploadingImage ? <RefreshCw className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
@@ -1274,14 +1274,14 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                                      value={prompt} 
                                      onChange={(e) => setPrompt(e.target.value)} 
                                      onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} 
-                                     className="flex-grow p-2 border-0 focus:outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm min-h-[36px] chat-input" 
+                                     className="flex-grow p-1.5 border-0 focus:outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm min-h-[32px] chat-input" 
                                      placeholder="Pune o întrebare sau încarcă o imagine..." 
                                      disabled={chatLoading}
                                  />
                                  <button 
                                      onClick={handleSend} 
                                      disabled={chatLoading || !prompt.trim()} 
-                                     className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all chat-send-button ${
+                                     className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all chat-send-button ${
                                          chatLoading || !prompt.trim() 
                                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
                                              : 'bg-purple-600 text-white hover:bg-purple-700 shadow-sm'
@@ -1290,7 +1290,7 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                                      {chatLoading ? (
                                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                                      ) : (
-                                         <Send size={16} />
+                                         <Send size={15} />
                                      )}
                                  </button>
                              </div>
@@ -1362,7 +1362,7 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                                      </button>
                                  </div>
                              ) : (
-                             <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 overflow-y-auto mb-4 border shadow-inner min-h-0 chat-container" style={{minHeight: 'max(250px, calc(80vh - 280px))', maxHeight: 'calc(85vh - 200px)'}}>
+                             <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 overflow-y-auto mb-2 border shadow-inner min-h-0 chat-container" style={{minHeight: 'max(300px, calc(85vh - 250px))', maxHeight: 'calc(88vh - 160px)'}}>
                                 {history.length === 0 && (
                                     <div className="flex items-center justify-center h-full text-center">
                                         <div className="text-gray-500">
@@ -1440,37 +1440,37 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                              )}
                              
                              <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm chat-input-mobile">
-                                 <div className="flex items-center p-3 gap-3">
+                                 <div className="flex items-center p-2 gap-2">
                                      <button
                                          onClick={() => imageInputRef.current?.click()}
                                          disabled={uploadingImage}
-                                         className="w-12 h-12 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center transition-colors"
+                                         className="w-10 h-10 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center transition-colors"
                                          title="Adaugă imagine sau document"
                                      >
-                                         {uploadingImage ? <RefreshCw className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+                                         {uploadingImage ? <RefreshCw className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
                                      </button>
                                      <input 
                                          type="text" 
                                          value={prompt} 
                                          onChange={(e) => setPrompt(e.target.value)} 
                                          onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSend()} 
-                                         className="flex-grow p-3 border-0 focus:outline-none text-gray-700 placeholder-gray-400 bg-transparent min-h-[44px] chat-input" 
+                                         className="flex-grow p-2 border-0 focus:outline-none text-gray-700 placeholder-gray-400 bg-transparent min-h-[38px] chat-input" 
                                          placeholder="Pune o întrebare sau încarcă o imagine..." 
                                          disabled={chatLoading}
                                      />
                                      <button 
                                          onClick={handleSend} 
                                          disabled={chatLoading || !prompt.trim()} 
-                                         className={`w-12 h-12 chat-send-button-mobile rounded-xl flex items-center justify-center transition-all chat-send-button ${
+                                         className={`w-10 h-10 chat-send-button-mobile rounded-lg flex items-center justify-center transition-all chat-send-button ${
                                              chatLoading || !prompt.trim() 
                                                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
                                                  : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md'
                                          }`}
                                      >
                                          {chatLoading ? (
-                                             <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                             <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                                          ) : (
-                                             <Send size={20} />
+                                             <Send size={18} />
                                          )}
                                      </button>
                                  </div>
@@ -2158,7 +2158,7 @@ Regeln:
                         </div>
                         
                         {/* Chat Area - Optimized for maximum space */}
-                        <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 md:p-4 overflow-y-auto mb-3 md:mb-4 border shadow-inner min-h-0" style={{maxHeight: 'calc(90vh - 180px)'}}>
+                        <div className="flex-grow bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 md:p-4 overflow-y-auto mb-2 md:mb-3 border shadow-inner min-h-0" style={{maxHeight: 'calc(93vh - 140px)'}}>
                             {history.length === 0 && (
                                 <div className="flex items-center justify-center h-full text-center">
                                     <div className="text-gray-500">
@@ -2212,15 +2212,15 @@ Regeln:
                             <div ref={chatEndRef} />
                         </div>
                         
-                        {/* Input Area - Modern design */}
+                        {/* Input Area - Compact design */}
                         <div className="flex-shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm">
-                            <div className="flex items-end p-3 gap-3">
+                            <div className="flex items-center p-2 gap-2">
                                 <input
                                     type="text"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
-                                    className="flex-grow p-3 border-0 focus:outline-none resize-none text-gray-700 placeholder-gray-400 bg-transparent min-h-[44px]"
+                                    className="flex-grow p-2 border-0 focus:outline-none resize-none text-gray-700 placeholder-gray-400 bg-transparent min-h-[36px]"
                                     placeholder={uploadedCase ? "Întreabă despre cazul tău..." : 
                                                selectedMedicalCase ? "Pune întrebări pacientului..." : "Scrie mesajul tău aici..."}
                                     disabled={loading}
@@ -2228,16 +2228,16 @@ Regeln:
                                 <button 
                                     onClick={handleSend} 
                                     disabled={loading || !prompt.trim()} 
-                                    className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all transform ${
+                                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all transform ${
                                         loading || !prompt.trim() 
                                             ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 active:scale-95 shadow-md'
                                     }`}
                                 >
                                     {loading ? (
-                                        <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
-                                        <Send size={20} />
+                                        <Send size={18} />
                                     )}
                                 </button>
                             </div>
