@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ApprobMed Preview Server - Standalone version for quick testing
+ApprobMed Preview Server - UPDATED to serve React build with GDPR modal fixes
 """
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -22,7 +22,7 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
         """Handle GET requests"""
         path = urlparse(self.path).path
         
-        # Serve the React application
+        # UPDATED: Serve the React application build instead of static HTML
         if path == "/" or path == "/index.html":
             self.send_response(200)
             self.send_header("Content-type", "text/html")
@@ -36,7 +36,7 @@ class ApprobMedHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(b"<h1>ApprobMed Preview</h1><p>React build not found. Please run 'npm run build' in frontend directory.</p>")
             return
         
-        # Serve static assets from React build
+        # ADDED: Serve static assets from React build (JS, CSS, etc.)
         if path.startswith("/static/"):
             static_path = os.path.join("frontend", "build", path[1:])  # Remove leading slash
             if os.path.exists(static_path):

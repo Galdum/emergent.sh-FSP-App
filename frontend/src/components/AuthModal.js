@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, Lock, User, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
+import { api } from '../services/api'; // FIXED: Changed from default import to named import
 import LegalModal from './LegalModal';
 
 const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {

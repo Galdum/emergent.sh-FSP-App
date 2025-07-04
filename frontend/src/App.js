@@ -11,7 +11,7 @@ import SubscriptionUpgrade from './components/SubscriptionUpgrade';
 import FeedbackWidget from './components/FeedbackWidget';
 import AdminPanel from './components/AdminPanel';
 import AuthModal from './components/AuthModal';
-import GDPRConsentModal from './components/GDPRConsentModal'; // GDPR Modal - Fixed and Working!
+import GDPRConsentModal from './components/GDPRConsentModal';
 import SettingsModal from './components/SettingsModal';
 import InteractiveTutorial from './components/InteractiveTutorial';
 import LegalModal from './components/LegalModal';
@@ -30,7 +30,8 @@ const Confetti = () => {
     const confettiCount = 100;
     const colors = ['#fde196', '#fdb497', '#F7941D', '#27AAE1', '#a3d4f4', '#81c784'];
     
-    // This useEffect is now handled in the AppContent component
+    // FIXED: Removed broken useEffect that was calling non-existent setGdprConsentOpen function
+    // This was causing the GDPR modal to fail completely
 
     return (
         <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
