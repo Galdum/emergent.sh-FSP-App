@@ -1,11 +1,14 @@
-# 🏥 ApprobMed - Analiză Completă Tehnică și de Business
+# 🏥 FSP Navigator - Analiză Completă Tehnică și de Business
 
 ## 📋 Rezumat Executiv
 
-**ApprobMed** este o aplicație web completă care ajută doctorii români să obțină licența medicală în Germania (chiamată "Approbation"). Aplicația funcționează ca un ghid digital inteligent care simplifică un proces birocratic complex, oferind instrumente AI pentru învățarea limbii germane medicale și un sistem de management al documentelor.
+**FSP Navigator** este o aplicație web completă care ajută doctorii români să obțină licența medicală în Germania (chiamată "Approbation"). Aplicația funcționează ca un ghid digital inteligent care simplifică un proces birocratic complex, oferind instrumente AI pentru învățarea limbii germane medicale și un sistem de management al documentelor.
 
 ### 🎯 Scopul Principal
 Să transforme procesul complicat și stresant de obținere a licenței medicale în Germania într-o experință ghidată, gamificată și eficientă pentru doctorii români.
+
+### ⚠️ Notă Importantă despre Denumire
+Aplicația a fost redenumită din **"ApprobMed"** în **"FSP Navigator"**. În codebase se folosește numele nou, dar unele documente vechi (README.md, script-uri) încă conțin referințe la numele anterior.
 
 ---
 
@@ -52,7 +55,7 @@ Imaginează-ți aplicația ca o casă cu două părți principale:
 
 #### Opțiunea 1: Start Rapid
 ```bash
-./start_approbmed.sh
+./start_approbmed.sh  # (script-ul încă folosește numele vechi)
 ```
 
 #### Opțiunea 2: Start Manual
@@ -159,6 +162,7 @@ npm start
 ### Frontend Dependencies (package.json)
 ```json
 {
+  "name": "fsp-navigator",
   "dependencies": {
     "@paypal/react-paypal-js": "^8.8.3",      // Integrare PayPal
     "@react-oauth/google": "^0.12.1",         // Google OAuth
@@ -343,7 +347,7 @@ response.headers["Strict-Transport-Security"] = "max-age=31536000"
 
 ---
 
-## 🎉 Concluzie: De Ce ApprobMed Este o Oportunitate Excepțională
+## 🎉 Concluzie: De Ce FSP Navigator Este o Oportunitate Excepțională
 
 ### ✅ Pentru Programatori
 - **Tech stack modern** și scalabil (React + FastAPI)
@@ -370,7 +374,7 @@ response.headers["Strict-Transport-Security"] = "max-age=31536000"
 
 ## 📞 Next Steps și Contact
 
-**ApprobMed reprezintă o investiție de €150,000+ în dezvoltare, livrat ca o aplicație production-ready, completă și optimizată pentru thousands de doctori români care caută să-și urmeze cariera în Germania.**
+**FSP Navigator reprezintă o investiție de €150,000+ în dezvoltare, livrat ca o aplicație production-ready, completă și optimizată pentru thousands de doctori români care caută să-și urmeze cariera în Germania.**
 
 **🚀 Gata pentru lansare și scalare către o piață de €50M+ în Europa de Est!**
 
@@ -379,11 +383,11 @@ response.headers["Strict-Transport-Security"] = "max-age=31536000"
 - **Pentru Doctori**: Early access la cea mai avansată platformă pentru Approbation în Germania
 - **Pentru Parteneri**: Integrări strategice cu instituții medicale și educaționale
 
-**ApprobMed - Transforming German medical licensing pentru Romanian doctors! 🇷🇴 ➡️ 🇩🇪**
+**FSP Navigator - Transforming German medical licensing pentru Romanian doctors! 🇷🇴 ➡️ 🇩🇪**
 
 ---
 
 *Raport generat pe: 17 Decembrie 2024*  
 *Status aplicație: ✅ Production Ready*  
 *Investiție dezvoltare: €150,000+*  
-*ROI proiectat: 250-400% în 3 ani*
+*ROI projectat: 250-400% în 3 ani*
