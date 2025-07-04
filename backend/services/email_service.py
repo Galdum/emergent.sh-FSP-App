@@ -82,18 +82,18 @@ class EmailService:
         base_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
         reset_url = f"{base_url}/reset-password?token={reset_token}"
         
-        subject = "ApprobMed - Resetare parolă"
+        subject = "FSP Navigator - Resetare parolă"
         
         html_body = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
-            <title>Resetare parolă ApprobMed</title>
+            <title>Resetare parolă FSP Navigator</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0; font-size: 28px;">ApprobMed</h1>
+                <h1 style="color: white; margin: 0; font-size: 28px;">FSP Navigator</h1>
                 <p style="color: #e0e7ff; margin: 10px 0 0 0;">Ghidul tău pentru Approbation în Germania</p>
             </div>
             
@@ -102,7 +102,7 @@ class EmailService:
                 
                 <p>Salut!</p>
                 
-                <p>Ai solicitat resetarea parolei pentru contul tău ApprobMed. Fă click pe butonul de mai jos pentru a crea o parolă nouă:</p>
+                <p>Ai solicitat resetarea parolei pentru contul tău FSP Navigator. Fă click pe butonul de mai jos pentru a crea o parolă nouă:</p>
                 
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="{reset_url}" 
@@ -129,7 +129,7 @@ class EmailService:
             
             <div style="background: #f9fafb; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
                 <p style="margin: 0; color: #6b7280; font-size: 12px;">
-                    © 2024 ApprobMed. Toate drepturile rezervate.<br>
+                    © 2024 FSP Navigator. Toate drepturile rezervate.<br>
                     Acest email a fost trimis pentru <strong>{to_email}</strong>
                 </p>
             </div>
@@ -138,11 +138,11 @@ class EmailService:
         """
         
         text_body = f"""
-ApprobMed - Resetare parolă
+FSP Navigator - Resetare parolă
 
 Salut!
 
-Ai solicitat resetarea parolei pentru contul tău ApprobMed.
+Ai solicitat resetarea parolei pentru contul tău FSP Navigator.
 
 Pentru a reseta parola, accesează următorul link:
 {reset_url}
@@ -151,7 +151,7 @@ Atenție: Acest link expiră în 1 oră din motive de securitate.
 
 Dacă nu ai solicitat această resetare, poți ignora acest email în siguranță.
 
-© 2024 ApprobMed
+© 2024 FSP Navigator
         """
         
         return await self.send_email(to_email, subject, html_body, text_body)
@@ -159,19 +159,19 @@ Dacă nu ai solicitat această resetare, poți ignora acest email în siguranț�
     async def send_welcome_email(self, to_email: str, first_name: str = None):
         """Send welcome email to new users"""
         name = first_name if first_name else "Doctor"
-        subject = f"Bine ai venit la ApprobMed, {name}!"
+        subject = f"Bine ai venit la FSP Navigator, {name}!"
         
         html_body = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
-            <title>Bine ai venit la ApprobMed</title>
+            <title>Bine ai venit la FSP Navigator</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                 <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Bine ai venit!</h1>
-                <p style="color: #e0e7ff; margin: 10px 0 0 0;">La ApprobMed - Ghidul tău pentru Germania</p>
+                <p style="color: #e0e7ff; margin: 10px 0 0 0;">La FSP Navigator - Ghidul tău pentru Germania</p>
             </div>
             
             <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none;">
@@ -179,7 +179,7 @@ Dacă nu ai solicitat această resetare, poți ignora acest email în siguranț�
                 
                 <p>Felicitări pentru că ai făcut primul pas către obținerea Approbation-ului în Germania! 🇩🇪</p>
                 
-                <p>ApprobMed te va ghida prin întreg procesul complex, oferindu-ți:</p>
+                <p>FSP Navigator te va ghida prin întreg procesul complex, oferindu-ți:</p>
                 
                 <ul style="color: #374151;">
                     <li>📋 Pași clari și organizați pentru fiecare Bundesland</li>
@@ -206,13 +206,13 @@ Dacă nu ai solicitat această resetare, poți ignora acest email în siguranț�
                 <p>Succes în călătoria ta către o carieră medicală de succes în Germania!</p>
                 
                 <p style="color: #6b7280; font-style: italic;">
-                    Echipa ApprobMed
+                    Echipa FSP Navigator
                 </p>
             </div>
             
             <div style="background: #f9fafb; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
                 <p style="margin: 0; color: #6b7280; font-size: 12px;">
-                    © 2024 ApprobMed. Toate drepturile rezervate.
+                    © 2024 FSP Navigator. Toate drepturile rezervate.
                 </p>
             </div>
         </body>

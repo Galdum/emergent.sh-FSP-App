@@ -45,7 +45,7 @@ class ChatResponse(BaseModel):
 
 # System prompts for different contexts
 SYSTEM_PROMPTS = {
-    "general": """You are ApprobMed Assistant, an AI helper specialized in guiding medical graduates through the German medical license (Approbation) process. 
+    "general": """You are FSP Navigator Assistant, an AI helper specialized in guiding medical graduates through the German medical license (Approbation) process. 
 
 Your knowledge includes:
 - Document requirements for each Bundesland

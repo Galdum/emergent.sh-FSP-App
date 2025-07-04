@@ -3542,7 +3542,7 @@ const AppContent = () => {
                 onClose={closeLegal}
             />
             
-            {/* Footer with Legal Links - mobile optimized */}
+   {/* Footer with Legal Links - mobile optimized */}
             <div className={`${isMobile ? 'footer-mobile mobile-safe-bottom' : 'fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30'}`}>
                 <div>© 2024 FSP Navigator</div>
                 {!isMobile && (
@@ -3579,6 +3579,7 @@ const AppContent = () => {
                         </button>
                     </div>
                 )}
+            </div>
             </div>
 
             {/* Feedback Widget - mobile positioned */}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# ApprobMed Startup Script
-echo "🚀 Starting ApprobMed Application..."
+# FSP Navigator Startup Script
+echo "🚀 Starting FSP Navigator Application..."
 
 # Start Backend
 echo "📡 Starting Backend API server..."
@@ -21,7 +21,7 @@ FRONTEND_PID=$!
 echo "Frontend PID: $FRONTEND_PID"
 
 echo ""
-echo "✅ ApprobMed is starting up!"
+echo "✅ FSP Navigator is starting up!"
 echo ""
 echo "🌐 Access the application at:"
 echo "   Frontend: http://localhost:3000"
@@ -31,7 +31,7 @@ echo ""
 echo "📝 To stop the application:"
 echo "   kill $BACKEND_PID $FRONTEND_PID"
 echo ""
-echo "🎉 ApprobMed is ready for Romanian doctors seeking German medical licenses!"
+echo "🎉 FSP Navigator is ready for Romanian doctors seeking German medical licenses!"
 
 # Keep script running
 wait
