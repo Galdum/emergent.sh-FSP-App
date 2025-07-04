@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Dict, Any
 from backend.models import (
-    Badge, UserBadge, BadgeResponse, UserBadgeProgress, MessageResponse, UserInDB
+    Badge, UserBadge, BadgeResponse, UserBadgeProgress, MessageResponse, UserInDB, UserActivity, UserLoginStreak
 )
 from backend.auth import get_current_user
 from backend.database import get_database
@@ -250,15 +250,56 @@ async def get_user_progress_stats(db, user_id: str) -> Dict[str, Any]:
     # Get documents uploaded
     documents_count = await db.personal_files.count_documents({"user_id": user_id})
     
-    # Get messages sent (if you have a messages collection)
-    messages_count = 0  # TODO: implement based on your AI chat system
+    # Get user stats from database or create default
+    user_stats = await db.user_stats.find_one({"user_id": user_id})
+    if not user_stats:
+        # Create default user stats if not exists
+        from backend.models import UserStats
+        default_stats = UserStats(user_id=user_id)
+        await db.user_stats.insert_one(default_stats.dict())
+        user_stats = default_stats.dict()
+    
+    # Get AI messages sent from activity tracking
+    messages_count = await db.user_activity.count_documents({
+        "user_id": user_id,
+        "activity_type": "ai_message"
+    })
+    
+    # Get emails generated from activity tracking
+    emails_count = await db.user_activity.count_documents({
+        "user_id": user_id,
+        "activity_type": "email_generated"
+    })
+    
+    # Get searches performed from activity tracking
+    searches_count = await db.user_activity.count_documents({
+        "user_id": user_id,
+        "activity_type": "search"
+    })
+    
+    # Get feedback submitted from activity tracking
+    feedback_count = await db.user_activity.count_documents({
+        "user_id": user_id,
+        "activity_type": "feedback"
+    })
+    
+    # Get login streak
+    streak_data = await db.user_login_streak.find_one({"user_id": user_id})
+    consecutive_days = streak_data.get("current_streak", 0) if streak_data else 0
     
     # Get checklist progress
     progress_data = await db.user_progress.find_one({"user_id": user_id})
     checklist_tasks = 0
+    checklist_all_complete = False
     if progress_data:
+        total_tasks = 0
+        completed_tasks = 0
         for step in progress_data.get("steps", []):
-            checklist_tasks += len([t for t in step.get("tasks", []) if t.get("completed", False)])
+            step_tasks = step.get("tasks", [])
+            total_tasks += len(step_tasks)
+            completed_tasks += len([t for t in step_tasks if t.get("completed", False)])
+        checklist_tasks = completed_tasks
+        checklist_all_complete = total_tasks > 0 and completed_tasks == total_tasks
     
     # Get user profile completion
     user_data = await db.users.find_one({"id": user_id})
@@ -270,21 +311,49 @@ async def get_user_progress_stats(db, user_id: str) -> Dict[str, Any]:
             user_data.get("email")
         )
     
+    # Check for hospitation certificate upload
+    hospitation_uploaded = await db.personal_files.count_documents({
+        "user_id": user_id,
+        "document_type": "hospitation_certificate"
+    }) > 0
+    
+    # Check tutorial completion from user stats
+    tutorial_completed = user_stats.get("tutorial_completed", False)
+    
+    # Get referrals made (if you have a referral system)
+    referrals_made = user_stats.get("referrals_made", 0)
+    
+    # Get Facebook groups joined (if you have social integration)
+    facebook_groups_joined = user_stats.get("facebook_groups_joined", 0)
+    
+    # Get Länder applications (if you have application tracking)
+    lander_applications = await db.user_activity.count_documents({
+        "user_id": user_id,
+        "activity_type": "lander_application"
+    })
+    
+    # Get FSP simulations passed (if you have FSP simulation system)
+    fsp_simulations_passed = await db.user_activity.count_documents({
+        "user_id": user_id,
+        "activity_type": "fsp_simulation_passed"
+    })
+    
     return {
         "documents_uploaded": documents_count,
         "messages_sent": messages_count,
         "checklist_tasks_completed": checklist_tasks,
+        "checklist_all_completed": checklist_all_complete,
         "profile_completed": profile_completed,
-        "emails_generated": 0,  # TODO: implement based on your email generation system
-        "consecutive_days": 0,  # TODO: implement login streak tracking
-        "searches_performed": 0,  # TODO: implement search tracking
-        "feedback_submitted": 0,  # TODO: implement feedback tracking
-        "referrals_made": 0,  # TODO: implement referral tracking
-        "facebook_groups_joined": 0,  # TODO: implement social tracking
-        "lander_applications": 0,  # TODO: implement application tracking
-        "fsp_simulations_passed": 0,  # TODO: implement FSP simulation tracking
-        "tutorial_completed": False,  # TODO: implement tutorial tracking
-        "hospitation_uploaded": False  # TODO: implement hospitation tracking
+        "emails_generated": emails_count,
+        "consecutive_days": consecutive_days,
+        "searches_performed": searches_count,
+        "feedback_submitted": feedback_count,
+        "referrals_made": referrals_made,
+        "facebook_groups_joined": facebook_groups_joined,
+        "lander_applications": lander_applications,
+        "fsp_simulations_passed": fsp_simulations_passed,
+        "tutorial_completed": tutorial_completed,
+        "hospitation_uploaded": hospitation_uploaded
     }
 
 async def award_badge(db, user_id: str, badge_id: str) -> bool:
@@ -312,7 +381,7 @@ async def check_and_award_badges(db, user_id: str) -> List[str]:
     newly_awarded = []
     stats = await get_user_progress_stats(db, user_id)
     
-    # Check each badge's criteria
+    # Check each badge's criteria (regular badges first)
     if stats["documents_uploaded"] >= 1:
         if await award_badge(db, user_id, "first_upload"):
             newly_awarded.append("first_upload")
@@ -332,6 +401,10 @@ async def check_and_award_badges(db, user_id: str) -> List[str]:
     if stats["checklist_tasks_completed"] >= 1:
         if await award_badge(db, user_id, "checklist_begin"):
             newly_awarded.append("checklist_begin")
+    
+    if stats["checklist_all_completed"]:
+        if await award_badge(db, user_id, "checklist_master"):
+            newly_awarded.append("checklist_master")
     
     if stats["documents_uploaded"] >= 20:
         if await award_badge(db, user_id, "doc_manager"):
@@ -361,18 +434,39 @@ async def check_and_award_badges(db, user_id: str) -> List[str]:
         if await award_badge(db, user_id, "feedback_giver"):
             newly_awarded.append("feedback_giver")
     
+    if stats["referrals_made"] >= 1:
+        if await award_badge(db, user_id, "referrer"):
+            newly_awarded.append("referrer")
+    
+    if stats["facebook_groups_joined"] >= 5:
+        if await award_badge(db, user_id, "social_butterfly"):
+            newly_awarded.append("social_butterfly")
+    
+    if stats["lander_applications"] >= 3:
+        if await award_badge(db, user_id, "land_explorer"):
+            newly_awarded.append("land_explorer")
+    
+    if stats["fsp_simulations_passed"] >= 1:
+        if await award_badge(db, user_id, "fsp_simulator"):
+            newly_awarded.append("fsp_simulator")
+    
     if stats["hospitation_uploaded"]:
         if await award_badge(db, user_id, "hospitation_hero"):
             newly_awarded.append("hospitation_hero")
     
     # Check meta badges (badges that depend on other badges)
-    user_badges_count = await db.user_badges.count_documents({"user_id": user_id})
+    # Get current badge count from database PLUS newly awarded badges in this session
+    current_badges_count = await db.user_badges.count_documents({"user_id": user_id})
+    total_badges_with_new = current_badges_count + len(newly_awarded)
     
-    if user_badges_count >= 5:
+    # Badge Collector: Earn 5 badges
+    if total_badges_with_new >= 5:
         if await award_badge(db, user_id, "badge_collector"):
             newly_awarded.append("badge_collector")
+            total_badges_with_new += 1  # Update count for next meta badge check
     
-    if user_badges_count >= 10:
+    # FSP Champion: Earn 10 badges
+    if total_badges_with_new >= 10:
         if await award_badge(db, user_id, "champion"):
             newly_awarded.append("champion")
     
@@ -449,3 +543,120 @@ async def get_badge_leaderboard(
             })
     
     return result
+
+# Utility Functions for Activity Tracking
+# These can be imported and used by other parts of the application
+
+async def log_user_activity(db, user_id: str, activity_type: str, activity_data: Dict[str, Any] = None):
+    """Log a user activity for badge tracking."""
+    activity = UserActivity(
+        user_id=user_id,
+        activity_type=activity_type,
+        activity_data=activity_data or {}
+    )
+    await db.user_activity.insert_one(activity.dict())
+
+async def update_login_streak(db, user_id: str):
+    """Update user's login streak and return current streak count."""
+    today = datetime.utcnow().date()
+    
+    # Get existing streak data
+    streak_data = await db.user_login_streak.find_one({"user_id": user_id})
+    
+    if not streak_data:
+        # Create new streak record
+        new_streak = UserLoginStreak(
+            user_id=user_id,
+            current_streak=1,
+            longest_streak=1,
+            last_login_date=datetime.utcnow(),
+            streak_start_date=datetime.utcnow()
+        )
+        await db.user_login_streak.insert_one(new_streak.dict())
+        return 1
+    
+    last_login = streak_data.get("last_login_date")
+    if last_login:
+        last_login_date = last_login.date() if isinstance(last_login, datetime) else last_login
+        days_diff = (today - last_login_date).days
+        
+        if days_diff == 0:
+            # Same day, no update needed
+            return streak_data.get("current_streak", 0)
+        elif days_diff == 1:
+            # Consecutive day, increment streak
+            new_streak = streak_data.get("current_streak", 0) + 1
+            longest = max(new_streak, streak_data.get("longest_streak", 0))
+        else:
+            # Streak broken, reset
+            new_streak = 1
+            longest = streak_data.get("longest_streak", 0)
+            streak_start = datetime.utcnow()
+    else:
+        # No previous login, start new streak
+        new_streak = 1
+        longest = max(1, streak_data.get("longest_streak", 0))
+        streak_start = datetime.utcnow()
+    
+    # Update streak data
+    update_data = {
+        "current_streak": new_streak,
+        "longest_streak": longest,
+        "last_login_date": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    if days_diff != 1 or not last_login:
+        update_data["streak_start_date"] = datetime.utcnow()
+    
+    await db.user_login_streak.update_one(
+        {"user_id": user_id},
+        {"$set": update_data}
+    )
+    
+    return new_streak
+
+async def mark_tutorial_complete(db, user_id: str):
+    """Mark tutorial as completed for a user."""
+    await db.user_stats.update_one(
+        {"user_id": user_id},
+        {"$set": {"tutorial_completed": True, "updated_at": datetime.utcnow()}},
+        upsert=True
+    )
+
+async def increment_user_stat(db, user_id: str, stat_field: str, increment: int = 1):
+    """Increment a user statistic by a given amount."""
+    await db.user_stats.update_one(
+        {"user_id": user_id},
+        {
+            "$inc": {stat_field: increment},
+            "$set": {"updated_at": datetime.utcnow()}
+        },
+        upsert=True
+    )
+
+# Activity logging shortcuts for common badge-triggering actions
+
+async def log_ai_message(db, user_id: str, message_data: Dict[str, Any] = None):
+    """Log an AI assistant message."""
+    await log_user_activity(db, user_id, "ai_message", message_data)
+
+async def log_email_generated(db, user_id: str, email_data: Dict[str, Any] = None):
+    """Log an email generation."""
+    await log_user_activity(db, user_id, "email_generated", email_data)
+
+async def log_search_performed(db, user_id: str, search_data: Dict[str, Any] = None):
+    """Log a search in the info-hub."""
+    await log_user_activity(db, user_id, "search", search_data)
+
+async def log_feedback_submitted(db, user_id: str, feedback_data: Dict[str, Any] = None):
+    """Log feedback submission."""
+    await log_user_activity(db, user_id, "feedback", feedback_data)
+
+async def log_lander_application(db, user_id: str, application_data: Dict[str, Any] = None):
+    """Log a Länder application."""
+    await log_user_activity(db, user_id, "lander_application", application_data)
+
+async def log_fsp_simulation_passed(db, user_id: str, simulation_data: Dict[str, Any] = None):
+    """Log a passed FSP simulation."""
+    await log_user_activity(db, user_id, "fsp_simulation_passed", simulation_data)

@@ -293,6 +293,17 @@ class UserAchievement(BaseModel):
 class UserStats(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
+    
+    # Badge-related statistics
+    ai_messages_sent: int = 0
+    emails_generated: int = 0
+    searches_performed: int = 0
+    feedback_submitted: int = 0
+    referrals_made: int = 0
+    tutorial_completed: bool = False
+    hospitation_uploaded: bool = False
+    
+    # Existing gamification stats
     total_points: int = 0
     level: int = 1
     documents_uploaded: int = 0
@@ -353,6 +364,24 @@ class UserBadgeProgress(BaseModel):
     profile_completed: bool = False
     tutorial_completed: bool = False
     hospitation_uploaded: bool = False
+
+# New models for tracking user activity
+class UserActivity(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    activity_type: str  # "ai_message", "email_generated", "search", "feedback", etc.
+    activity_data: Optional[Dict[str, Any]] = {}
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserLoginStreak(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    current_streak: int = 0
+    longest_streak: int = 0
+    last_login_date: Optional[datetime] = None
+    streak_start_date: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class UtilInfoDocument(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

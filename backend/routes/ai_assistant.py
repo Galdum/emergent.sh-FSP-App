@@ -11,6 +11,9 @@ import logging
 import json
 from pydantic import BaseModel
 
+# Import badge activity logging functions
+from backend.routes.badges import log_ai_message, check_and_award_badges
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai-assistant", tags=["ai_assistant"])
 
@@ -247,6 +250,19 @@ async def chat_with_assistant(
         "context": user_context
     }
     await db.chat_history.insert_one(chat_entry)
+    
+    # Log AI message activity for badge tracking
+    try:
+        await log_ai_message(db, current_user.id, {
+            "message_length": len(request.message),
+            "language": request.language,
+            "has_suggestions": len(response.suggestions) > 0
+        })
+        
+        # Check and award badges after logging activity
+        await check_and_award_badges(db, current_user.id)
+    except Exception as e:
+        logger.warning(f"Failed to log AI message activity or check badges: {e}")
     
     # Log interaction
     audit_logger = AuditLogger(db)

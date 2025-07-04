@@ -62,6 +62,11 @@ async def lifespan(app: FastAPI):
         await db.badges.create_index("badge_id", unique=True)
         await db.user_badges.create_index("user_id")
         await db.user_badges.create_index([("user_id", 1), ("badge_id", 1)], unique=True)
+        await db.user_activity.create_index("user_id")
+        await db.user_activity.create_index([("user_id", 1), ("activity_type", 1)])
+        await db.user_activity.create_index("created_at")
+        await db.user_login_streak.create_index("user_id", unique=True)
+        await db.user_stats.create_index("user_id", unique=True)
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.info(f"Database indexes already exist or error: {e}")
