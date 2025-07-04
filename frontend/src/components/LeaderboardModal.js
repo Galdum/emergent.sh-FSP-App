@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Medal, Crown, Star, Zap, Target, Clock, Award, Users, Gamepad2, Play, RefreshCw, X } from 'lucide-react';
+import { InteractiveQuiz } from './InteractiveQuiz';
+import { gamificationManager } from '../utils/gamificationManager';
 
 /**
  * Leaderboard and Competitions Component
@@ -9,8 +11,90 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('leaderboard');
   const [selectedCategory, setSelectedCategory] = useState('total');
   const [activeCompetition, setActiveCompetition] = useState(null);
+  const [activeMiniGame, setActiveMiniGame] = useState(null);
   const [userRankings, setUserRankings] = useState([]);
   const [competitions, setCompetitions] = useState([]);
+
+  // Mini Games Quiz Data
+  const miniGamesData = {
+    fachbegriffe: {
+      title: "⚡ Fachbegriffe Flash",
+      timeLimit: 0.5, // 30 seconds
+      questions: [
+        {
+          question: "Ce înseamnă 'Schmerzen' în română?",
+          options: ["Dureri", "Febră", "Greață", "Amețeală"],
+          correctAnswer: 0
+        },
+        {
+          question: "Cum se spune 'inimă' în germană?",
+          options: ["Leber", "Herz", "Lunge", "Niere"],
+          correctAnswer: 1
+        },
+        {
+          question: "Ce înseamnă 'Atemnot'?",
+          options: ["Durere de cap", "Dificultate în respirație", "Durere de stomac", "Febră"],
+          correctAnswer: 1
+        },
+        {
+          question: "Cum se spune 'medic' în germană?",
+          options: ["Pfleger", "Arzt", "Patient", "Schwester"],
+          correctAnswer: 1
+        },
+        {
+          question: "Ce înseamnă 'Übelkeit'?",
+          options: ["Durere", "Febră", "Greață", "Oboseală"],
+          correctAnswer: 2
+        },
+        {
+          question: "Cum se spune 'cap' în germană?",
+          options: ["Kopf", "Hals", "Arm", "Bein"],
+          correctAnswer: 0
+        },
+        {
+          question: "Ce înseamnă 'Fieber'?",
+          options: ["Durere", "Febră", "Tuse", "Răceală"],
+          correctAnswer: 1
+        },
+        {
+          question: "Cum se spune 'sânge' în germană?",
+          options: ["Wasser", "Blut", "Luft", "Haut"],
+          correctAnswer: 1
+        }
+      ]
+    },
+    diagnostic: {
+      title: "🔍 Diagnostic Express",
+      timeLimit: null, // No time limit
+      questions: [
+        {
+          question: "Pacient de 45 ani, bărbat, prezintă durere toracică intensă, irradiată în brațul stâng, transpirații reci și dispnee. Care este cel mai probabil diagnostic?",
+          options: ["Pneumonie", "Infarct miocardic acut", "Reflux gastroesofagian", "Anxietate"],
+          correctAnswer: 1
+        },
+        {
+          question: "Femeie de 28 ani prezintă febră de 39°C, durere de cap intensă, rigiditate cervicală și fotofobia. Diagnostic?",
+          options: ["Gripă", "Meningită", "Sinuzită", "Migrene"],
+          correctAnswer: 1
+        },
+        {
+          question: "Copil de 6 ani cu febră, durere în gât, ganglioni măriți și placaj alb pe amigdale. Diagnostic?",
+          options: ["Laringită", "Angină streptococică", "Gripă", "Bronșită"],
+          correctAnswer: 1
+        },
+        {
+          question: "Pacient de 60 ani cu durere abdominală în fosă iliacă dreaptă, febră și leucocitoză. Diagnostic?",
+          options: ["Gastrită", "Apendicită", "Colecistită", "Pancreatită"],
+          correctAnswer: 1
+        },
+        {
+          question: "Femeie de 35 ani cu durere pelvină, amenoree de 6 săptămâni și test de sarcină pozitiv. Prezintă durere acută și hemoragie vaginală. Diagnostic?",
+          options: ["Sarcină normală", "Sarcină ectopică", "Avort spontan", "Chisturi ovariene"],
+          correctAnswer: 1
+        }
+      ]
+    }
+  };
 
   // Mock data for demonstration
   useEffect(() => {
@@ -150,6 +234,34 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
   const startCompetition = (competition) => {
     setActiveCompetition(competition);
     // Here would be the actual game logic
+  };
+
+  const startMiniGame = (gameType) => {
+    setActiveMiniGame(gameType);
+  };
+
+  const handleMiniGameComplete = (result) => {
+    // Award points using gamification manager
+    const gameResult = gamificationManager.completeQuiz(result.totalQuestions, result.correctAnswers);
+    
+    // Update local user stats (this would normally sync with backend)
+    setUserRankings(prev => prev.map(user => {
+      if (user.isCurrentUser) {
+        return {
+          ...user,
+          totalXP: user.totalXP + gameResult.points,
+          fachbegriffe: activeMiniGame === 'fachbegriffe' ? user.fachbegriffe + result.correctAnswers : user.fachbegriffe
+        };
+      }
+      return user;
+    }));
+
+    // Close the mini game
+    setActiveMiniGame(null);
+  };
+
+  const handleMiniGameClose = () => {
+    setActiveMiniGame(null);
   };
 
   if (!isOpen) return null;
@@ -351,7 +463,10 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
                         <p className="text-sm text-gray-600">Quiz rapid 30 secunde</p>
                       </div>
                     </div>
-                    <button className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    <button 
+                      onClick={() => startMiniGame('fachbegriffe')}
+                      className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    >
                       Joacă Acum
                     </button>
                   </div>
@@ -364,7 +479,10 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
                         <p className="text-sm text-gray-600">Ghicește diagnosticul</p>
                       </div>
                     </div>
-                    <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <button 
+                      onClick={() => startMiniGame('diagnostic')}
+                      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
                       Joacă Acum
                     </button>
                   </div>
@@ -398,6 +516,16 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
           </div>
         )}
       </div>
+
+      {/* Mini Game Quiz Modal */}
+      {activeMiniGame && (
+        <InteractiveQuiz
+          quizData={miniGamesData[activeMiniGame]}
+          title={miniGamesData[activeMiniGame].title}
+          onComplete={handleMiniGameComplete}
+          onClose={handleMiniGameClose}
+        />
+      )}
     </div>
   );
 };
