@@ -27,9 +27,11 @@ const AdminPanel = ({ isOpen, onClose }) => {
   const [editingUser, setEditingUser] = useState(null);
   const [newUtilDoc, setNewUtilDoc] = useState(null);
   const [editingUtilDoc, setEditingUtilDoc] = useState(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   
   const intervalRef = useRef(null);
   const tutorialRef = useRef(null);
+  const currentStatsRef = useRef(null);
 
   // Check if user is admin
   const isAdmin = user?.is_admin || user?.role === 'admin' || user?.email?.includes('admin') || false;
@@ -61,14 +63,19 @@ const AdminPanel = ({ isOpen, onClose }) => {
         const response = await api.get('/admin/stats');
         setRealTimeData(response);
         
-        // Check for new notifications
-        const currentTime = new Date();
-        if (response.transactions_today > (stats?.transactions_today || 0)) {
-          addNotification('New transaction received!', 'success');
+        // Check for new notifications using current stats from ref
+        if (notificationsEnabled && currentStatsRef.current) {
+          const currentStats = currentStatsRef.current;
+          if (response.transactions_today > (currentStats.transactions_today || 0)) {
+            addNotification('New transaction received!', 'success');
+          }
+          if (response.total_users > (currentStats.total_users || 0)) {
+            addNotification('New user registered!', 'info');
+          }
         }
-        if (response.total_users > (stats?.total_users || 0)) {
-          addNotification('New user registered!', 'info');
-        }
+        
+        // Update the current stats ref for next comparison
+        currentStatsRef.current = response;
       } catch (error) {
         console.error('Real-time update failed:', error);
       }
@@ -76,6 +83,9 @@ const AdminPanel = ({ isOpen, onClose }) => {
   };
 
   const addNotification = (message, type = 'info') => {
+    // Only add notification if notifications are enabled
+    if (!notificationsEnabled) return;
+    
     const notification = {
       id: Date.now(),
       message,
@@ -107,6 +117,9 @@ const AdminPanel = ({ isOpen, onClose }) => {
       setErrors(errorsData);
       setUtilDocs(utilDocsData);
       setRealTimeData(statsData);
+      
+      // Initialize the current stats ref for real-time comparisons
+      currentStatsRef.current = statsData;
     } catch (error) {
       console.error('Failed to load admin data:', error);
       addNotification('Failed to load admin data', 'error');
@@ -963,24 +976,26 @@ const AdminPanel = ({ isOpen, onClose }) => {
                         />
                       </label>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Push Notifications</span>
-                        <p className="text-xs text-gray-500">Show notifications for important events</p>
-                      </div>
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={notifications.length > 0}
-                          onChange={(e) => {
-                            if (!e.target.checked) {
-                              setNotifications([]);
-                            }
-                          }}
-                          className="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                      </label>
-                    </div>
+                                         <div className="flex items-center justify-between">
+                       <div>
+                         <span className="text-sm font-medium text-gray-700">Push Notifications</span>
+                         <p className="text-xs text-gray-500">Show notifications for important events</p>
+                       </div>
+                       <label className="flex items-center cursor-pointer">
+                         <input
+                           type="checkbox"
+                           checked={notificationsEnabled}
+                           onChange={(e) => {
+                             setNotificationsEnabled(e.target.checked);
+                             if (!e.target.checked) {
+                               // Clear existing notifications when disabling
+                               setNotifications([]);
+                             }
+                           }}
+                           className="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                         />
+                       </label>
+                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-sm font-medium text-gray-700">Tutorial Mode</span>
