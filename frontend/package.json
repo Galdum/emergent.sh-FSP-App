@@ -8,20 +8,24 @@
     "axios": "^1.8.4",
     "lucide-react": "^0.522.0",
     "framer-motion": "^11.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "4.0.3"
+    "react-scripts": "5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "node scripts/simple-enhanced-build.js",
-    "build:react": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build:enhanced": "node scripts/simple-enhanced-build.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build:clean": "rm -rf build && npm run build",
     "build:production": "npm run build:clean",
     "postinstall": "patch-package"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "browserslist": {
     "production": [

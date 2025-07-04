@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: fsp_navigator_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: fsp_navigator
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - fsp_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fsp_navigator_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URL=mongodb://admin:password@mongodb:27017/fsp_navigator?authSource=admin
+      - DB_NAME=fsp_navigator
+      - JWT_SECRET_KEY=development-secret-key-change-in-production
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8000
+      - ENVIRONMENT=development
+      - PORT=8000
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend/build:/app/frontend/build
+    networks:
+      - fsp_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend-dev:
+    image: node:18-alpine
+    container_name: fsp_navigator_frontend_dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm start"
+    networks:
+      - fsp_network
+    profiles:
+      - dev
+
+volumes:
+  mongodb_data:
+
+networks:
+  fsp_network:
+    driver: bridge
