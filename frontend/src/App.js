@@ -1079,11 +1079,11 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
-            <div ref={modalRef} className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[90vh] overflow-hidden">
+            <div ref={modalRef} className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-6xl text-gray-800 relative transform animate-scale-in flex flex-col max-h-[95vh] overflow-hidden">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-20"><X size={28} /></button>
                 <h2 className="text-2xl md:text-3xl font-bold p-6 pb-2 text-center md:text-left flex-shrink-0">Dosarul Meu & Asistent Personal</h2>
                 
-                <div className="grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2">
+                <div className="grid md:grid-cols-2 flex-grow min-h-0 gap-6 p-6 pt-2" style={{minHeight: '600px'}}>
                     {/* Left Column: File Management */}
                     <div className="flex flex-col bg-gray-200 p-4 rounded-lg min-h-0">
                         <h3 className="text-lg font-bold mb-3 flex-shrink-0 text-gray-700">Resurse Personale</h3>
@@ -1109,7 +1109,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                         )}
-                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2">
+                        <div className="flex-grow overflow-y-auto space-y-3 pr-2 -mr-2" style={{minHeight: '400px'}}>
                              {loading ? (
                                 <div className="text-center text-gray-500 pt-10">Se încarcă...</div>
                              ) : files.length > 0 ? files.map(renderItem) : (
@@ -1144,7 +1144,7 @@ const PersonalFileModal = ({ isOpen, onClose }) => {
                                  </button>
                              </div>
                          ) : (
-                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300">
+                         <div className="flex-grow bg-white rounded-lg p-4 overflow-y-auto mb-4 border border-gray-300" style={{minHeight: '400px'}}>
                             {history.map((msg, index) => (
                                  <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                                      <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
