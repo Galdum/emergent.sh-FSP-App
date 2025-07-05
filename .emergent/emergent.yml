@@ -2,11 +2,11 @@ env_image_name: "fastapi_react_mongo_base_image_cloud_arm:v3.1.1"
 framework: "fullstack"
 frontend:
   type: "react"
-  build_command: "npm run build"
+  build_command: "npm run build:enhanced"
   output_directory: "build"
   install_command: "npm install"
   dev_command: "npm start"
-  node_version: "16"
+  node_version: "18"
 backend:
   type: "fastapi"
   main_file: "server.py"

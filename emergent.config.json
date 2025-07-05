@@ -2,7 +2,7 @@
   "name": "fsp-navigator",
   "build": {
     "frontend": {
-      "buildCommand": "cd frontend && npm install --force && npm run build:production",
+      "buildCommand": "cd frontend && npm install && npm run build:enhanced",
       "outputDirectory": "frontend/build"
     },
     "backend": {
