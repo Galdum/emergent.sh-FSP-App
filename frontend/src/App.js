@@ -2707,13 +2707,19 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     // Color logic based on AI access and subscription
     const getNodeColor = () => {
         if (!isAccessible) return 'fill-gray-300';
-        if (needsAIAccess && !hasAIAccess()) return 'fill-gray-400 hover:fill-gray-500';
+        // For AI nodes: gray for free users, orange for premium users
+        if (needsAIAccess) {
+            return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-400 hover:fill-gray-500';
+        }
         return 'fill-orange-500 hover:fill-orange-600';
     };
     
     const getIconColor = () => {
         if (!isAccessible) return 'text-gray-400';
-        if (needsAIAccess && !hasAIAccess()) return 'text-gray-500';
+        // For AI nodes: gray for free users, white for premium users
+        if (needsAIAccess) {
+            return hasAIAccess() ? 'text-white' : 'text-gray-500';
+        }
         return 'text-white';
     };
 
@@ -2773,7 +2779,7 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
             >
                 {isMobile && node.title.length > 10 ? node.title.substring(0, 10) + '...' : node.title}
             </text>
-            {!isAccessible && (
+            {(!isAccessible || (needsAIAccess && !hasAIAccess())) && (
                 <foreignObject 
                     x={node.position.x + (radius * 0.6)} 
                     y={node.position.y - (radius * 0.6)} 
