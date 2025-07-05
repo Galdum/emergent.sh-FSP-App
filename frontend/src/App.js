@@ -2956,7 +2956,9 @@ const AppContent = () => {
         settings: false,
         tutorial: false,
         legal: false,
-        badgeSystem: false
+        badgeSystem: false,
+        clinicalCasesGame: false,
+        fachbegriffeGame: false
     });
     
     // Gamification states
@@ -3221,6 +3223,8 @@ const AppContent = () => {
     const closeSettingsModal = () => setModalStates(prev => ({...prev, settings: false}));
     const closeAuthModal = () => setModalStates(prev => ({...prev, authModal: false}));
     const closeBadgeSystemModal = () => setModalStates(prev => ({...prev, badgeSystem: false}));
+    const closeClinicalCasesGame = () => setModalStates(prev => ({...prev, clinicalCasesGame: false}));
+    const closeFachbegriffeGame = () => setModalStates(prev => ({...prev, fachbegriffeGame: false}));
     const closeTutorial = () => {
         setModalStates(prev => ({...prev, tutorial: false}));
         // Mark tutorial as viewed
@@ -3283,6 +3287,17 @@ const AppContent = () => {
             fetchBadgeCount();
         }
     }, [isAuthenticated]);
+    
+    // Mini-Games handlers - placeholders for future implementation
+    const handleClinicalCasesComplete = (result) => {
+        console.log('Clinical Cases completed:', result);
+        closeClinicalCasesGame();
+    };
+    
+    const handleFachbegriffeComplete = (result) => {
+        console.log('Fachbegriffe completed:', result);
+        closeFachbegriffeGame();
+    };
 
     return (
         <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 prevent-horizontal-scroll">
@@ -3606,6 +3621,37 @@ const AppContent = () => {
                     badge={newBadgeNotification}
                     onClose={() => setNewBadgeNotification(null)}
                 />
+            )}
+            
+            {/* Mini-Games - Placeholders for future implementation */}
+            {modalStates.clinicalCasesGame && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl p-8 text-center">
+                        <h3 className="text-xl font-bold mb-4">Clinical Cases Mini-Game</h3>
+                        <p className="text-gray-600 mb-4">Feature coming soon!</p>
+                        <button 
+                            onClick={closeClinicalCasesGame}
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            {modalStates.fachbegriffeGame && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl p-8 text-center">
+                        <h3 className="text-xl font-bold mb-4">Fachbegriffe Mini-Game</h3>
+                        <p className="text-gray-600 mb-4">Feature coming soon!</p>
+                        <button 
+                            onClick={closeFachbegriffeGame}
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
             )}
             
    {/* Footer with Legal Links - mobile optimized */}
