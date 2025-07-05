@@ -3733,7 +3733,6 @@ const AppContent = () => {
                     </div>
                 )}
             </div>
-            </div>
 
             {/* Feedback Widget - mobile positioned */}
             <div className={isMobile ? 'feedback-widget-mobile' : ''}>
