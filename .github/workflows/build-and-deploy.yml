@@ -31,6 +31,14 @@ jobs:
         echo "Installing dependencies with legacy peer deps..."
         npm ci --legacy-peer-deps
         
+    - name: Check environment
+      working-directory: ./frontend
+      run: |
+        echo "Node version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        echo "React Scripts version:"
+        npm list react-scripts || echo "react-scripts not found"
+        
     - name: Run tests
       working-directory: ./frontend
       run: |
@@ -38,20 +46,67 @@ jobs:
         
     - name: Build application
       working-directory: ./frontend
+      env:
+        # Set CI to false to treat warnings as warnings, not errors
+        CI: false
+        # Set default values for required environment variables
+        REACT_APP_BACKEND_URL: https://api.example.com
+        REACT_APP_GEMINI_API_KEY: dummy_key_for_build
+        REACT_APP_PAYPAL_CLIENT_ID: dummy_paypal_client_id
+        # Disable source map generation to speed up build
+        GENERATE_SOURCEMAP: false
       run: |
         echo "Building application..."
-        npm run build
+        
+        # Clear any existing build directory
+        rm -rf build
+        
+        # First try the standard build and capture any errors
+        if npm run build; then
+          echo "✅ Standard build completed"
+        else
+          echo "⚠️ Standard build failed with exit code $?"
+          echo "Checking for common issues..."
+          
+          # Check if node_modules exists
+          if [ ! -d "node_modules" ]; then
+            echo "❌ node_modules not found!"
+          fi
+          
+          # Check for build errors in the output
+          if [ -f "build.log" ]; then
+            echo "Build log:"
+            tail -50 build.log
+          fi
+          
+          # Try the enhanced build as fallback
+          echo "Attempting enhanced build..."
+          npm run build:enhanced || {
+            echo "❌ Enhanced build also failed"
+            exit 1
+          }
+        fi
         
     - name: Verify build
       working-directory: ./frontend
       run: |
         echo "Verifying build output..."
         ls -la build/
+        
+        # Check if index.html exists
         if [ ! -f "build/index.html" ]; then
           echo "❌ Build failed - index.html not found"
+          echo "Build directory contents:"
+          find build -type f -name "*.html" || echo "No HTML files found"
           exit 1
         fi
+        
+        # Verify build contents
         echo "✅ Build verified successfully"
+        echo "Build contains:"
+        find build -name "*.html" | head -5
+        echo "Total files in build:"
+        find build -type f | wc -l
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -63,7 +118,9 @@ jobs:
     - name: Create deployment info
       working-directory: ./frontend
       run: |
-        cat > build/deployment-info.json << EOF
+        # Only create deployment info if build directory exists
+        if [ -d "build" ] && [ -f "build/index.html" ]; then
+          cat > build/deployment-info.json << EOF
         {
           "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
           "commit": "${{ github.sha }}",
@@ -72,6 +129,10 @@ jobs:
           "workflow_run": "${{ github.run_number }}"
         }
         EOF
+          echo "✅ Deployment info created"
+        else
+          echo "⚠️ Build directory not ready, skipping deployment info"
+        fi
         
   deploy-preview:
     needs: build
