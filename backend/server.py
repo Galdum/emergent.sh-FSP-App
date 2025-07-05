@@ -133,6 +133,7 @@ from backend.routes.gdpr import router as gdpr_router
     # Import new FSP Navigator specific routes
 from backend.routes.documents import router as documents_router
 from backend.routes.badges import router as badges_router
+from backend.routes.mini_games import router as mini_games_router
 try:
     from backend.routes.ai_assistant import router as ai_assistant_router
     AI_ROUTER_AVAILABLE = True
@@ -170,6 +171,7 @@ api_router.include_router(gdpr_router)
     # Include new FSP Navigator routes
 api_router.include_router(documents_router)
 api_router.include_router(badges_router)
+api_router.include_router(mini_games_router)
 if AI_ROUTER_AVAILABLE:
     api_router.include_router(ai_assistant_router)
 api_router.include_router(mongodb_example_router)

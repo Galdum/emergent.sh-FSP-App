@@ -21,6 +21,8 @@ import { renderMarkdown } from './utils/markdownRenderer';
 import { conversationManager, ImageOptimizer, CostTracker } from './utils/conversationManager';
 import { gamificationManager } from './utils/gamificationManager';
 import { InteractiveQuiz, sampleQuizzes } from './components/InteractiveQuiz';
+import ClinicalCasesMiniGame from './components/ClinicalCasesMiniGame';
+import FachbegriffeMiniGame from './components/FachbegriffeMiniGame';
 import GamificationProgress from './components/GamificationProgress';
 import LeaderboardModal from './components/LeaderboardModal';
 import EmailVerificationModal from './components/EmailVerificationModal';
@@ -2953,7 +2955,9 @@ const AppContent = () => {
         gdprConsent: false,
         settings: false,
         tutorial: false,
-        legal: false
+        legal: false,
+        clinicalCasesGame: false,
+        fachbegriffeGame: false
     });
     
     // Gamification states
@@ -3157,6 +3161,14 @@ const AppContent = () => {
                 setModalStates(prev => ({...prev, leaderboard: true}));
                 break;
                 
+            case 'clinical_cases_game':
+                setModalStates(prev => ({...prev, clinicalCasesGame: true}));
+                break;
+                
+            case 'fachbegriffe_game':
+                setModalStates(prev => ({...prev, fachbegriffeGame: true}));
+                break;
+                
             default:
                 console.log('Unknown action type:', action.type);
         }
@@ -3220,6 +3232,46 @@ const AppContent = () => {
         // since GDPR consent is handled during registration
     };
     const closeLegal = () => setModalStates(prev => ({...prev, legal: false}));
+    const closeClinicalCasesGame = () => setModalStates(prev => ({...prev, clinicalCasesGame: false}));
+    const closeFachbegriffeGame = () => setModalStates(prev => ({...prev, fachbegriffeGame: false}));
+
+    // Mini-game completion handlers
+    const handleClinicalCasesComplete = (result) => {
+        console.log('Clinical Cases completed:', result);
+        // Award XP based on performance
+        const xpGained = Math.round(result.score * 2); // 2 XP per percentage point
+        gamificationManager.addExperience(xpGained);
+        setUserStats(gamificationManager.getUserStats());
+        
+        // Show confetti for good scores
+        if (result.score >= 80) {
+            setConfetti(true);
+            setTimeout(() => setConfetti(false), 4000);
+        }
+        
+        // Could save result to backend here
+        // saveGameResult('clinical_cases', result);
+    };
+
+    const handleFachbegriffeComplete = (result) => {
+        console.log('Fachbegriffe completed:', result);
+        // Award XP based on performance and streak
+        let xpGained = Math.round(result.score * 1.5); // 1.5 XP per percentage point
+        if (result.streak && result.streak >= 5) {
+            xpGained += 50; // Bonus for good streak
+        }
+        gamificationManager.addExperience(xpGained);
+        setUserStats(gamificationManager.getUserStats());
+        
+        // Show confetti for good scores
+        if (result.score >= 85) {
+            setConfetti(true);
+            setTimeout(() => setConfetti(false), 4000);
+        }
+        
+        // Could save result to backend here
+        // saveGameResult('fachbegriffe', result);
+    };
 
     // Test mode functions
     const handleTestModeSubscription = async (tier) => {
@@ -3541,6 +3593,20 @@ const AppContent = () => {
                 isOpen={modalStates.legal}
                 onClose={closeLegal}
             />
+            
+            {/* Mini-Games */}
+            {modalStates.clinicalCasesGame && (
+                <ClinicalCasesMiniGame
+                    onComplete={handleClinicalCasesComplete}
+                    onClose={closeClinicalCasesGame}
+                />
+            )}
+            {modalStates.fachbegriffeGame && (
+                <FachbegriffeMiniGame
+                    onComplete={handleFachbegriffeComplete}
+                    onClose={closeFachbegriffeGame}
+                />
+            )}
             
    {/* Footer with Legal Links - mobile optimized */}
             <div className={`${isMobile ? 'footer-mobile mobile-safe-bottom' : 'fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30'}`}>

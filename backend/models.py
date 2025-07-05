@@ -433,3 +433,111 @@ class UtilInfoDocumentUpdate(BaseModel):
     color_theme: Optional[str] = None
     order_priority: Optional[int] = None
     is_active: Optional[bool] = None
+
+# Mini-Games Models
+class GameType(str, Enum):
+    CLINICAL_CASES = "clinical_cases"
+    FACHBEGRIFFE = "fachbegriffe"
+    INTERACTIVE_QUIZ = "interactive_quiz"
+
+class GameResult(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    game_type: GameType
+    game_mode: Optional[str] = None  # e.g., "multiple_choice", "speed_round", "match_terms"
+    score: int
+    total_questions: int
+    correct_answers: int
+    time_spent_seconds: int
+    streak: Optional[int] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    class Config:
+        use_enum_values = True
+
+class ClinicalCase(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    patient_info: Dict[str, Any]  # name, age, gender, chief_complaint
+    phases: Dict[str, Any]  # anamnese, diagnosis, therapy phases
+    difficulty: str = "medium"  # easy, medium, hard
+    category: str  # e.g., "cardiology", "emergency", "internal_medicine"
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
+class FachbegriffTerm(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    fachsprache: str  # Technical term
+    umgangssprache: str  # Everyday language equivalent
+    category: str  # e.g., "anatomy", "symptoms", "diagnosis", "therapy"
+    options: List[str]  # Multiple choice options
+    explanation: str  # Explanation of the term
+    difficulty: str = "medium"  # easy, medium, hard
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
+class GameResultCreate(BaseModel):
+    game_type: GameType
+    game_mode: Optional[str] = None
+    score: int
+    total_questions: int
+    correct_answers: int
+    time_spent_seconds: int
+    streak: Optional[int] = None
+    
+    class Config:
+        use_enum_values = True
+
+class GameResultResponse(BaseModel):
+    id: str
+    user_id: str
+    game_type: GameType
+    game_mode: Optional[str]
+    score: int
+    total_questions: int
+    correct_answers: int
+    time_spent_seconds: int
+    streak: Optional[int]
+    created_at: datetime
+    
+    class Config:
+        use_enum_values = True
+
+class UserGameStats(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    
+    # Clinical Cases stats
+    clinical_cases_played: int = 0
+    clinical_cases_best_score: int = 0
+    clinical_cases_total_score: int = 0
+    clinical_cases_average_score: float = 0.0
+    
+    # Fachbegriffe stats
+    fachbegriffe_played: int = 0
+    fachbegriffe_best_score: int = 0
+    fachbegriffe_total_score: int = 0
+    fachbegriffe_average_score: float = 0.0
+    fachbegriffe_best_streak: int = 0
+    
+    # General stats
+    total_games_played: int = 0
+    total_time_spent_seconds: int = 0
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class Leaderboard(BaseModel):
+    rank: int
+    user_id: str
+    user_name: Optional[str] = None
+    score: int
+    games_played: int
+    game_type: GameType
+    
+    class Config:
+        use_enum_values = True
