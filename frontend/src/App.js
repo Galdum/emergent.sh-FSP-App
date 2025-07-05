@@ -1751,10 +1751,13 @@ const InfoHubModal = ({ isOpen, onClose, fromStepModal = false }) => {
     };
 
     const handleSmartClose = () => {
-        // If opened from step modal, just close InfoHub and return to step modal
-        // If opened from main interface, close completely
+        // Always reset to list view and clear selected doc
         setView('list');
         setSelectedDoc(null);
+        
+        // If opened from step modal, just close InfoHub and return to step modal
+        // If opened from main interface, close completely
+        // The parent component handles the actual modal closure logic
         onClose();
     };
 
@@ -3217,7 +3220,17 @@ const AppContent = () => {
     const backToStepFromContent = () => setModalStates(prev => ({...prev, activeContent: null}));
     const closeGeminiModal = () => setModalStates(prev => ({...prev, activeGeminiModal: null}));
     const closeRecommenderModal = () => setModalStates(prev => ({...prev, recommender: false}));
-    const closeInfoHubModal = () => setModalStates(prev => ({...prev, infoHub: false, infoHubFromStep: false}));
+    const closeInfoHubModal = () => {
+        // Check if InfoHub was opened from step modal
+        const wasFromStepModal = modalStates.infoHubFromStep;
+        
+        // Always close InfoHub
+        setModalStates(prev => ({...prev, infoHub: false, infoHubFromStep: false}));
+        
+        // If it was opened from step modal, keep the step modal open
+        // If it was opened from main interface, it will naturally return to main interface
+        // No additional action needed as the step modal state is preserved
+    };
     const closeLeaderboardModal = () => setModalStates(prev => ({...prev, leaderboard: false}));
     const closePersonalFileModal = () => setModalStates(prev => ({...prev, personalFileModal: false}));
     const closeSubscriptionModal = () => setModalStates(prev => ({...prev, subscriptionUpgrade: false}));
