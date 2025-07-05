@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Star, Flame, Award, TrendingUp, Clock, Target, Zap, Crown, Medal } from 'lucide-react';
-import { BadgeDisplay } from './BadgeDisplay';
 
 /**
  * Gamification Progress Display Component
@@ -169,14 +168,7 @@ export const GamificationProgress = ({
         </div>
       </div>
 
-      {/* Badge Collection */}
-      {onOpenBadgeSystem && currentUser && (
-        <BadgeDisplay 
-          currentUser={currentUser}
-          onOpenBadgeSystem={onOpenBadgeSystem}
-          compact={false}
-        />
-      )}
+
 
       {/* Quiz Stats */}
       {userStats.quizStats && userStats.quizStats.totalQuizzes > 0 && (
