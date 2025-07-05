@@ -4,7 +4,7 @@ import {
   Search, Filter, Download, AlertTriangle, CheckCircle, PlayCircle,
   Eye, Trash2, Edit, UserX, Plus, Save, X, Bell, Zap,
   BarChart3, TrendingUp, Clock, Shield, FileText, Globe,
-  Database, Refresh, Copy, ExternalLink, Info, HelpCircle,
+  Database, RefreshCw, Copy, ExternalLink, Info, HelpCircle,
   Monitor, Smartphone, Mail, Calendar, Star, Award
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
