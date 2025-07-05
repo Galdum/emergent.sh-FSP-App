@@ -359,6 +359,7 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
           isOpen={showLegal}
           onClose={() => setShowLegal(false)}
           initialTab={legalTab}
+          hideTabs={true}
         />
       </div>
     </div>

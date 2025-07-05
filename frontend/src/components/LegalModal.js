@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Shield, FileText, Eye, Download, ExternalLink } from 'lucide-react';
 
-const LegalModal = ({ isOpen, onClose, initialTab = 'terms' }) => {
+const LegalModal = ({ isOpen, onClose, initialTab = 'terms', hideTabs = false }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   const tabs = [
@@ -294,52 +294,54 @@ Data ultimei actualizări: Decembrie 2024
         </div>
 
         <div className="flex h-[calc(90vh-120px)]">
-          {/* Sidebar */}
-          <div className="w-1/3 bg-gray-50 p-4 border-r overflow-y-auto">
-            <nav className="space-y-1">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Icon size={18} />
-                    <span className="text-sm font-medium">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+          {/* Sidebar - render only if hideTabs is false */}
+          {!hideTabs && (
+            <div className="w-1/3 bg-gray-50 p-4 border-r overflow-y-auto">
+              <nav className="space-y-1">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      <span className="text-sm font-medium">{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
 
-            {/* Quick Info */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h3 className="text-sm font-semibold text-blue-800 mb-2">Informații importante</h3>
-              <ul className="text-xs text-blue-700 space-y-1">
-                <li>• Conforme cu GDPR</li>
-                <li>• Actualizate decembrie 2024</li>
-                <li>• Disponibile în română</li>
-                <li>• Consultare gratuită</li>
-              </ul>
-            </div>
+              {/* Quick Info */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h3 className="text-sm font-semibold text-blue-800 mb-2">Informații importante</h3>
+                <ul className="text-xs text-blue-700 space-y-1">
+                  <li>• Conforme cu GDPR</li>
+                  <li>• Actualizate decembrie 2024</li>
+                  <li>• Disponibile în română</li>
+                  <li>• Consultare gratuită</li>
+                </ul>
+              </div>
 
-            <div className="mt-4 p-4 bg-green-50 rounded-lg">
-              <h3 className="text-sm font-semibold text-green-800 mb-2">Drepturile tale</h3>
-              <ul className="text-xs text-green-700 space-y-1">
-                <li>• Acces la date</li>
-                <li>• Rectificare</li>
-                <li>• Ștergere</li>
-                <li>• Portabilitate</li>
-              </ul>
+              <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                <h3 className="text-sm font-semibold text-green-800 mb-2">Drepturile tale</h3>
+                <ul className="text-xs text-green-700 space-y-1">
+                  <li>• Acces la date</li>
+                  <li>• Rectificare</li>
+                  <li>• Ștergere</li>
+                  <li>• Portabilitate</li>
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Content */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className={`${hideTabs ? 'w-full' : 'flex-1'} p-6 overflow-y-auto`}>
             <div className="prose max-w-none">
               <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
                 <ExternalLink size={14} />
