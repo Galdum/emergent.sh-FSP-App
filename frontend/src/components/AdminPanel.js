@@ -1448,7 +1448,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
                       className="w-full flex items-center gap-3 px-4 py-3 text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                       disabled={loading}
                     >
-                      <Refresh size={18} className={loading ? 'animate-spin' : ''} />
+                      <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                       <span className="font-medium">Refresh All Data</span>
                     </button>
                     <button
