@@ -304,7 +304,7 @@ export const FachbegriffeMiniGame = ({
       case 'multiple_choice': return <BookOpen className="h-5 w-5" />;
       case 'speed_round': return <Zap className="h-5 w-5" />;
       case 'match_terms': return <Target className="h-5 w-5" />;
-      default: return <Brain2 className="h-5 w-5" />;
+      default: return <Brain className="h-5 w-5" />;
     }
   };
 
