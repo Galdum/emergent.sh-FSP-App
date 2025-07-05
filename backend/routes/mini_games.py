@@ -3,8 +3,7 @@ from fastapi.security import HTTPBearer
 from typing import List, Optional
 from datetime import datetime, timedelta
 import logging
-from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError
+from motor.motor_asyncio import AsyncIOMotorClient
 import os
 
 from ..models import (
@@ -20,10 +19,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 security = HTTPBearer()
 
-# MongoDB connection
-MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
-client = MongoClient(MONGODB_URL)
-db = client.fsp_navigator
+# MongoDB connection - consistent with main app configuration
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.getenv("DB_NAME", "fsp_navigator")
+client = AsyncIOMotorClient(MONGO_URL)
+db = client[DB_NAME]
 
 # Collections
 game_results_collection = db.game_results
@@ -48,7 +48,7 @@ async def save_game_result(
         result_dict = result.dict()
         result_dict['created_at'] = result_dict['created_at'].isoformat()
         
-        game_results_collection.insert_one(result_dict)
+        await game_results_collection.insert_one(result_dict)
         
         # Update user game statistics
         await update_user_game_stats(current_user.id, result)
@@ -76,7 +76,8 @@ async def get_user_game_results(
         if game_type:
             query["game_type"] = game_type.value
         
-        results = game_results_collection.find(query).sort("created_at", -1).limit(limit)
+        cursor = game_results_collection.find(query).sort("created_at", -1).limit(limit)
+        results = await cursor.to_list(length=limit)
         
         game_results = []
         for result in results:
@@ -98,7 +99,7 @@ async def get_user_game_stats(
 ):
     """Get user's game statistics."""
     try:
-        stats = user_game_stats_collection.find_one({"user_id": current_user.id})
+        stats = await user_game_stats_collection.find_one({"user_id": current_user.id})
         
         if not stats:
             # Create initial stats
@@ -106,7 +107,7 @@ async def get_user_game_stats(
             stats_dict = stats.dict()
             stats_dict['created_at'] = stats_dict['created_at'].isoformat()
             stats_dict['updated_at'] = stats_dict['updated_at'].isoformat()
-            user_game_stats_collection.insert_one(stats_dict)
+            await user_game_stats_collection.insert_one(stats_dict)
         else:
             stats['created_at'] = datetime.fromisoformat(stats['created_at'])
             stats['updated_at'] = datetime.fromisoformat(stats['updated_at'])
@@ -142,7 +143,8 @@ async def get_leaderboard(
             {"$limit": limit}
         ]
         
-        results = list(game_results_collection.aggregate(pipeline))
+        cursor = game_results_collection.aggregate(pipeline)
+        results = await cursor.to_list(length=limit)
         
         leaderboard = []
         for i, result in enumerate(results, 1):
@@ -182,7 +184,8 @@ async def get_clinical_cases(
         if difficulty:
             query["difficulty"] = difficulty
         
-        cases = clinical_cases_collection.find(query).limit(limit)
+        cursor = clinical_cases_collection.find(query).limit(limit)
+        cases = await cursor.to_list(length=limit)
         
         clinical_cases = []
         for case in cases:
@@ -214,7 +217,8 @@ async def get_fachbegriffe_terms(
         if difficulty:
             query["difficulty"] = difficulty
         
-        terms = fachbegriffe_collection.find(query).limit(limit)
+        cursor = fachbegriffe_collection.find(query).limit(limit)
+        terms = await cursor.to_list(length=limit)
         
         fachbegriffe_terms = []
         for term in terms:
@@ -235,7 +239,7 @@ async def update_user_game_stats(user_id: str, game_result: GameResult):
     """Update user game statistics after a game."""
     try:
         # Get current stats
-        current_stats = user_game_stats_collection.find_one({"user_id": user_id})
+        current_stats = await user_game_stats_collection.find_one({"user_id": user_id})
         
         if not current_stats:
             # Create new stats
@@ -243,7 +247,7 @@ async def update_user_game_stats(user_id: str, game_result: GameResult):
             current_stats = stats.dict()
             current_stats['created_at'] = current_stats['created_at'].isoformat()
             current_stats['updated_at'] = current_stats['updated_at'].isoformat()
-            user_game_stats_collection.insert_one(current_stats)
+            await user_game_stats_collection.insert_one(current_stats)
         
         # Update stats based on game type
         update_data = {
@@ -276,7 +280,7 @@ async def update_user_game_stats(user_id: str, game_result: GameResult):
             update_data["fachbegriffe_average_score"] = total_score / games_played if games_played > 0 else 0
         
         # Update in database
-        user_game_stats_collection.update_one(
+        await user_game_stats_collection.update_one(
             {"user_id": user_id},
             {"$set": update_data},
             upsert=True
@@ -391,14 +395,14 @@ async def initialize_sample_data(
         
         # Insert sample data
         for case in sample_clinical_cases:
-            clinical_cases_collection.update_one(
+            await clinical_cases_collection.update_one(
                 {"id": case["id"]},
                 {"$set": case},
                 upsert=True
             )
         
         for term in sample_fachbegriffe:
-            fachbegriffe_collection.update_one(
+            await fachbegriffe_collection.update_one(
                 {"id": term["id"]},
                 {"$set": term},
                 upsert=True
