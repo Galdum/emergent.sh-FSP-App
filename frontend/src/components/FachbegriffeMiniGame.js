@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Clock, Trophy, Star, RefreshCw, ChevronRight, BookOpen, Target, Zap, Brain2 } from 'lucide-react';
+import { Check, X, Clock, Trophy, Star, RefreshCw, ChevronRight, BookOpen, Target, Zap, Brain } from 'lucide-react';
 
 /**
  * Fachbegriffe Mini-Game Component
