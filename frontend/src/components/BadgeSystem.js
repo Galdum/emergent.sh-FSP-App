@@ -3,15 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, Flame, Award, Lock, X, Users, Crown, Medal } from 'lucide-react';
 
 /**
- * Badge System Component - Displays user badges with animations and leaderboard
+ * Badge System Component - Modal principal cu toate badge-urile
  */
-export const BadgeSystem = ({ currentUser, onClose }) => {
+export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [activeTab, setActiveTab] = useState('badges');
   const [leaderboard, setLeaderboard] = useState([]);
-  const [newBadgePopup, setNewBadgePopup] = useState(null);
 
   useEffect(() => {
     fetchBadges();
@@ -59,21 +58,20 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
       const result = await response.json();
       
       if (result.newly_awarded && result.newly_awarded.length > 0) {
-        // Show popup for first new badge
+        // Trigger notification for first new badge
         const newBadge = badges.find(b => b.badge_id === result.newly_awarded[0]);
-        if (newBadge) {
-          setNewBadgePopup(newBadge);
-          // Refresh badges to show updated status
-          fetchBadges();
+        if (newBadge && onBadgeEarned) {
+          onBadgeEarned(newBadge);
         }
+        // Refresh badges to show updated status
+        fetchBadges();
       }
     } catch (error) {
       console.error('Failed to check for new badges:', error);
     }
   };
 
-  const getBadgeIcon = (badgeId, iconConcept) => {
-    // Map badge IDs to appropriate Lucide icons as fallbacks
+  const getBadgeIcon = (badgeId) => {
     const iconMap = {
       'first_upload': '📄',
       'profile_complete': '👤',
@@ -127,6 +125,18 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
 
   const earnedBadges = badges.filter(b => b.earned);
   const lockedBadges = badges.filter(b => !b.earned);
+  const allBadges = [...earnedBadges, ...lockedBadges];
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Încărcare badge-uri...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -134,7 +144,7 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+        className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 relative">
@@ -144,9 +154,9 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
                 <Trophy className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold">Badge Collection</h2>
+                <h2 className="text-2xl font-bold">Colecția de Badge-uri</h2>
                 <p className="text-purple-200">
-                  {earnedBadges.length} of {badges.length} badges earned
+                  {earnedBadges.length} din {badges.length} badge-uri câștigate
                 </p>
               </div>
             </div>
@@ -167,7 +177,7 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
               />
             </div>
             <div className="text-purple-200 text-sm mt-1">
-              {Math.round((earnedBadges.length / badges.length) * 100)}% Complete
+              {Math.round((earnedBadges.length / badges.length) * 100)}% Completat
             </div>
           </div>
         </div>
@@ -183,7 +193,7 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              My Badges
+              Badge-urile Mele
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
@@ -194,7 +204,7 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
               }`}
             >
               <Users className="h-4 w-4" />
-              Leaderboard
+              Clasament
             </button>
           </div>
         </div>
@@ -210,72 +220,54 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
                   className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center gap-2"
                 >
                   <Star className="h-4 w-4" />
-                  Check for New Badges
+                  Verifică Badge-uri Noi
                 </button>
               </div>
 
-              {/* Earned Badges */}
-              {earnedBadges.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-yellow-600" />
-                    Earned Badges ({earnedBadges.length})
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {earnedBadges.map((badge) => (
-                      <motion.div
-                        key={badge.badge_id}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setSelectedBadge(badge)}
-                        className="cursor-pointer"
-                      >
-                        <div className={`aspect-square rounded-2xl ${getBadgeColor(badge.badge_id)} text-white p-4 flex items-center justify-center shadow-lg hover:shadow-xl transition-all`}>
-                          <span className="text-3xl">{getBadgeIcon(badge.badge_id, badge.icon_concept)}</span>
-                        </div>
-                        <div className="text-center mt-2">
-                          <div className="font-medium text-sm text-gray-800">{badge.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {new Date(badge.awarded_at).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Locked Badges */}
-              {lockedBadges.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Lock className="h-5 w-5 text-gray-500" />
-                    Locked Badges ({lockedBadges.length})
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {lockedBadges.map((badge) => (
-                      <motion.div
-                        key={badge.badge_id}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setSelectedBadge(badge)}
-                        className="cursor-pointer"
-                      >
-                        <div className="aspect-square rounded-2xl bg-gray-300 text-gray-500 p-4 flex items-center justify-center shadow-lg hover:shadow-xl transition-all relative">
-                          <span className="text-3xl opacity-50">{getBadgeIcon(badge.badge_id, badge.icon_concept)}</span>
+              {/* All Badges Grid */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-600" />
+                  Toate Badge-urile ({badges.length})
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {allBadges.map((badge) => (
+                    <motion.div
+                      key={badge.badge_id}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectedBadge(badge)}
+                      className="cursor-pointer"
+                    >
+                      <div className={`aspect-square rounded-2xl ${
+                        badge.earned 
+                          ? getBadgeColor(badge.badge_id) 
+                          : 'bg-gray-300'
+                      } text-white p-4 flex items-center justify-center shadow-lg hover:shadow-xl transition-all relative`}>
+                        <span className={`text-3xl ${badge.earned ? '' : 'opacity-50'}`}>
+                          {getBadgeIcon(badge.badge_id)}
+                        </span>
+                        {!badge.earned && (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <Lock className="h-6 w-6 text-gray-600" />
                           </div>
+                        )}
+                      </div>
+                      <div className="text-center mt-2">
+                        <div className={`font-medium text-sm ${badge.earned ? 'text-gray-800' : 'text-gray-500'}`}>
+                          {badge.name}
                         </div>
-                        <div className="text-center mt-2">
-                          <div className="font-medium text-sm text-gray-500">{badge.name}</div>
-                          <div className="text-xs text-gray-400">Locked</div>
+                        <div className="text-xs text-gray-400">
+                          {badge.earned 
+                            ? new Date(badge.awarded_at).toLocaleDateString('ro-RO')
+                            : 'Blocat'
+                          }
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
@@ -283,7 +275,7 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Crown className="h-5 w-5 text-yellow-600" />
-                Top Badge Collectors
+                Top Colecționari de Badge-uri
               </h3>
               <div className="space-y-3">
                 {leaderboard.map((user, index) => (
@@ -299,11 +291,11 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
                         </div>
                         <div>
                           <div className="font-medium text-gray-800">{user.name}</div>
-                          <div className="text-sm text-gray-500">{user.badge_count} badges</div>
+                          <div className="text-sm text-gray-500">{user.badge_count} badge-uri</div>
                         </div>
                       </div>
                       <div className="flex gap-1">
-                        {user.top_badges.slice(0, 3).map((badge, i) => (
+                        {user.top_badges?.slice(0, 3).map((badge, i) => (
                           <div key={i} className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm">
                             {getBadgeIcon(badge.badge_id)}
                           </div>
@@ -336,8 +328,14 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
               className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
             >
               <div className="text-center">
-                <div className={`w-24 h-24 rounded-2xl ${selectedBadge.earned ? getBadgeColor(selectedBadge.badge_id) : 'bg-gray-300'} text-white mx-auto mb-4 flex items-center justify-center shadow-lg relative`}>
-                  <span className="text-4xl">{getBadgeIcon(selectedBadge.badge_id, selectedBadge.icon_concept)}</span>
+                <div className={`w-24 h-24 rounded-2xl ${
+                  selectedBadge.earned 
+                    ? getBadgeColor(selectedBadge.badge_id) 
+                    : 'bg-gray-300'
+                } text-white mx-auto mb-4 flex items-center justify-center shadow-lg relative`}>
+                  <span className={`text-4xl ${selectedBadge.earned ? '' : 'opacity-50'}`}>
+                    {getBadgeIcon(selectedBadge.badge_id)}
+                  </span>
                   {!selectedBadge.earned && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Lock className="h-8 w-8 text-gray-600" />
@@ -346,12 +344,16 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{selectedBadge.name}</h3>
                 <p className="text-gray-600 mb-4">{selectedBadge.description}</p>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm ${selectedBadge.earned ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
-                  {selectedBadge.earned ? 'Earned' : selectedBadge.criteria}
+                <div className={`inline-block px-3 py-1 rounded-full text-sm ${
+                  selectedBadge.earned 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {selectedBadge.earned ? 'Câștigat' : selectedBadge.criteria}
                 </div>
                 {selectedBadge.earned && selectedBadge.awarded_at && (
                   <div className="text-sm text-gray-500 mt-2">
-                    Earned on {new Date(selectedBadge.awarded_at).toLocaleDateString()}
+                    Câștigat pe {new Date(selectedBadge.awarded_at).toLocaleDateString('ro-RO')}
                   </div>
                 )}
               </div>
@@ -359,41 +361,9 @@ export const BadgeSystem = ({ currentUser, onClose }) => {
                 onClick={() => setSelectedBadge(null)}
                 className="w-full mt-6 bg-gray-100 text-gray-800 py-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Close
+                Închide
               </button>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* New Badge Popup */}
-      <AnimatePresence>
-        {newBadgePopup && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0, y: 50 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0, opacity: 0, y: 50 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="fixed bottom-8 right-8 z-70"
-          >
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-2xl shadow-2xl max-w-sm">
-              <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-xl ${getBadgeColor(newBadgePopup.badge_id)} flex items-center justify-center`}>
-                  <span className="text-2xl">{getBadgeIcon(newBadgePopup.badge_id, newBadgePopup.icon_concept)}</span>
-                </div>
-                <div>
-                  <div className="font-bold text-lg">🎉 Badge Earned!</div>
-                  <div className="text-purple-200">{newBadgePopup.name}</div>
-                  <div className="text-sm text-purple-300 mt-1">{newBadgePopup.description}</div>
-                </div>
-              </div>
-              <button
-                onClick={() => setNewBadgePopup(null)}
-                className="absolute top-2 right-2 text-purple-200 hover:text-white"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

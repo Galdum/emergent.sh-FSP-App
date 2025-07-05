@@ -24,6 +24,8 @@ import { InteractiveQuiz, sampleQuizzes } from './components/InteractiveQuiz';
 import GamificationProgress from './components/GamificationProgress';
 import LeaderboardModal from './components/LeaderboardModal';
 import EmailVerificationModal from './components/EmailVerificationModal';
+import BadgeSystem from './components/BadgeSystem';
+import { BadgeNotification } from './components/BadgeDisplay';
 
 // --- Confetti Component ---
 const Confetti = () => {
@@ -2953,7 +2955,8 @@ const AppContent = () => {
         gdprConsent: false,
         settings: false,
         tutorial: false,
-        legal: false
+        legal: false,
+        badgeSystem: false
     });
     
     // Gamification states
@@ -2963,6 +2966,11 @@ const AppContent = () => {
     const [achievements, setAchievements] = useState([]);
     const [pointsAnimation, setPointsAnimation] = useState(null);
     const [progressMode, setProgressMode] = useState('progressive'); // 'progressive' | 'free'
+    
+    // Badge states
+    const [badgeCount, setBadgeCount] = useState(0);
+    const [totalBadges, setTotalBadges] = useState(20);
+    const [newBadgeNotification, setNewBadgeNotification] = useState(null);
 
     useEffect(() => {
         // Enhanced registration process - Check if user is authenticated
@@ -3212,6 +3220,7 @@ const AppContent = () => {
     const closeEmailVerificationModal = () => setModalStates(prev => ({...prev, emailVerification: false}));
     const closeSettingsModal = () => setModalStates(prev => ({...prev, settings: false}));
     const closeAuthModal = () => setModalStates(prev => ({...prev, authModal: false}));
+    const closeBadgeSystemModal = () => setModalStates(prev => ({...prev, badgeSystem: false}));
     const closeTutorial = () => {
         setModalStates(prev => ({...prev, tutorial: false}));
         // Mark tutorial as viewed
@@ -3245,6 +3254,35 @@ const AppContent = () => {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+    
+    // Badge-related functions
+    const fetchBadgeCount = async () => {
+        try {
+            const response = await fetch('/api/badges/', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const badgeData = await response.json();
+            const earnedCount = badgeData.filter(b => b.earned).length;
+            setBadgeCount(earnedCount);
+        } catch (error) {
+            console.error('Failed to fetch badge count:', error);
+        }
+    };
+    
+    const handleBadgeNotification = (badge) => {
+        setNewBadgeNotification(badge);
+        setBadgeCount(prev => prev + 1);
+        setTimeout(() => setNewBadgeNotification(null), 5000);
+    };
+    
+    // Fetch badge count on component mount
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchBadgeCount();
+        }
+    }, [isAuthenticated]);
 
     return (
         <div className="bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 prevent-horizontal-scroll">
@@ -3278,6 +3316,11 @@ const AppContent = () => {
                             <span className="text-purple-600">{userStats.points}XP</span>
                             <Flame className="h-2 w-2 text-orange-500" />
                             <span>{userStats.streakDays}d</span>
+                            <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded transition-colors"
+                                 onClick={() => setModalStates(prev => ({...prev, badgeSystem: true}))}>
+                                <Trophy className="h-2 w-2 text-yellow-600" />
+                                <span className="text-xs font-medium text-gray-700">{badgeCount}/{totalBadges}</span>
+                            </div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
                             <div 
@@ -3358,6 +3401,12 @@ const AppContent = () => {
                                 <div className="flex items-center gap-1 text-orange-500">
                                     <Flame className="h-3 w-3" />
                                     <span className="text-xs">{userStats.streakDays}d</span>
+                                </div>
+                                <div className="text-gray-500">•</div>
+                                <div className="flex items-center gap-1 cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded transition-colors"
+                                     onClick={() => setModalStates(prev => ({...prev, badgeSystem: true}))}>
+                                    <Trophy className="h-3 w-3 text-yellow-600" />
+                                    <span className="text-xs font-medium text-gray-700">{badgeCount}/{totalBadges}</span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
@@ -3541,6 +3590,23 @@ const AppContent = () => {
                 isOpen={modalStates.legal}
                 onClose={closeLegal}
             />
+            
+            {/* Badge System Modal */}
+            {modalStates.badgeSystem && (
+                <BadgeSystem 
+                    currentUser={user} 
+                    onClose={closeBadgeSystemModal}
+                    onBadgeEarned={handleBadgeNotification}
+                />
+            )}
+            
+            {/* Badge Notification */}
+            {newBadgeNotification && (
+                <BadgeNotification 
+                    badge={newBadgeNotification}
+                    onClose={() => setNewBadgeNotification(null)}
+                />
+            )}
             
    {/* Footer with Legal Links - mobile optimized */}
             <div className={`${isMobile ? 'footer-mobile mobile-safe-bottom' : 'fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 py-2 px-4 text-xs text-gray-500 flex items-center justify-between z-30'}`}>
