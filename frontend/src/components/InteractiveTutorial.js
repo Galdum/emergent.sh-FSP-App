@@ -40,32 +40,48 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       showSpotlight: false,
     },
     {
-      title: 'Manager Documente',
-      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Click pe iconul mov de sus-dreapta.',
+      title: 'Manager Documente & Asistent AI',
+      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Aici găsești și Asistentul AI care te ajută cu întrebări despre Approbation & FSP.',
       target: '[title="Dosarul Meu Personal"]',
       position: 'left',
       action: 'highlight_personal_files',
       showSpotlight: true,
     },
     {
-      title: 'Asistent AI',
-      content: 'Întreabă orice despre Approbation & FSP. Asistentul AI îți răspunde instant. Găsește-l în nodurile orange.',
-      target: '.bonus-node',
-      position: 'top',
-      action: 'highlight_ai_assistant',
-      showSpotlight: true,
-    },
-    {
       title: 'Progres & Checklist',
-      content: 'Urmărește aici fiecare pas finalizat şi ce mai ai de făcut. Click pe oricare dintre nodurile albastre.',
+      content: 'Urmărește aici fiecare pas finalizat şi ce mai ai de făcut. Fiecare nod albastru reprezintă un pas important în procesul de Approbation.',
       target: '.step-node',
       position: 'bottom',
       action: 'highlight_progress_steps',
       showSpotlight: true,
     },
     {
+      title: 'Noduri Bonus cu Resurse',
+      content: 'Nodurile portocalii conțin resurse bonus: Hub-ul de Informații, Generatorul de Email-uri și Recomandatorul de Landuri.',
+      target: '.bonus-node',
+      position: 'top',
+      action: 'highlight_bonus_nodes',
+      showSpotlight: true,
+    },
+    {
+      title: 'Toggle Bar - Moduri de Navigare',
+      content: 'Aici poți comuta între modul Progresiv (pas cu pas) și modul Liber (acces la toate nodurile). Modul Progresiv te ghidează step-by-step.',
+      target: '.progress-toggle-mobile, .fixed.bottom-20',
+      position: 'top',
+      action: 'highlight_toggle_bar',
+      showSpotlight: true,
+    },
+    {
+      title: 'Setări și Informații Personale',
+      content: 'În Setări poți actualiza informațiile personale, schimba parola, administra abonamentul și descărca datele tale.',
+      target: '[title="Setări"]',
+      position: 'left',
+      action: 'highlight_settings',
+      showSpotlight: true,
+    },
+    {
       title: 'Totul pregătit!',
-      content: 'Succes! Poţi relua tutorialul din meniu oricând 🥳',
+      content: 'Perfect! Acum știi unde să găsești toate funcționalitățile importante. Poţi relua tutorialul din meniul de setări oricând 🥳',
       target: null,
       position: 'center',
       action: null,
@@ -106,22 +122,13 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
           personalFileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
           // Add pulse effect
           personalFileBtn.style.animation = 'pulse 2s infinite';
-        }
-        break;
-        
-      case 'highlight_ai_assistant':
-        const bonusNodes = document.querySelectorAll('.bonus-node');
-        bonusNodes.forEach((node, index) => {
-          node.classList.add('tutorial-highlight');
-          // Stagger the animations
+          
+          // Open the Personal Files modal to show the AI assistant
           setTimeout(() => {
-            if (node.style) {
-              node.style.animation = 'pulse 2s infinite';
+            if (personalFileBtn && personalFileBtn.click) {
+              personalFileBtn.click();
             }
-          }, index * 200);
-        });
-        if (bonusNodes.length > 0) {
-          bonusNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 1000);
         }
         break;
         
@@ -140,6 +147,44 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
           stepNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         break;
+        
+      case 'highlight_bonus_nodes':
+        const bonusNodes = document.querySelectorAll('.bonus-node');
+        bonusNodes.forEach((node, index) => {
+          node.classList.add('tutorial-highlight');
+          // Stagger the animations
+          setTimeout(() => {
+            if (node.style) {
+              node.style.animation = 'pulse 2s infinite';
+            }
+          }, index * 200);
+        });
+        if (bonusNodes.length > 0) {
+          bonusNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        break;
+        
+      case 'highlight_toggle_bar':
+        // Try both mobile and desktop toggle bar selectors
+        const toggleBarMobile = document.querySelector('.progress-toggle-mobile');
+        const toggleBarDesktop = document.querySelector('.fixed.bottom-20');
+        const toggleBar = toggleBarMobile || toggleBarDesktop;
+        
+        if (toggleBar) {
+          toggleBar.classList.add('tutorial-highlight');
+          toggleBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          toggleBar.style.animation = 'pulse 2s infinite';
+        }
+        break;
+        
+      case 'highlight_settings':
+        const settingsBtn = document.querySelector('[title="Setări"]');
+        if (settingsBtn) {
+          settingsBtn.classList.add('tutorial-highlight');
+          settingsBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          settingsBtn.style.animation = 'pulse 2s infinite';
+        }
+        break;
     }
   }, []);
 
@@ -150,7 +195,15 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       return;
     }
     
-    const element = document.querySelector(currentStepData.target);
+    // Handle multiple target selectors
+    const targets = currentStepData.target.split(', ');
+    let element = null;
+    
+    for (const target of targets) {
+      element = document.querySelector(target);
+      if (element) break;
+    }
+    
     if (!element) {
       setElementPosition(null);
       return;
