@@ -245,6 +245,8 @@ Data ultimei actualizări: Decembrie 2024
   `;
 
   const getContent = () => {
+    if (activeTab === 'terms' && remoteContents.terms) return remoteContents.terms;
+    if (activeTab === 'privacy' && remoteContents.privacy) return remoteContents.privacy;
     switch (activeTab) {
       case 'terms':
         return termsContent;
@@ -256,6 +258,27 @@ Data ultimei actualizări: Decembrie 2024
         return termsContent;
     }
   };
+
+  // Remote doc fetching
+  const [remoteContents, setRemoteContents] = useState({ terms: '', privacy: '' });
+
+  const docUrls = {
+    terms: 'https://docs.google.com/document/d/1JLNn5WcvVRH-wEskThLMs6pN5jJ4qsPR/export?format=txt',
+    privacy: 'https://docs.google.com/document/d/1JLNn5WcvVRH-wEskThLMs6pN5jJ4qsPR/export?format=txt'
+  };
+
+  React.useEffect(() => {
+    const key = activeTab === 'terms' ? 'terms' : activeTab === 'privacy' ? 'privacy' : null;
+    if (!key || remoteContents[key]) return;
+    const url = docUrls[key];
+    if (!url) return;
+    fetch(url)
+      .then((res) => res.text())
+      .then((txt) => {
+        setRemoteContents((prev) => ({ ...prev, [key]: txt }));
+      })
+      .catch(() => {});
+  }, [activeTab]);
 
   const handleDownload = () => {
     const content = getContent();
