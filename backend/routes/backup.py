@@ -23,52 +23,102 @@ async def create_database_backup(
     """Create a database backup."""
     
     try:
-        # Create backup in background
+        # Add backup task to background tasks
+        background_tasks.add_task(
+            _create_backup_with_logging,
+            admin_user.id,
+            db
+        )
+        
+        return {"message": "Database backup started in background", "status": "processing"}
+        
+    except Exception as e:
+        logger.error(f"Failed to schedule database backup: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to schedule backup: {str(e)}"
+        )
+
+async def _create_backup_with_logging(admin_user_id: str, db):
+    """Helper function to create backup and log the action."""
+    try:
         backup_result = await get_backup_service().create_database_backup()
         
         # Log admin action
         audit_log = AuditLog(
-            user_id=admin_user.id,
+            user_id=admin_user_id,
             action="database_backup_created",
             details={"backup_file": backup_result["filename"]}
         )
         await db.audit_logs.insert_one(audit_log.dict())
         
-        return backup_result
+        logger.info(f"Background database backup completed: {backup_result['filename']}")
         
     except Exception as e:
-        logger.error(f"Database backup failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Backup failed: {str(e)}"
-        )
+        logger.error(f"Background database backup failed: {str(e)}")
+        # Log the failure
+        try:
+            audit_log = AuditLog(
+                user_id=admin_user_id,
+                action="database_backup_failed",
+                details={"error": str(e)}
+            )
+            await db.audit_logs.insert_one(audit_log.dict())
+        except Exception as log_error:
+            logger.error(f"Failed to log backup failure: {str(log_error)}")
 
 @router.post("/files")
 async def create_files_backup(
+    background_tasks: BackgroundTasks,
     admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Create a files backup."""
     
     try:
+        # Add backup task to background tasks
+        background_tasks.add_task(
+            _create_files_backup_with_logging,
+            admin_user.id,
+            db
+        )
+        
+        return {"message": "Files backup started in background", "status": "processing"}
+        
+    except Exception as e:
+        logger.error(f"Failed to schedule files backup: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to schedule backup: {str(e)}"
+        )
+
+async def _create_files_backup_with_logging(admin_user_id: str, db):
+    """Helper function to create files backup and log the action."""
+    try:
         backup_result = await get_backup_service().create_files_backup()
         
         # Log admin action
         audit_log = AuditLog(
-            user_id=admin_user.id,
+            user_id=admin_user_id,
             action="files_backup_created",
             details={"backup_file": backup_result.get("filename", "none")}
         )
         await db.audit_logs.insert_one(audit_log.dict())
         
-        return backup_result
+        logger.info(f"Background files backup completed: {backup_result.get('filename', 'none')}")
         
     except Exception as e:
-        logger.error(f"Files backup failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Backup failed: {str(e)}"
-        )
+        logger.error(f"Background files backup failed: {str(e)}")
+        # Log the failure
+        try:
+            audit_log = AuditLog(
+                user_id=admin_user_id,
+                action="files_backup_failed",
+                details={"error": str(e)}
+            )
+            await db.audit_logs.insert_one(audit_log.dict())
+        except Exception as log_error:
+            logger.error(f"Failed to log files backup failure: {str(log_error)}")
 
 @router.get("/status")
 async def get_backup_status(
