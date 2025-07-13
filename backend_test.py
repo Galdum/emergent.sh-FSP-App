@@ -321,6 +321,59 @@ def test_files_create():
         print_test_result("Create Personal File", False, error=str(e))
         return False
 
+def test_files_download():
+    """Test the GET /files/download/{file_id} endpoint."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("Download File", False, error="No auth token available. Login first.")
+        return False
+    
+    try:
+        # First, get a list of files to find a file to download
+        files_response = requests.get(
+            f"{API_URL}/files/",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        if files_response.status_code != 200:
+            print_test_result("Download File", False, error="Could not retrieve files list")
+            return False
+        
+        files = files_response.json()
+        file_to_download = None
+        
+        # Find a file (not a note or link) to download
+        for file_item in files:
+            if file_item.get("type") == "file" and file_item.get("file_path"):
+                file_to_download = file_item
+                break
+        
+        if not file_to_download:
+            print_test_result("Download File", False, error="No downloadable files found")
+            return False
+        
+        # Test download
+        download_response = requests.get(
+            f"{API_URL}/files/download/{file_to_download['id']}",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        # Check if we get a file response (status 200 and content-type indicates file)
+        success = download_response.status_code == 200 and (
+            'application/' in download_response.headers.get('content-type', '') or
+            'text/' in download_response.headers.get('content-type', '') or
+            'image/' in download_response.headers.get('content-type', '') or
+            'video/' in download_response.headers.get('content-type', '') or
+            'audio/' in download_response.headers.get('content-type', '')
+        )
+        
+        print_test_result("Download File", success, download_response)
+        return success
+    except Exception as e:
+        print_test_result("Download File", False, error=str(e))
+        return False
+
 def test_subscription_get():
     """Test the GET /subscription endpoint."""
     global auth_token
@@ -906,6 +959,7 @@ def run_all_tests():
     # 5. Personal Files
     results["files_get"] = test_files_get()
     results["files_create"] = test_files_create()
+    results["files_download"] = test_files_download()
     
     # 6. Subscription
     results["subscription_get"] = test_subscription_get()

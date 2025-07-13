@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
+from fastapi.responses import FileResponse
 from typing import List
 from backend.models import PersonalFileCreate, PersonalFileResponse, MessageResponse, PersonalFile
 from backend.auth import get_current_user
@@ -14,6 +15,7 @@ from pathlib import Path
 import aiofiles
 import hashlib
 import logging
+from datetime import datetime
 
 # Import badge awarding functionality
 from backend.routes.badges import check_and_award_badges
@@ -357,6 +359,80 @@ async def sync_local_files(
     )
     
     return MessageResponse(message=f"Synced {synced_count} files successfully")
+
+@router.get("/download/{file_id}")
+async def download_file(
+    file_id: str, 
+    current_user: UserInDB = Depends(get_current_user), 
+    db = Depends(get_database)
+):
+    """Download a file by ID. Only allows users to download their own files."""
+    # Validate file_id format
+    try:
+        uuid.UUID(file_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file ID format"
+        )
+    
+    # Find the file record
+    record = await db.personal_files.find_one({
+        "id": file_id, 
+        "user_id": current_user.id
+    })
+    
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="File not found"
+        )
+    
+    # Check if this is actually a file (not a note or link)
+    if record.get("type") != "file" or not record.get("file_path"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This item is not a downloadable file"
+        )
+    
+    # Construct the full file path
+    file_path = UPLOAD_DIR / record["file_path"]
+    
+    # Security check: ensure the file is within the uploads directory
+    try:
+        file_path.relative_to(UPLOAD_DIR)
+    except ValueError:
+        logger.error(f"Path traversal attempt detected: {file_path}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file path"
+        )
+    
+    # Check if file exists
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="File not found on disk"
+        )
+    
+    # Log download access
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=current_user.id,
+        action="download_file",
+        details={
+            "file_id": file_id,
+            "filename": record.get("title"),
+            "size": record.get("file_size")
+        }
+    )
+    
+    # Return the file with appropriate headers
+    return FileResponse(
+        path=str(file_path),
+        filename=record.get("title", "download"),
+        media_type=record.get("mime_type")
+    )
 
 # Import logging
 logger = logging.getLogger(__name__)
