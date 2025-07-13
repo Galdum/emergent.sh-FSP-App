@@ -236,29 +236,16 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 
 # Add rate limiting middleware
-from backend.security import rate_limiter
-from starlette.status import HTTP_429_TOO_MANY_REQUESTS
+from backend.security import limiter, rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
-class RateLimitMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # Get client identifier (IP or user ID)
-        client_ip = request.client.host if request.client else "unknown"
-        
-        # Check rate limit for sensitive endpoints
-        if request.url.path in ["/api/auth/login", "/api/auth/register", "/api/files/upload"]:
-            max_requests = int(os.environ.get('RATE_LIMIT_REQUESTS', 100))
-            window_minutes = int(os.environ.get('RATE_LIMIT_WINDOW_MINUTES', 60))
-            
-            if not rate_limiter.is_allowed(client_ip, max_requests, window_minutes):
-                return Response(
-                    content="Too many requests",
-                    status_code=HTTP_429_TOO_MANY_REQUESTS
-                )
-        
-        response = await call_next(request)
-        return response
-
-app.add_middleware(RateLimitMiddleware)
+# Add slowapi rate limiting to the app (only if limiter is available)
+if limiter is not None:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+    logger.info("Rate limiting enabled")
+else:
+    logger.warning("Rate limiting disabled - limiter initialization failed")
 
 try:
     from backend.routes.paypal import router as paypal_router

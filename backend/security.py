@@ -235,13 +235,96 @@ def get_allowed_file_types() -> List[str]:
     return [ext.strip() for ext in allowed_types.split(',')]
 
 # Rate limiting utilities
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
+import redis.asyncio as redis
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Initialize Redis connection for rate limiting
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+redis_client = None
+
+async def get_redis_client():
+    """Get Redis client for rate limiting"""
+    global redis_client
+    if redis_client is None:
+        try:
+            redis_client = redis.from_url(redis_url, decode_responses=True)
+            # Test connection
+            await redis_client.ping()
+            logger.info("Redis connection established for rate limiting")
+        except Exception as e:
+            # Fallback to in-memory if Redis is not available
+            logger.warning(f"Redis connection failed: {e}. Falling back to in-memory rate limiting.")
+            return None
+    return redis_client
+
+# Initialize slowapi limiter with error handling
+def create_limiter():
+    """Create limiter with proper error handling"""
+    try:
+        # Try to create limiter with Redis
+        limiter = Limiter(
+            key_func=get_remote_address,
+            storage_uri=redis_url,
+            default_limits=["200 per day", "50 per hour"]
+        )
+        logger.info("Rate limiter initialized with Redis storage")
+        return limiter
+    except Exception as e:
+        logger.error(f"Failed to initialize Redis-based rate limiter: {e}")
+        # Fallback to in-memory storage
+        try:
+            limiter = Limiter(
+                key_func=get_remote_address,
+                default_limits=["200 per day", "50 per hour"]
+            )
+            logger.warning("Rate limiter initialized with in-memory storage (fallback)")
+            return limiter
+        except Exception as fallback_error:
+            logger.error(f"Failed to initialize rate limiter: {fallback_error}")
+            # Return None to disable rate limiting
+            return None
+
+# Create limiter with error handling
+limiter = create_limiter()
+
+# Rate limit exceeded handler
+def rate_limit_exceeded_handler(request, exc):
+    """Handle rate limit exceeded exceptions"""
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={
+            "error": "Rate limit exceeded",
+            "detail": "Too many requests. Please try again later.",
+            "retry_after": exc.retry_after
+        },
+        headers={
+            "Retry-After": str(exc.retry_after),
+            "X-RateLimit-Limit": str(exc.limit),
+            "X-RateLimit-Remaining": str(exc.remaining),
+            "X-RateLimit-Reset": str(exc.reset)
+        }
+    )
+
+# Legacy RateLimiter class for backward compatibility (deprecated)
 class RateLimiter:
     def __init__(self):
         self.requests = {}
         self.cleanup_counter = 0
     
     def is_allowed(self, identifier: str, max_requests: int = 100, window_minutes: int = 60) -> bool:
-        """Check if request is within rate limit"""
+        """Check if request is within rate limit (DEPRECATED - use slowapi instead)"""
+        # This method is kept for backward compatibility but should not be used
+        # The new implementation uses slowapi with Redis
+        print("WARNING: Using deprecated in-memory rate limiter. Use slowapi with Redis instead.")
+        
         now = datetime.utcnow()
         window_start = now - timedelta(minutes=window_minutes)
         
