@@ -14,6 +14,9 @@ from pathlib import Path
 import aiofiles
 import hashlib
 import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 # Import badge awarding functionality
 from backend.routes.badges import check_and_award_badges
@@ -38,6 +41,25 @@ async def scan_file_for_malware(file_path: Path) -> bool:
     except Exception:
         return False
 
+async def scan_bytes_for_malware(chunk: bytes) -> bool:
+    """
+    Basic malware scanning on bytes.
+    In production, integrate with proper antivirus service.
+    """
+    # TODO: Implement actual virus scanning on bytes
+    # For now, just check for common malicious file signatures
+    malicious_signatures = [
+        b'MZ',  # Windows executable
+        b'\x7fELF',  # Linux executable
+        b'\xfe\xed\xfa',  # Mach-O executable
+    ]
+    
+    for signature in malicious_signatures:
+        if chunk.startswith(signature):
+            return False  # Suspicious file type
+    
+    return True
+
 async def calculate_file_hash(file_path: Path) -> str:
     """Calculate SHA256 hash of file for integrity checking."""
     sha256_hash = hashlib.sha256()
@@ -45,6 +67,41 @@ async def calculate_file_hash(file_path: Path) -> str:
         while chunk := await f.read(8192):
             sha256_hash.update(chunk)
     return sha256_hash.hexdigest()
+
+async def stream_file_upload_with_hash_and_scan(
+    file: UploadFile, 
+    file_path: Path, 
+    chunk_size: int = 1024 * 1024  # 1MB chunks
+) -> tuple[str, bool]:
+    """
+    Stream file upload to disk while calculating hash and scanning for malware.
+    Returns (file_hash, scan_passed)
+    """
+    sha256_hash = hashlib.sha256()
+    scan_passed = True
+    first_chunk = True
+    
+    try:
+        async with aiofiles.open(file_path, "wb") as buffer:
+            while chunk := await file.read(chunk_size):
+                # Update hash
+                sha256_hash.update(chunk)
+                
+                # Basic malware scan on first chunk (file headers)
+                if first_chunk and not await scan_bytes_for_malware(chunk):
+                    scan_passed = False
+                    break
+                
+                # Write chunk to disk
+                await buffer.write(chunk)
+                first_chunk = False
+                
+    except Exception as e:
+        # Clean up partial file if write failed
+        file_path.unlink(missing_ok=True)
+        raise e
+    
+    return sha256_hash.hexdigest(), scan_passed
 
 @router.get("/", response_model=List[PersonalFileResponse])
 async def get_personal_files(
@@ -115,7 +172,7 @@ async def upload_file(
     current_user: UserInDB = Depends(get_current_user),
     db = Depends(get_database)
 ):
-    """Upload a file with security validations."""
+    """Upload a file with security validations using efficient streaming."""
     # Sanitize filename
     original_filename = sanitize_filename(file.filename)
     
@@ -127,15 +184,6 @@ async def upload_file(
             detail=f"File type not allowed. Allowed types: {', '.join(allowed_types)}"
         )
     
-    # Check file size
-    file_content = await file.read()
-    if not check_file_size(len(file_content)):
-        max_size = os.environ.get('MAX_FILE_SIZE_MB', 10)
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size exceeds maximum allowed size of {max_size}MB"
-        )
-    
     # Generate unique filename with user namespace
     file_extension = os.path.splitext(original_filename)[1]
     unique_filename = f"{current_user.id}/{uuid.uuid4()}{file_extension}"
@@ -144,18 +192,17 @@ async def upload_file(
     # Create user directory if it doesn't exist
     file_path.parent.mkdir(exist_ok=True, parents=True)
     
-    # Save file to disk
+    # Stream file upload with hash calculation and malware scanning
     try:
-        async with aiofiles.open(file_path, "wb") as buffer:
-            await buffer.write(file_content)
+        file_hash, scan_passed = await stream_file_upload_with_hash_and_scan(file, file_path)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to save file"
         )
     
-    # Scan for malware
-    if not await scan_file_for_malware(file_path):
+    # Check if malware scan passed
+    if not scan_passed:
         # Remove suspicious file
         file_path.unlink(missing_ok=True)
         raise HTTPException(
@@ -163,8 +210,18 @@ async def upload_file(
             detail="File failed security scan"
         )
     
-    # Calculate file hash for integrity
-    file_hash = await calculate_file_hash(file_path)
+    # Get file size from disk
+    file_size = file_path.stat().st_size
+    
+    # Validate file size after upload
+    if not check_file_size(file_size):
+        # Remove oversized file
+        file_path.unlink(missing_ok=True)
+        max_size = os.environ.get('MAX_FILE_SIZE_MB', 10)
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File size exceeds maximum allowed size of {max_size}MB"
+        )
     
     # Create database record
     personal_file = PersonalFile(
@@ -172,7 +229,7 @@ async def upload_file(
         title=original_filename,
         user_id=current_user.id,
         file_path=str(unique_filename),  # Store relative path only
-        file_size=len(file_content),
+        file_size=file_size,
         file_hash=file_hash,
         mime_type=file.content_type
     )
@@ -187,7 +244,7 @@ async def upload_file(
         details={
             "file_id": personal_file.id,
             "filename": original_filename,
-            "size": len(file_content),
+            "size": file_size,
             "type": file.content_type
         },
         ip_address=request.client.host if request.client else None
