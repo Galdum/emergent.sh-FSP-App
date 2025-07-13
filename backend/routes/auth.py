@@ -382,6 +382,7 @@ async def change_password(
 @router.post("/forgot-password", response_model=MessageResponse)
 @limiter.limit("3 per hour")  # Rate limit for password reset requests
 async def forgot_password(
+    request: Request,
     request_data: ForgotPasswordRequest,
     db = Depends(get_database)
 ):
