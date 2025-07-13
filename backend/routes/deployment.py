@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Dict, List
-from backend.auth import get_current_user
 from backend.models import UserInDB
+from backend.auth import get_current_user, get_current_admin_user
+from backend.models_billing import FeatureFlag
 from pydantic import BaseModel
 import os
 import subprocess
@@ -31,19 +32,9 @@ class DeploymentStatus(BaseModel):
     environment: str
     services: Dict[str, str]
 
-async def verify_admin_user(current_user: UserInDB = Depends(get_current_user)):
-    """Verify that the current user is an admin."""
-    admin_emails = [
-        "admin@medicalguidegermany.com",
-        # Add more admin emails as needed
-    ]
-    
-    if current_user.email not in admin_emails:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-    return current_user
+# SECURITY FIX: Removed insecure verify_admin_user function that used hardcoded email list
+# Now using get_current_admin_user which properly checks the is_admin field in the database
+# This prevents anyone from gaining admin access by simply registering with an admin email
 
 @router.get("/version", response_model=VersionInfo)
 async def get_version_info():
@@ -157,7 +148,7 @@ async def get_feature_flags(current_user: UserInDB = Depends(get_current_user)):
 async def toggle_feature_flag(
     flag_name: str,
     enabled: bool,
-    admin_user: UserInDB = Depends(verify_admin_user)
+    admin_user: UserInDB = Depends(get_current_admin_user)
 ):
     """Toggle a feature flag (admin only)."""
     

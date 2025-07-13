@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List, Dict
 from backend.models_billing import AuditLog
-from backend.auth import get_current_user
+from backend.auth import get_current_user, get_current_admin_user
 from backend.database import get_database
 from backend.models import UserInDB
 from backend.services.backup_service import get_backup_service
@@ -10,24 +10,14 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/backup", tags=["backup"])
 
-async def verify_admin_user(current_user: UserInDB = Depends(get_current_user)):
-    """Verify that the current user is an admin."""
-    admin_emails = [
-        "admin@medicalguidegermany.com",
-        # Add more admin emails as needed
-    ]
-    
-    if current_user.email not in admin_emails:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-    return current_user
+# SECURITY FIX: Removed insecure verify_admin_user function that used hardcoded email list
+# Now using get_current_admin_user which properly checks the is_admin field in the database
+# This prevents anyone from gaining admin access by simply registering with an admin email
 
 @router.post("/database")
 async def create_database_backup(
     background_tasks: BackgroundTasks,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Create a database backup."""
@@ -55,7 +45,7 @@ async def create_database_backup(
 
 @router.post("/files")
 async def create_files_backup(
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Create a files backup."""
@@ -82,7 +72,7 @@ async def create_files_backup(
 
 @router.get("/status")
 async def get_backup_status(
-    admin_user: UserInDB = Depends(verify_admin_user)
+    admin_user: UserInDB = Depends(get_current_admin_user)
 ):
     """Get backup status and list of available backups."""
     
@@ -99,7 +89,7 @@ async def get_backup_status(
 @router.post("/restore/{backup_filename}")
 async def restore_database(
     backup_filename: str,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Restore database from backup."""
@@ -127,7 +117,7 @@ async def restore_database(
 @router.post("/cleanup")
 async def cleanup_old_backups(
     keep_days: int = 30,
-    admin_user: UserInDB = Depends(verify_admin_user),
+    admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
     """Clean up old backup files."""
