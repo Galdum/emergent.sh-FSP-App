@@ -72,18 +72,33 @@ async def stream_file_upload_with_hash_and_scan(
     file: UploadFile, 
     file_path: Path, 
     chunk_size: int = 1024 * 1024  # 1MB chunks
-) -> tuple[str, bool]:
+) -> tuple[str, bool, int]:
     """
-    Stream file upload to disk while calculating hash and scanning for malware.
-    Returns (file_hash, scan_passed)
+    Stream file upload to disk while calculating hash, scanning for malware, and validating size.
+    Returns (file_hash, scan_passed, total_size)
     """
     sha256_hash = hashlib.sha256()
     scan_passed = True
     first_chunk = True
+    total_size = 0
+    
+    # Get maximum allowed file size in bytes
+    max_size_mb = int(os.environ.get('MAX_FILE_SIZE_MB', 10))
+    max_size_bytes = max_size_mb * 1024 * 1024
     
     try:
         async with aiofiles.open(file_path, "wb") as buffer:
             while chunk := await file.read(chunk_size):
+                # Check file size during streaming to prevent DoS
+                total_size += len(chunk)
+                if total_size > max_size_bytes:
+                    # Clean up partial file and raise error
+                    file_path.unlink(missing_ok=True)
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail=f"File size exceeds maximum allowed size of {max_size_mb}MB"
+                    )
+                
                 # Update hash
                 sha256_hash.update(chunk)
                 
@@ -96,12 +111,15 @@ async def stream_file_upload_with_hash_and_scan(
                 await buffer.write(chunk)
                 first_chunk = False
                 
+    except HTTPException:
+        # Re-raise HTTP exceptions (like size limit exceeded)
+        raise
     except Exception as e:
         # Clean up partial file if write failed
         file_path.unlink(missing_ok=True)
         raise e
     
-    return sha256_hash.hexdigest(), scan_passed
+    return sha256_hash.hexdigest(), scan_passed, total_size
 
 @router.get("/", response_model=List[PersonalFileResponse])
 async def get_personal_files(
@@ -192,9 +210,12 @@ async def upload_file(
     # Create user directory if it doesn't exist
     file_path.parent.mkdir(exist_ok=True, parents=True)
     
-    # Stream file upload with hash calculation and malware scanning
+    # Stream file upload with hash calculation, malware scanning, and size validation
     try:
-        file_hash, scan_passed = await stream_file_upload_with_hash_and_scan(file, file_path)
+        file_hash, scan_passed, file_size = await stream_file_upload_with_hash_and_scan(file, file_path)
+    except HTTPException:
+        # Re-raise HTTP exceptions (like size limit exceeded)
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -208,19 +229,6 @@ async def upload_file(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="File failed security scan"
-        )
-    
-    # Get file size from disk
-    file_size = file_path.stat().st_size
-    
-    # Validate file size after upload
-    if not check_file_size(file_size):
-        # Remove oversized file
-        file_path.unlink(missing_ok=True)
-        max_size = os.environ.get('MAX_FILE_SIZE_MB', 10)
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size exceeds maximum allowed size of {max_size}MB"
         )
     
     # Create database record
