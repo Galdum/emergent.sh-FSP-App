@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, User, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import LegalModal from './LegalModal';
 
 const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
   const [mode, setMode] = useState(defaultMode); // 'login', 'register', or 'forgot-password'
@@ -14,8 +13,6 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
   const [message, setMessage] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
-  const [showLegal, setShowLegal] = useState(false);
-  const [legalTab, setLegalTab] = useState('terms');
 
   const { login, register } = useAuth();
 
@@ -249,16 +246,14 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
                 />
                 <span>
                   Sunt de acord cu{' '}
-                  <button
-                    type="button"
+                  <a
+                    href="/termeni.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-blue-600 underline hover:text-blue-800"
-                    onClick={() => {
-                      setLegalTab('terms');
-                      setShowLegal(true);
-                    }}
                   >
                     Termenii și Condițiile
-                  </button>
+                  </a>
                 </span>
               </label>
 
@@ -272,16 +267,14 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
                 />
                 <span>
                   Sunt de acord cu{' '}
-                  <button
-                    type="button"
+                  <a
+                    href="/confidentialitate.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-blue-600 underline hover:text-blue-800"
-                    onClick={() => {
-                      setLegalTab('privacy');
-                      setShowLegal(true);
-                    }}
                   >
                     Politica de Confidențialitate
-                  </button>
+                  </a>
                 </span>
               </label>
             </div>
@@ -355,12 +348,7 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
           </div>
         )}
 
-        <LegalModal
-          isOpen={showLegal}
-          onClose={() => setShowLegal(false)}
-          initialTab={legalTab}
-          hideTabs={true}
-        />
+
       </div>
     </div>
   );
