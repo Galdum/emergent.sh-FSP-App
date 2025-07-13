@@ -20,6 +20,9 @@ from datetime import datetime
 # Import badge awarding functionality
 from backend.routes.badges import check_and_award_badges
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/files", tags=["personal_files"])
 
 # Create uploads directory if it doesn't exist
@@ -433,6 +436,3 @@ async def download_file(
         filename=record.get("title", "download"),
         media_type=record.get("mime_type")
     )
-
-# Import logging
-logger = logging.getLogger(__name__)
