@@ -295,6 +295,15 @@ def create_limiter():
 # Create limiter with error handling
 limiter = create_limiter()
 
+# Safe rate limiting decorator
+def safe_rate_limit(limit_string: str):
+    """Safe rate limiting decorator that only applies when limiter is available"""
+    def decorator(func):
+        if limiter is not None:
+            return limiter.limit(limit_string)(func)
+        return func
+    return decorator
+
 # Rate limit exceeded handler
 def rate_limit_exceeded_handler(request, exc):
     """Handle rate limit exceeded exceptions"""
@@ -312,53 +321,6 @@ def rate_limit_exceeded_handler(request, exc):
             "X-RateLimit-Reset": str(exc.reset)
         }
     )
-
-# Legacy RateLimiter class for backward compatibility (deprecated)
-class RateLimiter:
-    def __init__(self):
-        self.requests = {}
-        self.cleanup_counter = 0
-    
-    def is_allowed(self, identifier: str, max_requests: int = 100, window_minutes: int = 60) -> bool:
-        """Check if request is within rate limit (DEPRECATED - use slowapi instead)"""
-        # This method is kept for backward compatibility but should not be used
-        # The new implementation uses slowapi with Redis
-        print("WARNING: Using deprecated in-memory rate limiter. Use slowapi with Redis instead.")
-        
-        now = datetime.utcnow()
-        window_start = now - timedelta(minutes=window_minutes)
-        
-        if identifier not in self.requests:
-            self.requests[identifier] = []
-        
-        # Remove old requests
-        self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier]
-            if req_time > window_start
-        ]
-        
-        # Periodic cleanup to prevent memory leak
-        self.cleanup_counter += 1
-        if self.cleanup_counter > 1000:
-            self._cleanup_old_entries(window_start)
-            self.cleanup_counter = 0
-        
-        # Check if under limit
-        if len(self.requests[identifier]) < max_requests:
-            self.requests[identifier].append(now)
-            return True
-        
-        return False
-    
-    def _cleanup_old_entries(self, cutoff_time: datetime):
-        """Remove entries older than cutoff time"""
-        identifiers_to_remove = []
-        for identifier, timestamps in self.requests.items():
-            if not timestamps or max(timestamps) < cutoff_time:
-                identifiers_to_remove.append(identifier)
-        
-        for identifier in identifiers_to_remove:
-            del self.requests[identifier]
 
 # Input validation utilities
 def validate_email(email: str) -> bool:
@@ -385,4 +347,3 @@ def validate_bundesland(bundesland: str) -> bool:
 # Initialize global instances
 security_manager = SecurityManager()
 data_encryption = DataEncryption()
-rate_limiter = RateLimiter()

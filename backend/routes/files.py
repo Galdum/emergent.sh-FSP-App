@@ -6,7 +6,7 @@ from backend.database import get_database
 from backend.models import UserInDB
 from backend.security import (
     sanitize_filename, validate_file_type, check_file_size, 
-    get_allowed_file_types, AuditLogger, limiter
+    get_allowed_file_types, AuditLogger, safe_rate_limit
 )
 import os
 import uuid
@@ -109,7 +109,7 @@ async def create_personal_file(
     return PersonalFileResponse(**personal_file.dict())
 
 @router.post("/upload", response_model=PersonalFileResponse)
-@limiter.limit("20 per hour")  # Rate limit for file uploads
+@safe_rate_limit("20 per hour")  # Rate limit for file uploads
 async def upload_file(
     request: Request,
     file: UploadFile = File(...),
