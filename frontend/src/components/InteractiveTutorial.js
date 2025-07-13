@@ -24,6 +24,71 @@ const TutorialSpotlight = ({ elementPosition, isVisible }) => {
   );
 };
 
+// Floating arrow component to point to highlighted elements
+const TutorialArrow = ({ elementPosition, position, isVisible }) => {
+  if (!isVisible || !elementPosition) return null;
+
+  const getArrowPosition = () => {
+    const offset = 30;
+    const arrowSize = 24;
+    
+    switch (position) {
+      case 'top':
+        return {
+          left: elementPosition.centerX - arrowSize / 2,
+          top: elementPosition.top - offset - arrowSize,
+          transform: 'rotate(180deg)'
+        };
+      case 'bottom':
+        return {
+          left: elementPosition.centerX - arrowSize / 2,
+          top: elementPosition.top + elementPosition.height + offset,
+          transform: 'rotate(0deg)'
+        };
+      case 'left':
+        return {
+          left: elementPosition.left - offset - arrowSize,
+          top: elementPosition.centerY - arrowSize / 2,
+          transform: 'rotate(90deg)'
+        };
+      case 'right':
+        return {
+          left: elementPosition.left + elementPosition.width + offset,
+          top: elementPosition.centerY - arrowSize / 2,
+          transform: 'rotate(-90deg)'
+        };
+      default:
+        return {
+          left: elementPosition.centerX - arrowSize / 2,
+          top: elementPosition.top - offset - arrowSize,
+          transform: 'rotate(180deg)'
+        };
+    }
+  };
+
+  const arrowStyle = getArrowPosition();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{ duration: 0.3 }}
+      className="tutorial-arrow"
+      style={{
+        position: 'fixed',
+        zIndex: 102,
+        pointerEvents: 'none',
+        ...arrowStyle
+      }}
+    >
+      <div className="bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce">
+        <ArrowDown size={24} />
+      </div>
+    </motion.div>
+  );
+};
+
 const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -41,7 +106,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     },
     {
       title: 'Manager Documente & Asistent AI',
-      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Aici găsești și Asistentul AI care te ajută cu întrebări despre Approbation & FSP.',
+      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Aici găsești și Asistentul AI care te ajută cu întrebări despre Approbation & FSP. (Poți da click după tutorial pentru a-l deschide)',
       target: '[title="Dosarul Meu Personal"]',
       position: 'left',
       action: 'highlight_personal_files',
@@ -110,9 +175,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     if (!action) return;
     
     // Remove any existing highlights first
-    document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
-      el.classList.remove('tutorial-highlight', 'tutorial-ring');
-    });
+    cleanupAllTutorialElements();
 
     switch (action) {
       case 'highlight_personal_files':
@@ -122,13 +185,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
           personalFileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
           // Add pulse effect
           personalFileBtn.style.animation = 'pulse 2s infinite';
-          
-          // Open the Personal Files modal to show the AI assistant
-          setTimeout(() => {
-            if (personalFileBtn && personalFileBtn.click) {
-              personalFileBtn.click();
-            }
-          }, 1000);
+          // Note: Removed auto-click to prevent hidden modals during tutorial
         }
         break;
         
@@ -234,12 +291,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       return () => clearTimeout(timer);
     } else {
       // Clean up highlights when no target
-      document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
-        el.classList.remove('tutorial-highlight', 'tutorial-ring');
-        if (el.style) {
-          el.style.animation = '';
-        }
-      });
+      cleanupAllTutorialElements();
     }
   }, [currentStep, isOpen, currentStepData.target, currentStepData.action, updateElementPosition, handleStepAction]);
 
@@ -266,30 +318,58 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   };
 
   const handleComplete = () => {
-    // Clean up highlights and animations
-    document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
-      el.classList.remove('tutorial-highlight', 'tutorial-ring');
-      if (el.style) {
-        el.style.animation = '';
-      }
-    });
-    
+    // Enhanced cleanup of highlights and animations
+    cleanupAllTutorialElements();
     localStorage.setItem('tutorialViewed', 'true');
     onComplete?.();
     onClose();
   };
 
   const handleSkip = () => {
-    // Clean up highlights and animations
+    // Enhanced cleanup of highlights and animations
+    cleanupAllTutorialElements();
+    localStorage.setItem('tutorialViewed', 'true');
+    onClose();
+  };
+
+  // Enhanced cleanup function to ensure all tutorial elements are properly reset
+  const cleanupAllTutorialElements = () => {
+    // Remove tutorial highlight classes
     document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
       el.classList.remove('tutorial-highlight', 'tutorial-ring');
       if (el.style) {
         el.style.animation = '';
+        el.style.outline = '';
+        el.style.boxShadow = '';
+        el.style.background = '';
       }
     });
-    
-    localStorage.setItem('tutorialViewed', 'true');
-    onClose();
+
+    // Explicitly target specific elements that might have been highlighted
+    const specificSelectors = [
+      '[title="Dosarul Meu Personal"]',
+      '[title="Setări"]',
+      '.step-node',
+      '.bonus-node',
+      '.progress-toggle-mobile',
+      '.fixed.bottom-20'
+    ];
+
+    specificSelectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(el => {
+        el.classList.remove('tutorial-highlight', 'tutorial-ring');
+        if (el.style) {
+          el.style.animation = '';
+          el.style.outline = '';
+          el.style.boxShadow = '';
+          el.style.background = '';
+        }
+      });
+    });
+
+    // Remove any tutorial-related CSS classes from body
+    document.body.classList.remove('tutorial-open');
   };
 
   const getModalPosition = () => {
@@ -399,15 +479,16 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         .tutorial-highlight {
           position: relative !important;
           z-index: 105 !important;
-          outline: 3px solid #3b82f6 !important;
-          outline-offset: 4px !important;
+          outline: 4px solid #3b82f6 !important;
+          outline-offset: 6px !important;
           border-radius: 12px !important;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+          box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3), 0 0 30px rgba(59, 130, 246, 0.4) !important;
           animation: tutorialHighlight 2s infinite !important;
+          background: rgba(59, 130, 246, 0.15) !important;
         }
         @keyframes tutorialHighlight {
-          0%, 100% { outline-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.3); }
-          50% { outline-color: #1d4ed8; box-shadow: 0 0 0 6px rgba(29, 78, 216, 0.3), 0 0 30px rgba(29, 78, 216, 0.4); }
+          0%, 100% { outline-color: #3b82f6; box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3), 0 0 30px rgba(59, 130, 246, 0.4); }
+          50% { outline-color: #1d4ed8; box-shadow: 0 0 0 8px rgba(29, 78, 216, 0.4), 0 0 40px rgba(29, 78, 216, 0.5); }
         }
         @keyframes pulse {
           0%, 100% { transform: scale(1); }
@@ -422,6 +503,8 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       if (existingStyle) {
         existingStyle.remove();
       }
+      // Clean up any remaining highlights when tutorial closes
+      cleanupAllTutorialElements();
     }
     
     return () => {
@@ -430,6 +513,8 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       if (existingStyle) {
         existingStyle.remove();
       }
+      // Clean up any remaining highlights on component unmount
+      cleanupAllTutorialElements();
     };
   }, [isOpen]);
 
@@ -448,6 +533,13 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         {/* Add spotlight effect */}
         <TutorialSpotlight 
           elementPosition={elementPosition} 
+          isVisible={currentStepData.showSpotlight && !!elementPosition} 
+        />
+        
+        {/* Add floating arrow */}
+        <TutorialArrow 
+          elementPosition={elementPosition} 
+          position={currentStepData.position}
           isVisible={currentStepData.showSpotlight && !!elementPosition} 
         />
         
