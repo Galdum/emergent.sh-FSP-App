@@ -18,7 +18,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # JWT settings
-JWT_SECRET = os.environ.get("JWT_SECRET", "preview-secret")
+JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "preview-secret")
 JWT_ALGORITHM = "HS256"
 
 app = FastAPI(
