@@ -106,18 +106,18 @@ class SecurityManager:
         to_encode.update({"exp": expire})
         
         # Get secret from environment - no fallback
-        secret_key = os.environ.get("JWT_SECRET")
+        secret_key = os.environ.get("JWT_SECRET_KEY")
         if not secret_key:
-            raise ValueError("JWT_SECRET environment variable must be set")
+            raise ValueError("JWT_SECRET_KEY environment variable must be set")
             
         return jwt.encode(to_encode, secret_key, algorithm="HS256")
     
     def verify_jwt_token(self, token: str) -> dict:
         """Verify and decode JWT token"""
         try:
-            secret_key = os.environ.get("JWT_SECRET")
+            secret_key = os.environ.get("JWT_SECRET_KEY")
             if not secret_key:
-                raise ValueError("JWT_SECRET environment variable must be set")
+                raise ValueError("JWT_SECRET_KEY environment variable must be set")
                 
             payload = jwt.decode(token, secret_key, algorithms=["HS256"])
             return payload
