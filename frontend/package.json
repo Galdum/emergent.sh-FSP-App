@@ -11,11 +11,11 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "5.0.1"
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "start": "set \"SKIP_PREFLIGHT_CHECK=true\" && react-scripts start",
+    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
     "build:enhanced": "node scripts/simple-enhanced-build.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -41,7 +41,9 @@
     "postcss": "^8.4.31",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
-    "fork-ts-checker-webpack-plugin": "^9.0.2"
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "webpack": "^5.89.0",
+    "terser-webpack-plugin": "^5.3.9"
   },
   "browserslist": {
     "production": [

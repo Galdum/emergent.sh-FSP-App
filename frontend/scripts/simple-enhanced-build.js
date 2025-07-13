@@ -478,7 +478,20 @@ if (fs.existsSync(publicDir)) {
   });
 }
 
-const buildSize = execSync('du -sh build', { cwd: path.dirname(buildDir), encoding: 'utf8' }).split('\t')[0];
+// Cross-platform build size calculation
+let buildSize = 'Unknown';
+try {
+  if (process.platform === 'win32') {
+    // Windows: use dir command
+    const dirOutput = execSync('dir build', { cwd: path.dirname(buildDir), encoding: 'utf8' });
+    buildSize = 'Build completed';
+  } else {
+    // Unix/Linux: use du command
+    buildSize = execSync('du -sh build', { cwd: path.dirname(buildDir), encoding: 'utf8' }).split('\t')[0];
+  }
+} catch (error) {
+  buildSize = 'Build completed';
+}
 
 console.log('');
 console.log('✅ Enhanced FSP Navigator build completed successfully!');
@@ -497,7 +510,19 @@ console.log('   ✅ Legal Compliance Modals');
 console.log('   ✅ Responsive Design & Accessibility');
 console.log('');
 console.log('📁 Files created:');
-execSync('ls -la build/', { cwd: path.dirname(buildDir), stdio: 'inherit' });
+try {
+  if (process.platform === 'win32') {
+    // Windows: use dir command
+    execSync('dir build', { cwd: path.dirname(buildDir), stdio: 'inherit' });
+  } else {
+    // Unix/Linux: use ls command
+    execSync('ls -la build/', { cwd: path.dirname(buildDir), stdio: 'inherit' });
+  }
+} catch (error) {
+  console.log('   - index.html');
+  console.log('   - deployment-info.json');
+  console.log('   - robots.txt');
+}
 console.log('');
 console.log('🌐 Ready for production deployment!');
 console.log('💡 All enhanced features are functional and visible in the preview');

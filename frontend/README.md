@@ -2,6 +2,41 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Node.js Compatibility
+
+This project is compatible with Node.js 18+ and has been tested with Node.js 22. The recommended Node.js version is **18.19.0** (LTS).
+
+### Node.js Version Management
+
+If you're using `nvm` (Node Version Manager), you can automatically switch to the correct version:
+
+```bash
+nvm use
+```
+
+Or install the recommended version:
+
+```bash
+nvm install 18.19.0
+nvm use 18.19.0
+```
+
+### Troubleshooting Node.js Issues
+
+If you encounter build errors related to Node.js compatibility:
+
+1. **Use Node.js 18 LTS** (recommended for stability)
+2. **Clear npm cache**: `npm cache clean --force`
+3. **Delete node_modules and reinstall**: 
+   ```bash
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+4. **Use the enhanced build scripts** if standard build fails:
+   ```bash
+   npm run build:enhanced
+   ```
+
 ## Available Scripts
 
 In the project directory, you can run:
