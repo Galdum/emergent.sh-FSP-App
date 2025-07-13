@@ -19,28 +19,11 @@ class DataEncryption:
         self.fernet = Fernet(self.encryption_key)
     
     def _get_or_create_key(self):
-        """Get encryption key from environment or generate new one"""
-        # Try to get key from environment first
+        """Get encryption key from environment"""
         env_key = os.environ.get('ENCRYPTION_KEY')
-        if env_key:
-            return env_key.encode()
-        
-        # For development only - in production, key should be in environment
-        if os.environ.get('ENVIRONMENT') == 'development':
-            key_file = os.path.join(os.path.dirname(__file__), '.encryption_key')
-            
-            if os.path.exists(key_file):
-                with open(key_file, "rb") as f:
-                    return f.read()
-            else:
-                # Generate new key
-                key = Fernet.generate_key()
-                with open(key_file, "wb") as f:
-                    f.write(key)
-                os.chmod(key_file, 0o600)  # Restrict file permissions
-                return key
-        else:
-            raise ValueError("ENCRYPTION_KEY environment variable must be set in production")
+        if not env_key:
+            raise ValueError("ENCRYPTION_KEY environment variable must be set (no auto-generation).")
+        return env_key.encode()
     
     def encrypt_data(self, data: str) -> str:
         """Encrypt sensitive data"""
