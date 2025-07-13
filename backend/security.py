@@ -235,13 +235,58 @@ def get_allowed_file_types() -> List[str]:
     return [ext.strip() for ext in allowed_types.split(',')]
 
 # Rate limiting utilities
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+import redis.asyncio as redis
+import os
+
+# Initialize Redis connection for rate limiting
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+redis_client = None
+
+async def get_redis_client():
+    """Get Redis client for rate limiting"""
+    global redis_client
+    if redis_client is None:
+        try:
+            redis_client = redis.from_url(redis_url, decode_responses=True)
+            # Test connection
+            await redis_client.ping()
+        except Exception as e:
+            # Fallback to in-memory if Redis is not available
+            print(f"Redis connection failed: {e}. Falling back to in-memory rate limiting.")
+            return None
+    return redis_client
+
+# Initialize slowapi limiter with Redis storage
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri=redis_url,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+# Rate limit exceeded handler
+def rate_limit_exceeded_handler(request, exc):
+    """Handle rate limit exceeded exceptions"""
+    return {
+        "error": "Rate limit exceeded",
+        "detail": "Too many requests. Please try again later.",
+        "retry_after": exc.retry_after
+    }
+
+# Legacy RateLimiter class for backward compatibility (deprecated)
 class RateLimiter:
     def __init__(self):
         self.requests = {}
         self.cleanup_counter = 0
     
     def is_allowed(self, identifier: str, max_requests: int = 100, window_minutes: int = 60) -> bool:
-        """Check if request is within rate limit"""
+        """Check if request is within rate limit (DEPRECATED - use slowapi instead)"""
+        # This method is kept for backward compatibility but should not be used
+        # The new implementation uses slowapi with Redis
+        print("WARNING: Using deprecated in-memory rate limiter. Use slowapi with Redis instead.")
+        
         now = datetime.utcnow()
         window_start = now - timedelta(minutes=window_minutes)
         
