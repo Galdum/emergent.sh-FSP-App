@@ -8,6 +8,7 @@ from backend.auth import get_current_user
 from backend.database import get_database
 from backend.models import UserInDB
 from backend.services.stripe_service import get_stripe_service
+from backend.security import safe_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ async def get_subscription_plans():
     return await get_stripe_service().get_subscription_plans()
 
 @router.post("/checkout", response_model=CheckoutSessionResponse)
+@safe_rate_limit("5 per hour")  # Rate limit for checkout sessions to prevent abuse
 async def create_checkout_session(
     request: Request,
     checkout_data: CheckoutSessionCreate,
