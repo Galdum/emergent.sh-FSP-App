@@ -187,7 +187,7 @@ class DownloadEndpointTester:
         
         # Try to download without token
         response = requests.get(f"{API_BASE_URL}/api/files/download/{self.uploaded_file_id}")
-        if response.status_code == 401:
+        if response.status_code in [401, 403]:  # FastAPI can return either for missing auth
             print("✅ Unauthorized access properly rejected (no token)")
         else:
             print(f"❌ Unauthorized access not properly rejected: {response.status_code}")
@@ -234,9 +234,11 @@ class DownloadEndpointTester:
             if not self.start_server():
                 return False
             
-            # Register user
+            # Register user (or login if already exists)
             if not self.register_user():
-                return False
+                print("👤 User already exists, trying to login...")
+                if not self.login_user():
+                    return False
             
             # List files (should be empty)
             self.list_files()
