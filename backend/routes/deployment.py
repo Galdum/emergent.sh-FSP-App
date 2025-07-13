@@ -80,8 +80,7 @@ async def get_deployment_status():
     # Check Redis status
     try:
         from backend.redis_config import test_redis_connection
-        import asyncio
-        redis_available = asyncio.run(test_redis_connection())
+        redis_available = await test_redis_connection()
         services["redis"] = "running" if redis_available else "unavailable"
     except Exception as e:
         services["redis"] = f"error: {str(e)}"

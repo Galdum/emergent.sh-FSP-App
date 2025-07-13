@@ -239,9 +239,13 @@ app.add_middleware(SecurityHeadersMiddleware)
 from backend.security import limiter, rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-# Add slowapi rate limiting to the app
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+# Add slowapi rate limiting to the app (only if limiter is available)
+if limiter is not None:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+    logger.info("Rate limiting enabled")
+else:
+    logger.warning("Rate limiting disabled - limiter initialization failed")
 
 try:
     from backend.routes.paypal import router as paypal_router
