@@ -8,9 +8,10 @@ import os
 
 from ..models import (
     GameResult, GameResultCreate, GameResultResponse, ClinicalCase, 
-    FachbegriffTerm, UserGameStats, Leaderboard, GameType
+    FachbegriffTerm, UserGameStats, Leaderboard, GameType, UserInDB
 )
-from ..auth import get_current_user, UserInDB
+from ..auth import get_current_user, get_current_admin_user
+from ..database import get_database
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -294,14 +295,9 @@ async def update_user_game_stats(user_id: str, game_result: GameResult):
 
 @router.post("/initialize-sample-data")
 async def initialize_sample_data(
-    current_user: UserInDB = Depends(get_current_user)
+    admin_user: UserInDB = Depends(get_current_admin_user)
 ):
     """Initialize sample data for mini-games (admin only)."""
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can initialize sample data"
-        )
     
     try:
         # Sample clinical cases
@@ -356,7 +352,7 @@ async def initialize_sample_data(
                 },
                 "difficulty": "medium",
                 "category": "cardiology",
-                "created_by": current_user.id,
+                "created_by": admin_user.id,
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat(),
                 "is_active": True
@@ -373,7 +369,7 @@ async def initialize_sample_data(
                 "options": ["Herzinfarkt", "Herzrhythmusstörung", "Herzinsuffizienz", "Herzklappendefekt"],
                 "explanation": "Der Myokardinfarkt ist der medizinische Fachbegriff für den umgangssprachlichen Herzinfarkt - das Absterben von Herzmuskelgewebe.",
                 "difficulty": "medium",
-                "created_by": current_user.id,
+                "created_by": admin_user.id,
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat(),
                 "is_active": True
@@ -386,7 +382,7 @@ async def initialize_sample_data(
                 "options": ["Atemnot", "Husten", "Brustschmerzen", "Herzrasen"],
                 "explanation": "Dyspnoe bezeichnet medizinisch die subjektiv empfundene Atemnot oder Luftnot.",
                 "difficulty": "easy",
-                "created_by": current_user.id,
+                "created_by": admin_user.id,
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat(),
                 "is_active": True
