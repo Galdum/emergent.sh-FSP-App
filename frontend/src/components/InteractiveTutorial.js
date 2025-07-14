@@ -1,69 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, ArrowRight, ArrowLeft, Check, ArrowDown, ArrowUp, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Check, ArrowDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Enhanced cleanup function to ensure all tutorial elements are properly reset
-const cleanupAllTutorialElements = () => {
-  // Remove tutorial highlight classes
-  document.querySelectorAll('.tutorial-highlight, .tutorial-ring, .tutorial-spotlight-active').forEach(el => {
-    el.classList.remove('tutorial-highlight', 'tutorial-ring', 'tutorial-spotlight-active');
-    if (el.style) {
-      el.style.animation = '';
-      el.style.outline = '';
-      el.style.boxShadow = '';
-      el.style.background = '';
-      el.style.zIndex = '';
-      el.style.position = '';
-      el.style.transform = '';
-      el.style.filter = '';
-    }
+// Simple cleanup function
+const cleanupTutorial = () => {
+  // Remove all tutorial styles
+  document.querySelectorAll('.tutorial-highlight').forEach(el => {
+    el.classList.remove('tutorial-highlight');
+    el.style.cssText = '';
   });
-
-  // Explicitly target specific elements that might have been highlighted
-  const specificSelectors = [
-    '[title="Dosarul Meu Personal"]',
-    '[title="Setări"]',
-    '.step-node',
-    '.bonus-node',
-    '.step-node-mobile',
-    '.bonus-node-mobile',
-    '.progress-toggle-mobile',
-    '.fixed.bottom-20',
-    'g.step-node-mobile',
-    'g.bonus-node-mobile',
-    'g:has(.step-node)',
-    'g:has(.bonus-node)'
-  ];
-
-  specificSelectors.forEach(selector => {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(el => {
-      el.classList.remove('tutorial-highlight', 'tutorial-ring', 'tutorial-spotlight-active');
-      if (el.style) {
-        el.style.animation = '';
-        el.style.outline = '';
-        el.style.boxShadow = '';
-        el.style.background = '';
-        el.style.zIndex = '';
-        el.style.position = '';
-        el.style.transform = '';
-        el.style.filter = '';
-      }
-    });
-  });
-
-  // Remove any tutorial-related CSS classes from body
-  document.body.classList.remove('tutorial-open');
   
-  // Remove blur from all elements
-  document.querySelectorAll('*').forEach(el => {
-    if (el.style && el.style.filter && el.style.filter.includes('blur')) {
-      el.style.filter = el.style.filter.replace(/blur\([^)]*\)/g, '').trim();
-      if (!el.style.filter) {
-        el.style.filter = '';
-      }
-    }
-  });
+  // Remove tutorial styles
+  const tutorialStyle = document.getElementById('tutorial-styles');
+  if (tutorialStyle) {
+    tutorialStyle.remove();
+  }
+  
+  document.body.classList.remove('tutorial-active');
 };
 
 // Simple spotlight - just highlight the element, don't blur anything else
