@@ -734,19 +734,21 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm"
       >
-        {/* Add spotlight effect */}
+        {/* Enhanced spotlight effect */}
         <TutorialSpotlight 
           elementPosition={elementPosition} 
-          isVisible={currentStepData.showSpotlight && !!elementPosition} 
+          isVisible={currentStepData.showSpotlight && !!elementPosition}
+          currentStep={currentStep}
         />
         
-        {/* Add floating arrow */}
+        {/* Enhanced floating arrow */}
         <TutorialArrow 
           elementPosition={elementPosition} 
           position={currentStepData.position}
-          isVisible={currentStepData.showSpotlight && !!elementPosition} 
+          isVisible={currentStepData.showSpotlight && !!elementPosition}
+          stepData={currentStepData}
         />
         
         <motion.div
