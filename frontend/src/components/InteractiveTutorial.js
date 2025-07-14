@@ -19,317 +19,177 @@ const cleanupTutorial = () => {
   document.body.classList.remove('tutorial-active');
 };
 
-// Simple spotlight - just highlight the element, don't blur anything else
-const TutorialSpotlight = ({ elementPosition, isVisible }) => {
-  if (!isVisible || !elementPosition) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="tutorial-spotlight-ring"
-      style={{
-        position: 'fixed',
-        top: elementPosition.top - 20,
-        left: elementPosition.left - 20,
-        width: elementPosition.width + 40,
-        height: elementPosition.height + 40,
-        border: '4px solid #3b82f6',
-        borderRadius: '12px',
-        boxShadow: '0 0 0 8px rgba(59, 130, 246, 0.3), 0 0 30px rgba(59, 130, 246, 0.5)',
-        zIndex: 104,
-        pointerEvents: 'none',
-        animation: 'tutorialPulse 2s infinite'
-      }}
-    />
-  );
-};
-
-// Simple arrow - only show when it makes sense
-const TutorialArrow = ({ elementPosition, position, isVisible, stepData }) => {
-  if (!isVisible || !elementPosition || !shouldShowArrow(stepData)) return null;
-
-  const getArrowStyle = () => {
-    const offset = 50;
-    
-    switch (position) {
-      case 'top':
-        return {
-          top: elementPosition.top - offset,
-          left: elementPosition.centerX - 15,
-          transform: 'rotate(180deg)'
-        };
-      case 'bottom':
-        return {
-          top: elementPosition.bottom + 20,
-          left: elementPosition.centerX - 15,
-          transform: 'rotate(0deg)'
-        };
-      case 'left':
-        return {
-          top: elementPosition.centerY - 15,
-          left: elementPosition.left - offset,
-          transform: 'rotate(90deg)'
-        };
-      case 'right':
-        return {
-          top: elementPosition.centerY - 15,
-          left: elementPosition.right + 20,
-          transform: 'rotate(-90deg)'
-        };
-      default:
-        return null;
-    }
-  };
-
-  const arrowStyle = getArrowStyle();
-  if (!arrowStyle) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8 }}
-      transition={{ duration: 0.3 }}
-      className="tutorial-arrow"
-      style={{
-        position: 'fixed',
-        zIndex: 105,
-        pointerEvents: 'none',
-        ...arrowStyle
-      }}
-    >
-      <div className="bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce">
-        <ArrowDown size={20} />
-      </div>
-    </motion.div>
-  );
-};
-
-// Helper function to determine if arrow should be shown
-const shouldShowArrow = (stepData) => {
-  if (!stepData || !stepData.target) return false;
-  
-  // Only show arrow for specific steps that need pointing
-  const arrowSteps = ['highlight_settings', 'highlight_toggle_bar', 'highlight_personal_files'];
-  return arrowSteps.includes(stepData.action);
-};
-
 const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [elementPosition, setElementPosition] = useState(null);
-  const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [highlightedElement, setHighlightedElement] = useState(null);
 
   const tutorialSteps = [
     {
       title: 'Bine ai venit la FSP Navigator! 👋',
       content: 'În următoarele secunde îți arătăm locurile cheie din aplicație pentru un start rapid.',
       target: null,
-      position: 'center',
-      action: null,
-      showSpotlight: false,
+      showArrow: false,
     },
     {
       title: 'Manager Documente & Asistent AI',
-      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Aici găsești și Asistentul AI care te ajută cu întrebări despre Approbation & FSP. (Poți da click după tutorial pentru a-l deschide)',
+      content: 'Încarcă rapid rapoarte, diplome și notițe în acest hub personal. Aici găsești și Asistentul AI care te ajută cu întrebări despre Approbation & FSP.',
       target: '[title="Dosarul Meu Personal"]',
-      position: 'left',
-      action: 'highlight_personal_files',
-      showSpotlight: true,
+      showArrow: true,
     },
     {
       title: 'Progres & Checklist',
       content: 'Urmărește aici fiecare pas finalizat şi ce mai ai de făcut. Fiecare nod albastru reprezintă un pas important în procesul de Approbation.',
       target: '.step-node',
-      position: 'bottom',
-      action: 'highlight_progress_steps',
-      showSpotlight: true,
+      showArrow: false,
     },
     {
       title: 'Noduri Bonus cu Resurse',
       content: 'Nodurile portocalii conțin resurse bonus: Hub-ul de Informații, Generatorul de Email-uri și Recomandatorul de Landuri.',
       target: '.bonus-node',
-      position: 'top',
-      action: 'highlight_bonus_nodes',
-      showSpotlight: true,
+      showArrow: false,
     },
     {
       title: 'Toggle Bar - Moduri de Navigare',
-      content: 'Aici poți comuta între modul Progresiv (pas cu pas) și modul Liber (acces la toate nodurile). Modul Progresiv te ghidează step-by-step.',
-      target: '.progress-toggle-mobile, .fixed.bottom-20',
-      position: 'top',
-      action: 'highlight_toggle_bar',
-      showSpotlight: true,
+      content: 'Aici poți comuta între modul Progresiv (pas cu pas) și modul Liber (acces la toate nodurile).',
+      target: '.fixed.bottom-20',
+      showArrow: true,
     },
     {
       title: 'Setări și Informații Personale',
       content: 'În Setări poți actualiza informațiile personale, schimba parola, administra abonamentul și descărca datele tale.',
       target: '[title="Setări"]',
-      position: 'left',
-      action: 'highlight_settings',
-      showSpotlight: true,
+      showArrow: true,
     },
     {
       title: 'Totul pregătit!',
       content: 'Perfect! Acum știi unde să găsești toate funcționalitățile importante. Poţi relua tutorialul din meniul de setări oricând 🥳',
       target: null,
-      position: 'center',
-      action: null,
-      showSpotlight: false,
+      showArrow: false,
     },
   ];
 
   const currentStepData = tutorialSteps[currentStep];
 
-  // Update viewport size on resize
-  useEffect(() => {
-    const handleResize = () => {
-      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
-      // Recalculate element position on resize
-      if (currentStepData.target) {
-        updateElementPosition();
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [currentStepData.target]);
+  // Find and highlight element
+  const findAndHighlightElement = useCallback((target) => {
+    if (!target) {
+      setHighlightedElement(null);
+      return;
+    }
 
-  // Simple highlighting - just make elements visible and pulsing
-  const handleStepAction = useCallback((action) => {
-    if (!action) return;
+    let element = document.querySelector(target);
     
-    // Remove any existing highlights first
-    cleanupAllTutorialElements();
+    // Fallback selectors for step and bonus nodes
+    if (!element && target === '.step-node') {
+      element = document.querySelector('.step-node-mobile') || 
+                document.querySelector('g.step-node') || 
+                document.querySelector('circle[class*="fill-blue-500"]') ||
+                document.querySelector('circle[class*="fill-green-500"]');
+    }
+    
+    if (!element && target === '.bonus-node') {
+      element = document.querySelector('.bonus-node-mobile') || 
+                document.querySelector('g.bonus-node') || 
+                document.querySelector('circle[class*="fill-orange-500"]');
+    }
 
-    const addHighlight = (element) => {
-      if (!element) return;
+    if (!element && target === '.fixed.bottom-20') {
+      element = document.querySelector('.progress-toggle-mobile') || 
+                document.querySelector('[class*="fixed"][class*="bottom"]');
+    }
+
+    if (element) {
+      // Clear previous highlights
+      cleanupTutorial();
       
-      element.style.position = 'relative';
-      element.style.zIndex = '106';
-      element.style.outline = '4px solid #3b82f6';
-      element.style.outlineOffset = '4px';
-      element.style.borderRadius = '8px';
-      element.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.5)';
-      element.style.animation = 'tutorialPulse 2s infinite';
+      // Add highlight
+      element.classList.add('tutorial-highlight');
       
-      // Make sure element is visible
+      // Scroll to element
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
-
-    switch (action) {
-      case 'highlight_personal_files':
-        const personalFileBtn = document.querySelector('[title="Dosarul Meu Personal"]');
-        addHighlight(personalFileBtn);
-        break;
-        
-      case 'highlight_progress_steps':
-        const stepNodes = document.querySelectorAll('.step-node, .step-node-mobile, g.step-node, g.step-node-mobile');
-        stepNodes.forEach((node, index) => {
-          setTimeout(() => addHighlight(node), index * 200);
-        });
-        break;
-        
-      case 'highlight_bonus_nodes':
-        const bonusNodes = document.querySelectorAll('.bonus-node, .bonus-node-mobile, g.bonus-node, g.bonus-node-mobile');
-        bonusNodes.forEach((node, index) => {
-          setTimeout(() => addHighlight(node), index * 200);
-        });
-        break;
-        
-      case 'highlight_toggle_bar':
-        const toggleBar = document.querySelector('.progress-toggle-mobile') || 
-                         document.querySelector('.fixed.bottom-20') ||
-                         document.querySelector('[class*="toggle"]');
-        addHighlight(toggleBar);
-        break;
-        
-      case 'highlight_settings':
-        const settingsBtn = document.querySelector('[title="Setări"]');
-        addHighlight(settingsBtn);
-        break;
+      
+      // Get element position for arrow
+      const rect = element.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+      
+      setHighlightedElement({
+        top: rect.top + scrollTop,
+        left: rect.left + scrollLeft,
+        width: rect.width,
+        height: rect.height,
+        centerX: rect.left + scrollLeft + rect.width / 2,
+        centerY: rect.top + scrollTop + rect.height / 2,
+      });
+    } else {
+      setHighlightedElement(null);
     }
   }, []);
 
-  // Enhanced calculate element position and update state
-  const updateElementPosition = useCallback(() => {
-    if (!currentStepData.target) {
-      setElementPosition(null);
-      return;
-    }
-    
-    // Handle multiple target selectors
-    const targets = currentStepData.target.split(', ');
-    let element = null;
-    
-    for (const target of targets) {
-      // Try different approaches to find the element
-      element = document.querySelector(target);
-      if (element) break;
-      
-      // Try finding by partial class match for step/bonus nodes
-      if (target.includes('.step-node')) {
-        element = document.querySelector('g.step-node-mobile') || 
-                  document.querySelector('circle[class*="fill-blue-500"]') ||
-                  document.querySelector('circle[class*="fill-green-500"]');
-      }
-      if (target.includes('.bonus-node')) {
-        element = document.querySelector('g.bonus-node-mobile') || 
-                  document.querySelector('circle[class*="fill-orange-500"]');
-      }
-      if (element) break;
-    }
-    
-    if (!element) {
-      setElementPosition(null);
-      return;
-    }
-    
-    const rect = element.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
-    // Enhanced position calculation
-    const elementData = {
-      top: rect.top + scrollTop,
-      left: rect.left + scrollLeft,
-      bottom: rect.bottom + scrollTop,
-      right: rect.right + scrollLeft,
-      width: rect.width,
-      height: rect.height,
-      centerX: rect.left + scrollLeft + rect.width / 2,
-      centerY: rect.top + scrollTop + rect.height / 2,
-      element: element // Keep reference to element for better targeting
-    };
-    
-    setElementPosition(elementData);
-  }, [currentStepData.target]);
-
+  // Update highlight when step changes
   useEffect(() => {
-    if (isOpen && currentStepData.target) {
-      // Add a small delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        updateElementPosition();
-        handleStepAction(currentStepData.action);
-      }, 100);
-      
-      return () => clearTimeout(timer);
-    } else {
-      // Clean up highlights when no target
-      cleanupAllTutorialElements();
+    if (isOpen) {
+      findAndHighlightElement(currentStepData.target);
     }
-  }, [currentStep, isOpen, currentStepData.target, currentStepData.action, updateElementPosition, handleStepAction]);
+  }, [currentStep, isOpen, findAndHighlightElement, currentStepData.target]);
+
+  // Setup tutorial styles
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('tutorial-active');
+      
+      // Add tutorial styles
+      const style = document.createElement('style');
+      style.id = 'tutorial-styles';
+      style.textContent = `
+        .tutorial-active {
+          overflow: hidden;
+        }
+        
+        .tutorial-highlight {
+          position: relative !important;
+          z-index: 1000 !important;
+          outline: 4px solid #3b82f6 !important;
+          outline-offset: 4px !important;
+          border-radius: 8px !important;
+          box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.5) !important;
+          animation: tutorialPulse 2s infinite !important;
+        }
+        
+        @keyframes tutorialPulse {
+          0%, 100% { 
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% { 
+            transform: scale(1.02);
+            opacity: 0.95;
+          }
+        }
+        
+        .tutorial-modal {
+          z-index: 1100 !important;
+        }
+        
+        .tutorial-arrow {
+          z-index: 1050 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    } else {
+      cleanupTutorial();
+    }
+    
+    return () => {
+      if (!isOpen) {
+        cleanupTutorial();
+      }
+    };
+  }, [isOpen]);
 
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-        setIsAnimating(false);
-      }, 150);
+      setCurrentStep(currentStep + 1);
     } else {
       handleComplete();
     }
@@ -337,169 +197,66 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentStep(currentStep - 1);
-        setIsAnimating(false);
-      }, 150);
+      setCurrentStep(currentStep - 1);
     }
   };
 
   const handleComplete = () => {
-    // Enhanced cleanup of highlights and animations
-    cleanupAllTutorialElements();
+    cleanupTutorial();
     localStorage.setItem('tutorialViewed', 'true');
     onComplete?.();
     onClose();
   };
 
   const handleSkip = () => {
-    // Enhanced cleanup of highlights and animations
-    cleanupAllTutorialElements();
+    cleanupTutorial();
     localStorage.setItem('tutorialViewed', 'true');
     onClose();
   };
 
+  // Get modal position
   const getModalPosition = () => {
     const padding = 20;
-    const modalWidth = Math.min(384, viewportSize.width - padding * 2); // max-w-sm = 384px
-    const modalHeight = 300; // approximate modal height
+    const modalWidth = 400;
     
-    if (!elementPosition || !currentStepData.target) {
-      // Center positioning for steps without targets
+    if (!highlightedElement) {
       return {
         position: 'fixed',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: `${modalWidth}px`,
-        maxWidth: `calc(100vw - ${padding * 2}px)`,
       };
     }
+
+    // Position modal to not overlap with highlighted element
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
     
-    const { position } = currentStepData;
-    let modalStyle = {
+    let top = highlightedElement.top - 350;
+    let left = highlightedElement.centerX - modalWidth / 2;
+    
+    // Adjust if modal goes outside viewport
+    if (top < padding) {
+      top = highlightedElement.top + highlightedElement.height + 20;
+    }
+    if (left < padding) {
+      left = padding;
+    }
+    if (left + modalWidth > viewportWidth - padding) {
+      left = viewportWidth - modalWidth - padding;
+    }
+    if (top + 300 > viewportHeight - padding) {
+      top = viewportHeight - 300 - padding;
+    }
+
+    return {
       position: 'fixed',
+      top: `${top}px`,
+      left: `${left}px`,
       width: `${modalWidth}px`,
-      maxWidth: `calc(100vw - ${padding * 2}px)`,
     };
-    
-    switch (position) {
-      case 'top':
-        modalStyle.top = Math.max(padding, elementPosition.top - modalHeight - 20);
-        modalStyle.left = Math.max(padding, Math.min(
-          elementPosition.centerX - modalWidth / 2,
-          viewportSize.width - modalWidth - padding
-        ));
-        break;
-        
-      case 'bottom':
-        modalStyle.top = Math.min(
-          viewportSize.height - modalHeight - padding,
-          elementPosition.top + elementPosition.height + 20
-        );
-        modalStyle.left = Math.max(padding, Math.min(
-          elementPosition.centerX - modalWidth / 2,
-          viewportSize.width - modalWidth - padding
-        ));
-        break;
-        
-      case 'left':
-        modalStyle.top = Math.max(padding, Math.min(
-          elementPosition.centerY - modalHeight / 2,
-          viewportSize.height - modalHeight - padding
-        ));
-        modalStyle.left = Math.max(padding, elementPosition.left - modalWidth - 20);
-        // If no space on the left, put it on the right
-        if (modalStyle.left < padding) {
-          modalStyle.left = Math.min(
-            elementPosition.left + elementPosition.width + 20,
-            viewportSize.width - modalWidth - padding
-          );
-        }
-        break;
-        
-      case 'right':
-        modalStyle.top = Math.max(padding, Math.min(
-          elementPosition.centerY - modalHeight / 2,
-          viewportSize.height - modalHeight - padding
-        ));
-        modalStyle.left = Math.min(
-          elementPosition.left + elementPosition.width + 20,
-          viewportSize.width - modalWidth - padding
-        );
-        break;
-        
-      default:
-        modalStyle.top = '50%';
-        modalStyle.left = '50%';
-        modalStyle.transform = 'translate(-50%, -50%)';
-    }
-    
-    return modalStyle;
   };
-
-  const getArrowComponent = () => {
-    if (!elementPosition || !currentStepData.target) return null;
-    
-    const { position } = currentStepData;
-    const arrowProps = { size: 24, className: "text-blue-600 animate-bounce" };
-    
-    switch (position) {
-      case 'top': return <ArrowDown {...arrowProps} />;
-      case 'bottom': return <ArrowUp {...arrowProps} />;
-      case 'left': return <ArrowRight {...arrowProps} />;
-      case 'right': return <ArrowLeft {...arrowProps} />;
-      default: return null;
-    }
-  };
-
-  // Simplified styling
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('tutorial-open');
-      // Simple CSS for tutorial
-      const style = document.createElement('style');
-      style.textContent = `
-        .tutorial-open {
-          overflow: hidden;
-        }
-        
-        @keyframes tutorialPulse {
-          0%, 100% { 
-            transform: scale(1); 
-            opacity: 1;
-          }
-          50% { 
-            transform: scale(1.05); 
-            opacity: 0.9;
-          }
-        }
-        
-        .tutorial-modal-responsive {
-          z-index: 110 !important;
-        }
-      `;
-      style.id = 'tutorial-styles';
-      document.head.appendChild(style);
-    } else {
-      document.body.classList.remove('tutorial-open');
-      const existingStyle = document.getElementById('tutorial-styles');
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-      cleanupAllTutorialElements();
-    }
-    
-    return () => {
-      document.body.classList.remove('tutorial-open');
-      const existingStyle = document.getElementById('tutorial-styles');
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-      cleanupAllTutorialElements();
-    };
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
