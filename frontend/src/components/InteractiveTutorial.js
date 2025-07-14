@@ -245,139 +245,58 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [currentStepData.target]);
 
-  // Enhanced element highlighting and interaction
+  // Simple highlighting - just make elements visible and pulsing
   const handleStepAction = useCallback((action) => {
     if (!action) return;
     
     // Remove any existing highlights first
     cleanupAllTutorialElements();
 
+    const addHighlight = (element) => {
+      if (!element) return;
+      
+      element.style.position = 'relative';
+      element.style.zIndex = '106';
+      element.style.outline = '4px solid #3b82f6';
+      element.style.outlineOffset = '4px';
+      element.style.borderRadius = '8px';
+      element.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.5)';
+      element.style.animation = 'tutorialPulse 2s infinite';
+      
+      // Make sure element is visible
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
     switch (action) {
       case 'highlight_personal_files':
         const personalFileBtn = document.querySelector('[title="Dosarul Meu Personal"]');
-        if (personalFileBtn) {
-          personalFileBtn.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
-          personalFileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Enhanced styling for visibility
-          personalFileBtn.style.position = 'relative';
-          personalFileBtn.style.zIndex = '105';
-          personalFileBtn.style.filter = 'none';
-          personalFileBtn.style.animation = 'tutorialPulse 2s infinite';
-        }
+        addHighlight(personalFileBtn);
         break;
         
       case 'highlight_progress_steps':
-        // Target both regular and mobile step nodes
-        const stepSelectors = [
-          '.step-node',
-          '.step-node-mobile',
-          'g.step-node-mobile',
-          'g:has(.step-node)',
-          'circle[class*="fill-blue-500"], circle[class*="fill-green-500"]'
-        ];
-        
-        let stepNodes = [];
-        stepSelectors.forEach(selector => {
-          const nodes = document.querySelectorAll(selector);
-          nodes.forEach(node => {
-            if (!stepNodes.includes(node)) {
-              stepNodes.push(node);
-            }
-          });
-        });
-        
+        const stepNodes = document.querySelectorAll('.step-node, .step-node-mobile, g.step-node, g.step-node-mobile');
         stepNodes.forEach((node, index) => {
-          node.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
-          node.style.position = 'relative';
-          node.style.zIndex = '105';
-          node.style.filter = 'none';
-          // Stagger the animations
-          setTimeout(() => {
-            if (node.style) {
-              node.style.animation = 'tutorialPulse 2s infinite';
-            }
-          }, index * 150);
+          setTimeout(() => addHighlight(node), index * 200);
         });
-        
-        if (stepNodes.length > 0) {
-          stepNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
         break;
         
       case 'highlight_bonus_nodes':
-        // Target both regular and mobile bonus nodes
-        const bonusSelectors = [
-          '.bonus-node',
-          '.bonus-node-mobile',
-          'g.bonus-node-mobile',
-          'g:has(.bonus-node)',
-          'circle[class*="fill-orange-500"]'
-        ];
-        
-        let bonusNodes = [];
-        bonusSelectors.forEach(selector => {
-          const nodes = document.querySelectorAll(selector);
-          nodes.forEach(node => {
-            if (!bonusNodes.includes(node)) {
-              bonusNodes.push(node);
-            }
-          });
-        });
-        
+        const bonusNodes = document.querySelectorAll('.bonus-node, .bonus-node-mobile, g.bonus-node, g.bonus-node-mobile');
         bonusNodes.forEach((node, index) => {
-          node.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
-          node.style.position = 'relative';
-          node.style.zIndex = '105';
-          node.style.filter = 'none';
-          // Stagger the animations
-          setTimeout(() => {
-            if (node.style) {
-              node.style.animation = 'tutorialPulse 2s infinite';
-            }
-          }, index * 200);
+          setTimeout(() => addHighlight(node), index * 200);
         });
-        
-        if (bonusNodes.length > 0) {
-          bonusNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
         break;
         
       case 'highlight_toggle_bar':
-        // Try both mobile and desktop toggle bar selectors
-        const toggleBarSelectors = [
-          '.progress-toggle-mobile',
-          '.fixed.bottom-20',
-          '[class*="fixed"][class*="bottom"]',
-          'button[class*="toggle"]'
-        ];
-        
-        let toggleBar = null;
-        toggleBarSelectors.forEach(selector => {
-          if (!toggleBar) {
-            toggleBar = document.querySelector(selector);
-          }
-        });
-        
-        if (toggleBar) {
-          toggleBar.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
-          toggleBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          toggleBar.style.position = 'relative';
-          toggleBar.style.zIndex = '105';
-          toggleBar.style.filter = 'none';
-          toggleBar.style.animation = 'tutorialPulse 2s infinite';
-        }
+        const toggleBar = document.querySelector('.progress-toggle-mobile') || 
+                         document.querySelector('.fixed.bottom-20') ||
+                         document.querySelector('[class*="toggle"]');
+        addHighlight(toggleBar);
         break;
         
       case 'highlight_settings':
         const settingsBtn = document.querySelector('[title="Setări"]');
-        if (settingsBtn) {
-          settingsBtn.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
-          settingsBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          settingsBtn.style.position = 'relative';
-          settingsBtn.style.zIndex = '105';
-          settingsBtn.style.filter = 'none';
-          settingsBtn.style.animation = 'tutorialPulse 2s infinite';
-        }
+        addHighlight(settingsBtn);
         break;
     }
   }, []);
