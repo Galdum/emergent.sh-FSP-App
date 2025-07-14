@@ -5,13 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Enhanced cleanup function to ensure all tutorial elements are properly reset
 const cleanupAllTutorialElements = () => {
   // Remove tutorial highlight classes
-  document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
-    el.classList.remove('tutorial-highlight', 'tutorial-ring');
+  document.querySelectorAll('.tutorial-highlight, .tutorial-ring, .tutorial-spotlight-active').forEach(el => {
+    el.classList.remove('tutorial-highlight', 'tutorial-ring', 'tutorial-spotlight-active');
     if (el.style) {
       el.style.animation = '';
       el.style.outline = '';
       el.style.boxShadow = '';
       el.style.background = '';
+      el.style.zIndex = '';
+      el.style.position = '';
+      el.style.transform = '';
+      el.style.filter = '';
     }
   });
 
@@ -21,25 +25,45 @@ const cleanupAllTutorialElements = () => {
     '[title="Setări"]',
     '.step-node',
     '.bonus-node',
+    '.step-node-mobile',
+    '.bonus-node-mobile',
     '.progress-toggle-mobile',
-    '.fixed.bottom-20'
+    '.fixed.bottom-20',
+    'g.step-node-mobile',
+    'g.bonus-node-mobile',
+    'g:has(.step-node)',
+    'g:has(.bonus-node)'
   ];
 
   specificSelectors.forEach(selector => {
     const elements = document.querySelectorAll(selector);
     elements.forEach(el => {
-      el.classList.remove('tutorial-highlight', 'tutorial-ring');
+      el.classList.remove('tutorial-highlight', 'tutorial-ring', 'tutorial-spotlight-active');
       if (el.style) {
         el.style.animation = '';
         el.style.outline = '';
         el.style.boxShadow = '';
         el.style.background = '';
+        el.style.zIndex = '';
+        el.style.position = '';
+        el.style.transform = '';
+        el.style.filter = '';
       }
     });
   });
 
   // Remove any tutorial-related CSS classes from body
   document.body.classList.remove('tutorial-open');
+  
+  // Remove blur from all elements
+  document.querySelectorAll('*').forEach(el => {
+    if (el.style && el.style.filter && el.style.filter.includes('blur')) {
+      el.style.filter = el.style.filter.replace(/blur\([^)]*\)/g, '').trim();
+      if (!el.style.filter) {
+        el.style.filter = '';
+      }
+    }
+  });
 };
 
 // Spotlight component for highlighting elements
