@@ -132,46 +132,59 @@ const TutorialSpotlight = ({ elementPosition, isVisible, currentStep }) => {
   );
 };
 
-// Floating arrow component to point to highlighted elements
-const TutorialArrow = ({ elementPosition, position, isVisible }) => {
+// Enhanced floating arrow component that points accurately to highlighted elements
+const TutorialArrow = ({ elementPosition, position, isVisible, stepData }) => {
   if (!isVisible || !elementPosition) return null;
 
   const getArrowPosition = () => {
-    const offset = 30;
-    const arrowSize = 24;
+    const offset = 40;
+    const arrowSize = 32;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    let left, top, transform;
+    
+    // Convert viewport coordinates to absolute coordinates
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    let left, top, rotate, ArrowComponent;
+    
     switch (position) {
       case 'top':
         left = elementPosition.centerX - arrowSize / 2;
         top = elementPosition.top - offset - arrowSize;
-        transform = 'rotate(0deg)';
+        rotate = 'rotate(180deg)';
+        ArrowComponent = ArrowDown;
         break;
       case 'bottom':
         left = elementPosition.centerX - arrowSize / 2;
-        top = elementPosition.top + elementPosition.height + offset;
-        transform = 'rotate(180deg)';
+        top = elementPosition.bottom + offset;
+        rotate = 'rotate(0deg)';
+        ArrowComponent = ArrowDown;
         break;
       case 'left':
         left = elementPosition.left - offset - arrowSize;
         top = elementPosition.centerY - arrowSize / 2;
-        transform = 'rotate(90deg)';
+        rotate = 'rotate(90deg)';
+        ArrowComponent = ArrowRight;
         break;
       case 'right':
-        left = elementPosition.left + elementPosition.width + offset;
+        left = elementPosition.right + offset;
         top = elementPosition.centerY - arrowSize / 2;
-        transform = 'rotate(-90deg)';
+        rotate = 'rotate(-90deg)';
+        ArrowComponent = ArrowLeft;
         break;
       default:
         left = elementPosition.centerX - arrowSize / 2;
         top = elementPosition.top - offset - arrowSize;
-        transform = 'rotate(0deg)';
+        rotate = 'rotate(180deg)';
+        ArrowComponent = ArrowDown;
     }
-    // Clamp to viewport
-    left = Math.max(0, Math.min(left, viewportWidth - arrowSize));
-    top = Math.max(0, Math.min(top, viewportHeight - arrowSize));
-    return { left, top, transform };
+    
+    // Ensure arrow stays within viewport
+    left = Math.max(10, Math.min(left, viewportWidth - arrowSize - 10));
+    top = Math.max(10, Math.min(top, viewportHeight - arrowSize - 10));
+    
+    return { left, top, rotate, ArrowComponent };
   };
 
   const arrowStyle = getArrowPosition();
@@ -185,13 +198,15 @@ const TutorialArrow = ({ elementPosition, position, isVisible }) => {
       className="tutorial-arrow"
       style={{
         position: 'fixed',
-        zIndex: 102,
+        left: arrowStyle.left,
+        top: arrowStyle.top,
+        zIndex: 103,
         pointerEvents: 'none',
-        ...arrowStyle
+        transform: arrowStyle.rotate,
       }}
     >
       <div className="bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce">
-        <ArrowDown size={24} />
+        <arrowStyle.ArrowComponent size={24} />
       </div>
     </motion.div>
   );
