@@ -430,7 +430,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     }
   }, []);
 
-  // Calculate element position and update state
+  // Enhanced calculate element position and update state
   const updateElementPosition = useCallback(() => {
     if (!currentStepData.target) {
       setElementPosition(null);
@@ -442,7 +442,20 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     let element = null;
     
     for (const target of targets) {
+      // Try different approaches to find the element
       element = document.querySelector(target);
+      if (element) break;
+      
+      // Try finding by partial class match for step/bonus nodes
+      if (target.includes('.step-node')) {
+        element = document.querySelector('g.step-node-mobile') || 
+                  document.querySelector('circle[class*="fill-blue-500"]') ||
+                  document.querySelector('circle[class*="fill-green-500"]');
+      }
+      if (target.includes('.bonus-node')) {
+        element = document.querySelector('g.bonus-node-mobile') || 
+                  document.querySelector('circle[class*="fill-orange-500"]');
+      }
       if (element) break;
     }
     
@@ -455,14 +468,20 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
     
-    setElementPosition({
+    // Enhanced position calculation
+    const elementData = {
       top: rect.top + scrollTop,
       left: rect.left + scrollLeft,
+      bottom: rect.bottom + scrollTop,
+      right: rect.right + scrollLeft,
       width: rect.width,
       height: rect.height,
       centerX: rect.left + scrollLeft + rect.width / 2,
       centerY: rect.top + scrollTop + rect.height / 2,
-    });
+      element: element // Keep reference to element for better targeting
+    };
+    
+    setElementPosition(elementData);
   }, [currentStepData.target]);
 
   useEffect(() => {
