@@ -14,7 +14,7 @@ from backend.auth import (
 )
 from backend.database import get_database
 from backend.models import UserInDB, User
-from backend.security import AuditLogger, validate_email
+from backend.security import AuditLogger, validate_email, safe_rate_limit
 from backend.services.email_service import send_password_reset_email, send_welcome_email
 
 # Import badge functions for login streak tracking
@@ -23,6 +23,7 @@ from backend.routes.badges import update_login_streak, check_and_award_badges
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
 @router.post("/register", response_model=Token)
+@safe_rate_limit("5 per hour")  # Strict rate limit for registration
 async def register(
     user_data: UserCreate,
     request: Request,
@@ -100,6 +101,7 @@ async def register(
     )
 
 @router.post("/login", response_model=Token)
+@safe_rate_limit("10 per minute")  # Rate limit for login attempts
 async def login(
     login_data: UserLogin,
     request: Request,
@@ -378,7 +380,9 @@ async def change_password(
     return MessageResponse(message="Password changed successfully")
 
 @router.post("/forgot-password", response_model=MessageResponse)
+@safe_rate_limit("3 per hour")  # Rate limit for password reset requests
 async def forgot_password(
+    request: Request,
     request_data: ForgotPasswordRequest,
     db = Depends(get_database)
 ):

@@ -17,9 +17,9 @@ export const useSubscription = () => {
   }, [user, isAuthenticated]);
 
   const SUBSCRIPTION_TIERS = {
-    FREE: { name: 'Free', price: 0, maxSteps: 2, maxOrangeNodes: 1, hasAI: false },
-    BASIC: { name: 'Basic', price: 10, maxSteps: 6, maxOrangeNodes: 4, hasAI: false },
-    PREMIUM: { name: 'Premium', price: 30, maxSteps: 6, maxOrangeNodes: 4, hasAI: true }
+    FREE: { name: 'Free', price: 0, maxSteps: 2, maxOrangeNodes: 0, hasAI: false },
+    BASIC: { name: 'Basic', price: 10, maxSteps: 6, maxOrangeNodes: 5, hasAI: false },
+    PREMIUM: { name: 'Premium', price: 30, maxSteps: 6, maxOrangeNodes: 5, hasAI: true }
   };
 
   const getCurrentTier = () => SUBSCRIPTION_TIERS[subscriptionTier];

@@ -19,28 +19,11 @@ class DataEncryption:
         self.fernet = Fernet(self.encryption_key)
     
     def _get_or_create_key(self):
-        """Get encryption key from environment or generate new one"""
-        # Try to get key from environment first
+        """Get encryption key from environment"""
         env_key = os.environ.get('ENCRYPTION_KEY')
-        if env_key:
-            return env_key.encode()
-        
-        # For development only - in production, key should be in environment
-        if os.environ.get('ENVIRONMENT') == 'development':
-            key_file = os.path.join(os.path.dirname(__file__), '.encryption_key')
-            
-            if os.path.exists(key_file):
-                with open(key_file, "rb") as f:
-                    return f.read()
-            else:
-                # Generate new key
-                key = Fernet.generate_key()
-                with open(key_file, "wb") as f:
-                    f.write(key)
-                os.chmod(key_file, 0o600)  # Restrict file permissions
-                return key
-        else:
-            raise ValueError("ENCRYPTION_KEY environment variable must be set in production")
+        if not env_key:
+            raise ValueError("ENCRYPTION_KEY environment variable must be set (no auto-generation).")
+        return env_key.encode()
     
     def encrypt_data(self, data: str) -> str:
         """Encrypt sensitive data"""
@@ -106,18 +89,18 @@ class SecurityManager:
         to_encode.update({"exp": expire})
         
         # Get secret from environment - no fallback
-        secret_key = os.environ.get("JWT_SECRET")
+        secret_key = os.environ.get("JWT_SECRET_KEY")
         if not secret_key:
-            raise ValueError("JWT_SECRET environment variable must be set")
+            raise ValueError("JWT_SECRET_KEY environment variable must be set")
             
         return jwt.encode(to_encode, secret_key, algorithm="HS256")
     
     def verify_jwt_token(self, token: str) -> dict:
         """Verify and decode JWT token"""
         try:
-            secret_key = os.environ.get("JWT_SECRET")
+            secret_key = os.environ.get("JWT_SECRET_KEY")
             if not secret_key:
-                raise ValueError("JWT_SECRET environment variable must be set")
+                raise ValueError("JWT_SECRET_KEY environment variable must be set")
                 
             payload = jwt.decode(token, secret_key, algorithms=["HS256"])
             return payload
@@ -235,47 +218,92 @@ def get_allowed_file_types() -> List[str]:
     return [ext.strip() for ext in allowed_types.split(',')]
 
 # Rate limiting utilities
-class RateLimiter:
-    def __init__(self):
-        self.requests = {}
-        self.cleanup_counter = 0
-    
-    def is_allowed(self, identifier: str, max_requests: int = 100, window_minutes: int = 60) -> bool:
-        """Check if request is within rate limit"""
-        now = datetime.utcnow()
-        window_start = now - timedelta(minutes=window_minutes)
-        
-        if identifier not in self.requests:
-            self.requests[identifier] = []
-        
-        # Remove old requests
-        self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier]
-            if req_time > window_start
-        ]
-        
-        # Periodic cleanup to prevent memory leak
-        self.cleanup_counter += 1
-        if self.cleanup_counter > 1000:
-            self._cleanup_old_entries(window_start)
-            self.cleanup_counter = 0
-        
-        # Check if under limit
-        if len(self.requests[identifier]) < max_requests:
-            self.requests[identifier].append(now)
-            return True
-        
-        return False
-    
-    def _cleanup_old_entries(self, cutoff_time: datetime):
-        """Remove entries older than cutoff time"""
-        identifiers_to_remove = []
-        for identifier, timestamps in self.requests.items():
-            if not timestamps or max(timestamps) < cutoff_time:
-                identifiers_to_remove.append(identifier)
-        
-        for identifier in identifiers_to_remove:
-            del self.requests[identifier]
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
+import redis.asyncio as redis
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Initialize Redis connection for rate limiting
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+redis_client = None
+
+async def get_redis_client():
+    """Get Redis client for rate limiting"""
+    global redis_client
+    if redis_client is None:
+        try:
+            redis_client = redis.from_url(redis_url, decode_responses=True)
+            # Test connection
+            await redis_client.ping()
+            logger.info("Redis connection established for rate limiting")
+        except Exception as e:
+            # Fallback to in-memory if Redis is not available
+            logger.warning(f"Redis connection failed: {e}. Falling back to in-memory rate limiting.")
+            return None
+    return redis_client
+
+# Initialize slowapi limiter with error handling
+def create_limiter():
+    """Create limiter with proper error handling"""
+    try:
+        # Try to create limiter with Redis
+        limiter = Limiter(
+            key_func=get_remote_address,
+            storage_uri=redis_url,
+            default_limits=["200 per day", "50 per hour"]
+        )
+        logger.info("Rate limiter initialized with Redis storage")
+        return limiter
+    except Exception as e:
+        logger.error(f"Failed to initialize Redis-based rate limiter: {e}")
+        # Fallback to in-memory storage
+        try:
+            limiter = Limiter(
+                key_func=get_remote_address,
+                default_limits=["200 per day", "50 per hour"]
+            )
+            logger.warning("Rate limiter initialized with in-memory storage (fallback)")
+            return limiter
+        except Exception as fallback_error:
+            logger.error(f"Failed to initialize rate limiter: {fallback_error}")
+            # Return None to disable rate limiting
+            return None
+
+# Create limiter with error handling
+limiter = create_limiter()
+
+# Safe rate limiting decorator
+def safe_rate_limit(limit_string: str):
+    """Safe rate limiting decorator that only applies when limiter is available"""
+    def decorator(func):
+        if limiter is not None:
+            return limiter.limit(limit_string)(func)
+        return func
+    return decorator
+
+# Rate limit exceeded handler
+def rate_limit_exceeded_handler(request, exc):
+    """Handle rate limit exceeded exceptions"""
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={
+            "error": "Rate limit exceeded",
+            "detail": "Too many requests. Please try again later.",
+            "retry_after": exc.retry_after
+        },
+        headers={
+            "Retry-After": str(exc.retry_after),
+            "X-RateLimit-Limit": str(exc.limit),
+            "X-RateLimit-Remaining": str(exc.remaining),
+            "X-RateLimit-Reset": str(exc.reset)
+        }
+    )
 
 # Input validation utilities
 def validate_email(email: str) -> bool:
@@ -302,4 +330,3 @@ def validate_bundesland(bundesland: str) -> bool:
 # Initialize global instances
 security_manager = SecurityManager()
 data_encryption = DataEncryption()
-rate_limiter = RateLimiter()

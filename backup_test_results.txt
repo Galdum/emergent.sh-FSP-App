@@ -1,0 +1,369 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /workspace
+plugins: anyio-4.9.0
+collected 5 items
+
+test/test_backup_background_tasks.py FF                                  [ 40%]
+test/test_celery_backup_tasks.py EEE                                     [100%]
+
+==================================== ERRORS ====================================
+______________ ERROR at setup of test_create_database_backup_task ______________
+
+    @pytest.fixture(autouse=True)
+    def setup_and_teardown():
+>       clear_status_and_logs()
+
+test/test_celery_backup_tasks.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/test_celery_backup_tasks.py:14: in clear_status_and_logs
+    db.backup_task_status.delete_many({})
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/collection.py:1711: in delete_many
+    self._delete_retryable(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/collection.py:1587: in _delete_retryable
+    return self._database.client._retryable_write(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2061: in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1947: in _retry_with_session
+    return self._retry_internal(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/_csot.py:125: in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1993: in _retry_internal
+    ).run()
+      ^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2730: in run
+    return self._read() if self._is_read else self._write()
+                                              ^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2840: in _write
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2823: in _get_server
+    return self._client._select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1812: in _select_server
+    server = topology.select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:409: in select_server
+    server = self._select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:387: in _select_server
+    servers = self.select_servers(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:294: in select_servers
+    server_descriptions = self._select_servers_loop(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Topology <TopologyDescription id: 68753b35b37d5e4e44dd1f65, topology_type: ReplicaSetNoPrimary, servers: [<ServerDesc...alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>>
+selector = <function writable_server_selector at 0x7fc2e3afbec0>, timeout = 30
+operation = <_Op.DELETE: 'delete'>, operation_id = None, address = None
+
+    def _select_servers_loop(
+        self,
+        selector: Callable[[Selection], Selection],
+        timeout: float,
+        operation: str,
+        operation_id: Optional[int],
+        address: Optional[_Address],
+    ) -> list[ServerDescription]:
+        """select_servers() guts. Hold the lock when calling this."""
+        now = time.monotonic()
+        end_time = now + timeout
+        logged_waiting = False
+    
+        if _SERVER_SELECTION_LOGGER.isEnabledFor(logging.DEBUG):
+            _debug_log(
+                _SERVER_SELECTION_LOGGER,
+                message=_ServerSelectionStatusMessage.STARTED,
+                selector=selector,
+                operation=operation,
+                operationId=operation_id,
+                topologyDescription=self.description,
+                clientId=self.description._topology_settings._topology_id,
+            )
+    
+        server_descriptions = self._description.apply_selector(
+            selector, address, custom_selector=self._settings.server_selector
+        )
+    
+        while not server_descriptions:
+            # No suitable servers.
+            if timeout == 0 or now > end_time:
+                if _SERVER_SELECTION_LOGGER.isEnabledFor(logging.DEBUG):
+                    _debug_log(
+                        _SERVER_SELECTION_LOGGER,
+                        message=_ServerSelectionStatusMessage.FAILED,
+                        selector=selector,
+                        operation=operation,
+                        operationId=operation_id,
+                        topologyDescription=self.description,
+                        clientId=self.description._topology_settings._topology_id,
+                        failure=self._error_message(selector),
+                    )
+>               raise ServerSelectionTimeoutError(
+                    f"{self._error_message(selector)}, Timeout: {timeout}s, Topology Description: {self.description!r}"
+                )
+E               pymongo.errors.ServerSelectionTimeoutError: SSL handshake failed: ac-ly5wywe-shard-00-00.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ly5wywe-shard-00-01.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ly5wywe-shard-00-02.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68753b35b37d5e4e44dd1f65, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ly5wywe-shard-00-00.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-00.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ly5wywe-shard-00-01.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-01.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ly5wywe-shard-00-02.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-02.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:344: ServerSelectionTimeoutError
+_______________ ERROR at setup of test_create_files_backup_task ________________
+
+    @pytest.fixture(autouse=True)
+    def setup_and_teardown():
+>       clear_status_and_logs()
+
+test/test_celery_backup_tasks.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/test_celery_backup_tasks.py:14: in clear_status_and_logs
+    db.backup_task_status.delete_many({})
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/collection.py:1711: in delete_many
+    self._delete_retryable(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/collection.py:1587: in _delete_retryable
+    return self._database.client._retryable_write(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2061: in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1947: in _retry_with_session
+    return self._retry_internal(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/_csot.py:125: in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1993: in _retry_internal
+    ).run()
+      ^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2730: in run
+    return self._read() if self._is_read else self._write()
+                                              ^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2840: in _write
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2823: in _get_server
+    return self._client._select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1812: in _select_server
+    server = topology.select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:409: in select_server
+    server = self._select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:387: in _select_server
+    servers = self.select_servers(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:294: in select_servers
+    server_descriptions = self._select_servers_loop(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Topology <TopologyDescription id: 68753b54b37d5e4e44dd1f66, topology_type: ReplicaSetNoPrimary, servers: [<ServerDesc...alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>>
+selector = <function writable_server_selector at 0x7fc2e3afbec0>, timeout = 30
+operation = <_Op.DELETE: 'delete'>, operation_id = None, address = None
+
+    def _select_servers_loop(
+        self,
+        selector: Callable[[Selection], Selection],
+        timeout: float,
+        operation: str,
+        operation_id: Optional[int],
+        address: Optional[_Address],
+    ) -> list[ServerDescription]:
+        """select_servers() guts. Hold the lock when calling this."""
+        now = time.monotonic()
+        end_time = now + timeout
+        logged_waiting = False
+    
+        if _SERVER_SELECTION_LOGGER.isEnabledFor(logging.DEBUG):
+            _debug_log(
+                _SERVER_SELECTION_LOGGER,
+                message=_ServerSelectionStatusMessage.STARTED,
+                selector=selector,
+                operation=operation,
+                operationId=operation_id,
+                topologyDescription=self.description,
+                clientId=self.description._topology_settings._topology_id,
+            )
+    
+        server_descriptions = self._description.apply_selector(
+            selector, address, custom_selector=self._settings.server_selector
+        )
+    
+        while not server_descriptions:
+            # No suitable servers.
+            if timeout == 0 or now > end_time:
+                if _SERVER_SELECTION_LOGGER.isEnabledFor(logging.DEBUG):
+                    _debug_log(
+                        _SERVER_SELECTION_LOGGER,
+                        message=_ServerSelectionStatusMessage.FAILED,
+                        selector=selector,
+                        operation=operation,
+                        operationId=operation_id,
+                        topologyDescription=self.description,
+                        clientId=self.description._topology_settings._topology_id,
+                        failure=self._error_message(selector),
+                    )
+>               raise ServerSelectionTimeoutError(
+                    f"{self._error_message(selector)}, Timeout: {timeout}s, Topology Description: {self.description!r}"
+                )
+E               pymongo.errors.ServerSelectionTimeoutError: SSL handshake failed: ac-ly5wywe-shard-00-00.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ly5wywe-shard-00-01.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ly5wywe-shard-00-02.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68753b54b37d5e4e44dd1f66, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ly5wywe-shard-00-00.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-00.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ly5wywe-shard-00-01.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-01.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ly5wywe-shard-00-02.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-02.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:344: ServerSelectionTimeoutError
+___________________ ERROR at setup of test_status_endpoints ____________________
+
+    @pytest.fixture(autouse=True)
+    def setup_and_teardown():
+>       clear_status_and_logs()
+
+test/test_celery_backup_tasks.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test/test_celery_backup_tasks.py:14: in clear_status_and_logs
+    db.backup_task_status.delete_many({})
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/collection.py:1711: in delete_many
+    self._delete_retryable(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/collection.py:1587: in _delete_retryable
+    return self._database.client._retryable_write(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2061: in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1947: in _retry_with_session
+    return self._retry_internal(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/_csot.py:125: in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1993: in _retry_internal
+    ).run()
+      ^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2730: in run
+    return self._read() if self._is_read else self._write()
+                                              ^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2840: in _write
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:2823: in _get_server
+    return self._client._select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py:1812: in _select_server
+    server = topology.select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:409: in select_server
+    server = self._select_server(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:387: in _select_server
+    servers = self.select_servers(
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:294: in select_servers
+    server_descriptions = self._select_servers_loop(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Topology <TopologyDescription id: 68753b72b37d5e4e44dd1f67, topology_type: ReplicaSetNoPrimary, servers: [<ServerDesc...alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>>
+selector = <function writable_server_selector at 0x7fc2e3afbec0>, timeout = 30
+operation = <_Op.DELETE: 'delete'>, operation_id = None, address = None
+
+    def _select_servers_loop(
+        self,
+        selector: Callable[[Selection], Selection],
+        timeout: float,
+        operation: str,
+        operation_id: Optional[int],
+        address: Optional[_Address],
+    ) -> list[ServerDescription]:
+        """select_servers() guts. Hold the lock when calling this."""
+        now = time.monotonic()
+        end_time = now + timeout
+        logged_waiting = False
+    
+        if _SERVER_SELECTION_LOGGER.isEnabledFor(logging.DEBUG):
+            _debug_log(
+                _SERVER_SELECTION_LOGGER,
+                message=_ServerSelectionStatusMessage.STARTED,
+                selector=selector,
+                operation=operation,
+                operationId=operation_id,
+                topologyDescription=self.description,
+                clientId=self.description._topology_settings._topology_id,
+            )
+    
+        server_descriptions = self._description.apply_selector(
+            selector, address, custom_selector=self._settings.server_selector
+        )
+    
+        while not server_descriptions:
+            # No suitable servers.
+            if timeout == 0 or now > end_time:
+                if _SERVER_SELECTION_LOGGER.isEnabledFor(logging.DEBUG):
+                    _debug_log(
+                        _SERVER_SELECTION_LOGGER,
+                        message=_ServerSelectionStatusMessage.FAILED,
+                        selector=selector,
+                        operation=operation,
+                        operationId=operation_id,
+                        topologyDescription=self.description,
+                        clientId=self.description._topology_settings._topology_id,
+                        failure=self._error_message(selector),
+                    )
+>               raise ServerSelectionTimeoutError(
+                    f"{self._error_message(selector)}, Timeout: {timeout}s, Topology Description: {self.description!r}"
+                )
+E               pymongo.errors.ServerSelectionTimeoutError: SSL handshake failed: ac-ly5wywe-shard-00-00.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ly5wywe-shard-00-01.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),SSL handshake failed: ac-ly5wywe-shard-00-02.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68753b72b37d5e4e44dd1f67, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ly5wywe-shard-00-00.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-00.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ly5wywe-shard-00-01.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-01.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ly5wywe-shard-00-02.u6elads.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-ly5wywe-shard-00-02.u6elads.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1029) (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+/home/ubuntu/.local/lib/python3.13/site-packages/pymongo/synchronous/topology.py:344: ServerSelectionTimeoutError
+=================================== FAILURES ===================================
+________________ test_create_backup_with_logging_in_background _________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_____________ test_create_files_backup_with_logging_in_background ______________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+=============================== warnings summary ===============================
+backend/models.py:56
+  /workspace/backend/models.py:56: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('email')
+
+backend/models.py:79
+  /workspace/backend/models.py:79: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('email')
+
+backend/models.py:83
+  /workspace/backend/models.py:83: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('password')
+
+backend/models.py:93
+  /workspace/backend/models.py:93: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('email')
+
+backend/models.py:124
+  /workspace/backend/models.py:124: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('email')
+
+backend/models.py:132
+  /workspace/backend/models.py:132: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('new_password')
+
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323
+  /home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:298
+../home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:298
+  /home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:298: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://docs.pydantic.dev/2.11/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(
+
+test/test_backup_background_tasks.py:11
+  /workspace/test/test_backup_background_tasks.py:11: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+test/test_backup_background_tasks.py:30
+  /workspace/test/test_backup_background_tasks.py:30: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test/test_backup_background_tasks.py::test_create_backup_with_logging_in_background
+FAILED test/test_backup_background_tasks.py::test_create_files_backup_with_logging_in_background
+ERROR test/test_celery_backup_tasks.py::test_create_database_backup_task - py...
+ERROR test/test_celery_backup_tasks.py::test_create_files_backup_task - pymon...
+ERROR test/test_celery_backup_tasks.py::test_status_endpoints - pymongo.error...
+============= 2 failed, 18 warnings, 3 errors in 92.00s (0:01:32) ==============

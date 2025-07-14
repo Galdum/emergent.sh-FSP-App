@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
+from fastapi.responses import FileResponse
 from typing import List
 from backend.models import PersonalFileCreate, PersonalFileResponse, MessageResponse, PersonalFile
 from backend.auth import get_current_user
@@ -6,7 +7,7 @@ from backend.database import get_database
 from backend.models import UserInDB
 from backend.security import (
     sanitize_filename, validate_file_type, check_file_size, 
-    get_allowed_file_types, AuditLogger
+    get_allowed_file_types, AuditLogger, safe_rate_limit
 )
 import os
 import uuid
@@ -14,9 +15,16 @@ from pathlib import Path
 import aiofiles
 import hashlib
 import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
 
 # Import badge awarding functionality
 from backend.routes.badges import check_and_award_badges
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/files", tags=["personal_files"])
 
@@ -38,6 +46,25 @@ async def scan_file_for_malware(file_path: Path) -> bool:
     except Exception:
         return False
 
+async def scan_bytes_for_malware(chunk: bytes) -> bool:
+    """
+    Basic malware scanning on bytes.
+    In production, integrate with proper antivirus service.
+    """
+    # TODO: Implement actual virus scanning on bytes
+    # For now, just check for common malicious file signatures
+    malicious_signatures = [
+        b'MZ',  # Windows executable
+        b'\x7fELF',  # Linux executable
+        b'\xfe\xed\xfa',  # Mach-O executable
+    ]
+    
+    for signature in malicious_signatures:
+        if chunk.startswith(signature):
+            return False  # Suspicious file type
+    
+    return True
+
 async def calculate_file_hash(file_path: Path) -> str:
     """Calculate SHA256 hash of file for integrity checking."""
     sha256_hash = hashlib.sha256()
@@ -45,6 +72,59 @@ async def calculate_file_hash(file_path: Path) -> str:
         while chunk := await f.read(8192):
             sha256_hash.update(chunk)
     return sha256_hash.hexdigest()
+
+async def stream_file_upload_with_hash_and_scan(
+    file: UploadFile, 
+    file_path: Path, 
+    chunk_size: int = 1024 * 1024  # 1MB chunks
+) -> tuple[str, bool, int]:
+    """
+    Stream file upload to disk while calculating hash, scanning for malware, and validating size.
+    Returns (file_hash, scan_passed, total_size)
+    """
+    sha256_hash = hashlib.sha256()
+    scan_passed = True
+    first_chunk = True
+    total_size = 0
+    
+    # Get maximum allowed file size in bytes
+    max_size_mb = int(os.environ.get('MAX_FILE_SIZE_MB', 10))
+    max_size_bytes = max_size_mb * 1024 * 1024
+    
+    try:
+        async with aiofiles.open(file_path, "wb") as buffer:
+            while chunk := await file.read(chunk_size):
+                # Check file size during streaming to prevent DoS
+                total_size += len(chunk)
+                if total_size > max_size_bytes:
+                    # Clean up partial file and raise error
+                    file_path.unlink(missing_ok=True)
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail=f"File size exceeds maximum allowed size of {max_size_mb}MB"
+                    )
+                
+                # Update hash
+                sha256_hash.update(chunk)
+                
+                # Basic malware scan on first chunk (file headers)
+                if first_chunk and not await scan_bytes_for_malware(chunk):
+                    scan_passed = False
+                    break
+                
+                # Write chunk to disk
+                await buffer.write(chunk)
+                first_chunk = False
+                
+    except HTTPException:
+        # Re-raise HTTP exceptions (like size limit exceeded)
+        raise
+    except Exception as e:
+        # Clean up partial file if write failed
+        file_path.unlink(missing_ok=True)
+        raise e
+    
+    return sha256_hash.hexdigest(), scan_passed, total_size
 
 @router.get("/", response_model=List[PersonalFileResponse])
 async def get_personal_files(
@@ -109,13 +189,14 @@ async def create_personal_file(
     return PersonalFileResponse(**personal_file.dict())
 
 @router.post("/upload", response_model=PersonalFileResponse)
+@safe_rate_limit("20 per hour")  # Rate limit for file uploads
 async def upload_file(
     request: Request,
     file: UploadFile = File(...),
     current_user: UserInDB = Depends(get_current_user),
     db = Depends(get_database)
 ):
-    """Upload a file with security validations."""
+    """Upload a file with security validations using efficient streaming."""
     # Sanitize filename
     original_filename = sanitize_filename(file.filename)
     
@@ -127,15 +208,6 @@ async def upload_file(
             detail=f"File type not allowed. Allowed types: {', '.join(allowed_types)}"
         )
     
-    # Check file size
-    file_content = await file.read()
-    if not check_file_size(len(file_content)):
-        max_size = os.environ.get('MAX_FILE_SIZE_MB', 10)
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size exceeds maximum allowed size of {max_size}MB"
-        )
-    
     # Generate unique filename with user namespace
     file_extension = os.path.splitext(original_filename)[1]
     unique_filename = f"{current_user.id}/{uuid.uuid4()}{file_extension}"
@@ -144,18 +216,20 @@ async def upload_file(
     # Create user directory if it doesn't exist
     file_path.parent.mkdir(exist_ok=True, parents=True)
     
-    # Save file to disk
+    # Stream file upload with hash calculation, malware scanning, and size validation
     try:
-        async with aiofiles.open(file_path, "wb") as buffer:
-            await buffer.write(file_content)
+        file_hash, scan_passed, file_size = await stream_file_upload_with_hash_and_scan(file, file_path)
+    except HTTPException:
+        # Re-raise HTTP exceptions (like size limit exceeded)
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to save file"
         )
     
-    # Scan for malware
-    if not await scan_file_for_malware(file_path):
+    # Check if malware scan passed
+    if not scan_passed:
         # Remove suspicious file
         file_path.unlink(missing_ok=True)
         raise HTTPException(
@@ -163,16 +237,13 @@ async def upload_file(
             detail="File failed security scan"
         )
     
-    # Calculate file hash for integrity
-    file_hash = await calculate_file_hash(file_path)
-    
     # Create database record
     personal_file = PersonalFile(
         type="file",
         title=original_filename,
         user_id=current_user.id,
         file_path=str(unique_filename),  # Store relative path only
-        file_size=len(file_content),
+        file_size=file_size,
         file_hash=file_hash,
         mime_type=file.content_type
     )
@@ -187,7 +258,7 @@ async def upload_file(
         details={
             "file_id": personal_file.id,
             "filename": original_filename,
-            "size": len(file_content),
+            "size": file_size,
             "type": file.content_type
         },
         ip_address=request.client.host if request.client else None
@@ -357,5 +428,76 @@ async def sync_local_files(
     
     return MessageResponse(message=f"Synced {synced_count} files successfully")
 
-# Import logging
-logger = logging.getLogger(__name__)
+@router.get("/download/{file_id}")
+async def download_file(
+    file_id: str, 
+    current_user: UserInDB = Depends(get_current_user), 
+    db = Depends(get_database)
+):
+    """Download a file by ID. Only allows users to download their own files."""
+    # Validate file_id format
+    try:
+        uuid.UUID(file_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file ID format"
+        )
+    
+    # Find the file record
+    record = await db.personal_files.find_one({
+        "id": file_id, 
+        "user_id": current_user.id
+    })
+    
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="File not found"
+        )
+    
+    # Check if this is actually a file (not a note or link)
+    if record.get("type") != "file" or not record.get("file_path"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This item is not a downloadable file"
+        )
+    
+    # Construct the full file path
+    file_path = UPLOAD_DIR / record["file_path"]
+    
+    # Security check: ensure the file is within the uploads directory
+    try:
+        file_path.relative_to(UPLOAD_DIR)
+    except ValueError:
+        logger.error(f"Path traversal attempt detected: {file_path}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file path"
+        )
+    
+    # Check if file exists
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="File not found on disk"
+        )
+    
+    # Log download access
+    audit_logger = AuditLogger(db)
+    await audit_logger.log_action(
+        user_id=current_user.id,
+        action="download_file",
+        details={
+            "file_id": file_id,
+            "filename": record.get("title"),
+            "size": record.get("file_size")
+        }
+    )
+    
+    # Return the file with appropriate headers
+    return FileResponse(
+        path=str(file_path),
+        filename=record.get("title", "download"),
+        media_type=record.get("mime_type")
+    )

@@ -50,9 +50,9 @@ const indexHtml = `<!DOCTYPE html>
   <!-- Framer Motion CDN -->
   <script src="https://unpkg.com/framer-motion@11.0.0/dist/framer-motion.js"></script>
   
-  <!-- React 17 CDN -->
-  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <!-- React 18 CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   
   <!-- Lucide React Icons -->
   <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
@@ -334,8 +334,9 @@ const indexHtml = `<!DOCTYPE html>
       );
     }
 
-    // Render the enhanced app
-    ReactDOM.render(<EnhancedFSPNavigator />, document.getElementById('root'));
+    // Render the enhanced app with React 18 createRoot
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<EnhancedFSPNavigator />);
   </script>
   
   <!-- Babel for JSX transpilation -->
@@ -396,7 +397,7 @@ const deploymentInfo = {
     "✅ GDPR Compliant Privacy Policy Modal",
     "✅ Responsive Design with Backdrop Blur Effects",
     "✅ Professional Styling and Smooth Transitions",
-    "✅ React 17 + CDN Implementation",
+    "✅ React 18 + CDN Implementation",
     "✅ Real Working Components (not just static HTML)"
   ],
   enhancements: {
@@ -413,7 +414,7 @@ const deploymentInfo = {
       "accessibility": "Keyboard navigation and ARIA labels"
     },
     "technical": {
-      "react_version": "17.0.2 (stable)",
+      "react_version": "18.3.1 (stable)",
       "animation_library": "Framer Motion 11.0.0",
       "css_framework": "Tailwind CSS via CDN",
       "font_loading": "Google Fonts Inter family"

@@ -7,7 +7,7 @@ from backend.models_billing import (
 from backend.auth import get_current_user, get_current_admin_user
 from backend.database import get_database
 from backend.models import UserInDB
-from backend.security import sanitize_regex_pattern, AuditLogger
+from backend.security import sanitize_regex_pattern, AuditLogger, safe_rate_limit
 from datetime import datetime, timedelta
 import logging
 import os
@@ -353,6 +353,7 @@ async def update_user_admin_status(
     return {"message": f"Admin status {'granted' if is_admin else 'revoked'} successfully"}
 
 @router.delete("/users/{user_id}")
+@safe_rate_limit("10 per hour")  # Rate limit for user deletion
 async def delete_user(
     user_id: str,
     request: Request,
@@ -410,6 +411,7 @@ async def delete_user(
     return {"message": "User deleted successfully"}
 
 @router.post("/initialize-admin")
+@safe_rate_limit("1 per day")  # Rate limit for admin initialization
 async def initialize_admin(
     request: Request,
     db = Depends(get_database)

@@ -902,6 +902,7 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
+                event.stopPropagation(); // Prevent event from bubbling up to StepModal
                 onClose();
             }
         };
@@ -1104,7 +1105,7 @@ const PersonalFileModal = ({ isOpen, onClose, onSubscriptionUpgrade }) => {
                     className="hidden"
                 />
                 
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-20"><X size={28} /></button>
+                <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-20"><X size={28} /></button>
                 <h2 className="text-2xl md:text-3xl font-bold p-6 pb-2 text-center md:text-left flex-shrink-0">Dosarul Meu & Asistent Personal</h2>
                 
                 {/* Mobile Tab Navigation - Only visible on small screens */}
@@ -1556,6 +1557,7 @@ const BundeslandRecommenderModal = ({ onClose }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
+                event.stopPropagation(); // Prevent event from bubbling up to StepModal
                 if (view === 'result') {
                     setView('selection'); // Go back to selection
                 } else {
@@ -1657,7 +1659,7 @@ Strukturieren Sie Ihre Antwort klar und beginnen Sie direkt mit der Empfehlung f
     return (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
         <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
-            <button onClick={view === 'result' ? () => setView('selection') : onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+            <button onClick={(e) => { e.stopPropagation(); view === 'result' ? setView('selection') : onClose(); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
              <div className="flex-shrink-0 mb-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-center flex items-center justify-center gap-2"><Compass className="text-blue-600"/> Consilier Federal</h2>
                 <p className="text-gray-600 text-center mt-2">Găsește landul perfect pentru tine pe baza priorităților tale.</p>
@@ -1719,6 +1721,7 @@ const InfoHubModal = ({ isOpen, onClose, fromStepModal = false }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
+                event.stopPropagation(); // Prevent event from bubbling up to StepModal
                 if (view === 'detail') {
                     handleBack(); // Go back to list view
                 } else {
@@ -1768,7 +1771,7 @@ const InfoHubModal = ({ isOpen, onClose, fromStepModal = false }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
             <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
-                <button onClick={view === 'detail' ? handleBack : handleSmartClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                <button onClick={(e) => { e.stopPropagation(); view === 'detail' ? handleBack() : handleSmartClose(); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
                 
                 {view === 'list' && (
                     <>
@@ -1817,6 +1820,7 @@ const GeminiFspTutorModal = ({ onClose }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
+                event.stopPropagation(); // Prevent event from bubbling up to StepModal
                 if (view === 'chat') {
                     handleBackToMenu(); // Go back to menu view
                 } else if (view === 'case_selection') {
@@ -2065,11 +2069,12 @@ Regeln:
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-1 md:p-4 animate-fade-in-fast">
             <div ref={modalRef} className="bg-white rounded-lg md:rounded-2xl shadow-2xl w-full max-w-full md:max-w-7xl text-gray-800 p-3 md:p-6 relative transform animate-scale-in flex flex-col h-[100vh] md:h-auto md:max-h-[95vh] chat-modal">
-                <button onClick={
-                    view === 'chat' ? handleBackToMenu : 
-                    view === 'case_selection' ? () => setView('menu') : 
-                    onClose
-                } className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-800 transition-colors z-10 p-1"><X size={24} /></button>
+                <button onClick={(e) => { 
+                    e.stopPropagation(); 
+                    view === 'chat' ? handleBackToMenu() : 
+                    view === 'case_selection' ? setView('menu') : 
+                    onClose(); 
+                }} className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-800 transition-colors z-10 p-1"><X size={24} /></button>
                 
                 <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 md:mb-6 flex items-center justify-center gap-2 pr-8">
                     <MessageCircle className="text-blue-600"/> Tutor FSP AI
@@ -2269,6 +2274,7 @@ const GeminiEmailModal = ({ onClose }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
+                event.stopPropagation(); // Prevent event from bubbling up to StepModal
                 if (view === 'result') {
                     setView('form'); // Go back to form
                 } else if (view === 'form') {
@@ -2458,7 +2464,7 @@ Erstelle die komplette E-Mail. Sie soll perfekt korrekt sein, aber menschlich un
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
             <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl text-gray-800 p-6 md:p-8 relative transform animate-scale-in flex flex-col max-h-[90vh]">
-                <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
+                <button onClick={(e) => { e.stopPropagation(); handleClose(); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-10"><X size={28} /></button>
                 
                 <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 flex items-center justify-center gap-2">
                     <Mail className="text-green-600"/> Generator Email AI
@@ -2710,18 +2716,18 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     // Color logic based on AI access and subscription
     const getNodeColor = () => {
         if (!isAccessible) return 'fill-gray-300';
-        // For AI nodes: gray for free users, orange for premium users
+        // For AI nodes: check if user has AI access
         if (needsAIAccess) {
-            return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-400 hover:fill-gray-500';
+            return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-300 hover:fill-gray-400';
         }
         return 'fill-orange-500 hover:fill-orange-600';
     };
     
     const getIconColor = () => {
         if (!isAccessible) return 'text-gray-400';
-        // For AI nodes: gray for free users, white for premium users
+        // For AI nodes: check if user has AI access
         if (needsAIAccess) {
-            return hasAIAccess() ? 'text-white' : 'text-gray-500';
+            return hasAIAccess() ? 'text-white' : 'text-gray-400';
         }
         return 'text-white';
     };
@@ -2800,13 +2806,30 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
 };
 
 // --- Step Modal Component ---
-const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
+const StepModal = ({ step, onTaskToggle, onActionClick, onClose, modalStates }) => {
     const modalRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
-                onClose();
+                // Check if any sub-modals are open before closing StepModal
+                const hasOpenSubModal = modalStates.activeContent || 
+                                      modalStates.activeGeminiModal || 
+                                      modalStates.infoHub || 
+                                      modalStates.personalFileModal ||
+                                      modalStates.subscriptionUpgrade ||
+                                      modalStates.recommender ||
+                                      modalStates.leaderboard ||
+                                      modalStates.emailVerification ||
+                                      modalStates.settings ||
+                                      modalStates.badgeSystem ||
+                                      modalStates.clinicalCasesGame ||
+                                      modalStates.fachbegriffeGame;
+                
+                // Only close StepModal if no sub-modals are open
+                if (!hasOpenSubModal) {
+                    onClose();
+                }
             }
         };
 
@@ -2816,7 +2839,7 @@ const StepModal = ({ step, onTaskToggle, onActionClick, onClose }) => {
                 document.removeEventListener('mousedown', handleClickOutside);
             };
         }
-    }, [step, onClose]);
+    }, [step, onClose, modalStates]);
 
     if (!step) return null;
 
@@ -2902,6 +2925,7 @@ const ContentModal = ({ content, onClose, onBackToStep }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
+                event.stopPropagation(); // Prevent event from bubbling up to StepModal
                 // Go back to step modal instead of closing everything
                 onBackToStep();
             }
@@ -2920,7 +2944,7 @@ const ContentModal = ({ content, onClose, onBackToStep }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 animate-fade-in-fast">
             <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full text-gray-800 p-6 md:p-8 relative transform animate-scale-in max-h-[90vh] overflow-y-auto">
-                <button onClick={onBackToStep} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
+                <button onClick={(e) => { e.stopPropagation(); onBackToStep(); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors">
                     <X size={28} />
                 </button>
                 
@@ -3033,11 +3057,7 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
-        // Make InfoHub (index 3) and Leaderboard (index 4) accessible for all users
-        if (nodeIndex === 3 || nodeIndex === 4) {
-            return true;
-        }
-        // Other nodes require premium subscription
+        // All bonus nodes are now controlled by subscription tier
         return canAccessOrangeNode(nodeIndex);
     };
 
@@ -3221,7 +3241,10 @@ const AppContent = () => {
 
     const handleBonusNodeClick = (action) => {
         const nodeIndex = bonusNodes.findIndex(node => node.action.type === action.type);
-        if (!isBonusNodeAccessible(nodeIndex)) {
+        const node = bonusNodes[nodeIndex];
+        const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
+        
+        if (!isBonusNodeAccessible(nodeIndex) || (needsAIAccess && !hasAIAccess())) {
             setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
@@ -3596,7 +3619,7 @@ const AppContent = () => {
                 </main>
             </div>
             
-            <StepModal step={modalStates.selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} />
+                            <StepModal step={modalStates.selectedStep} onTaskToggle={handleTaskToggle} onActionClick={handleActionClick} onClose={closeModal} modalStates={modalStates} />
             <ContentModal content={modalStates.activeContent} onClose={closeContentModal} onBackToStep={backToStepFromContent} />
             {modalStates.activeGeminiModal === 'fsp_tutor' && <GeminiFspTutorModal onClose={closeGeminiModal} />}
             {modalStates.activeGeminiModal === 'email_generator' && <GeminiEmailModal onClose={closeGeminiModal} />}

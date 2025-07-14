@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, Medal, Crown, Star, Zap, Target, Clock, Award, Users, Gamepad2, Play, RefreshCw, X } from 'lucide-react';
 import { InteractiveQuiz } from './InteractiveQuiz';
 import { gamificationManager } from '../utils/gamificationManager';
+import { competitionQuestions, competitionConfig } from '../data/competitionQuestions';
 
 /**
  * Leaderboard and Competitions Component
@@ -15,86 +16,8 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
   const [userRankings, setUserRankings] = useState([]);
   const [competitions, setCompetitions] = useState([]);
 
-  // Mini Games Quiz Data
-  const miniGamesData = {
-    fachbegriffe: {
-      title: "⚡ Fachbegriffe Flash",
-      timeLimit: 0.5, // 0.5 minutes = 30 seconds
-      questions: [
-        {
-          question: "Ce înseamnă 'Schmerzen' în română?",
-          options: ["Dureri", "Febră", "Greață", "Amețeală"],
-          correctAnswer: 0
-        },
-        {
-          question: "Cum se spune 'inimă' în germană?",
-          options: ["Leber", "Herz", "Lunge", "Niere"],
-          correctAnswer: 1
-        },
-        {
-          question: "Ce înseamnă 'Atemnot'?",
-          options: ["Durere de cap", "Dificultate în respirație", "Durere de stomac", "Febră"],
-          correctAnswer: 1
-        },
-        {
-          question: "Cum se spune 'medic' în germană?",
-          options: ["Pfleger", "Arzt", "Patient", "Schwester"],
-          correctAnswer: 1
-        },
-        {
-          question: "Ce înseamnă 'Übelkeit'?",
-          options: ["Durere", "Febră", "Greață", "Oboseală"],
-          correctAnswer: 2
-        },
-        {
-          question: "Cum se spune 'cap' în germană?",
-          options: ["Kopf", "Hals", "Arm", "Bein"],
-          correctAnswer: 0
-        },
-        {
-          question: "Ce înseamnă 'Fieber'?",
-          options: ["Durere", "Febră", "Tuse", "Răceală"],
-          correctAnswer: 1
-        },
-        {
-          question: "Cum se spune 'sânge' în germană?",
-          options: ["Wasser", "Blut", "Luft", "Haut"],
-          correctAnswer: 1
-        }
-      ]
-    },
-    diagnostic: {
-      title: "🔍 Diagnostic Express",
-      timeLimit: null, // No time limit
-      questions: [
-        {
-          question: "Pacient de 45 ani, bărbat, prezintă durere toracică intensă, irradiată în brațul stâng, transpirații reci și dispnee. Care este cel mai probabil diagnostic?",
-          options: ["Pneumonie", "Infarct miocardic acut", "Reflux gastroesofagian", "Anxietate"],
-          correctAnswer: 1
-        },
-        {
-          question: "Femeie de 28 ani prezintă febră de 39°C, durere de cap intensă, rigiditate cervicală și fotofobia. Diagnostic?",
-          options: ["Gripă", "Meningită", "Sinuzită", "Migrene"],
-          correctAnswer: 1
-        },
-        {
-          question: "Copil de 6 ani cu febră, durere în gât, ganglioni măriți și placaj alb pe amigdale. Diagnostic?",
-          options: ["Laringită", "Angină streptococică", "Gripă", "Bronșită"],
-          correctAnswer: 1
-        },
-        {
-          question: "Pacient de 60 ani cu durere abdominală în fosă iliacă dreaptă, febră și leucocitoză. Diagnostic?",
-          options: ["Gastrită", "Apendicită", "Colecistită", "Pancreatită"],
-          correctAnswer: 1
-        },
-        {
-          question: "Femeie de 35 ani cu durere pelvină, amenoree de 6 săptămâni și test de sarcină pozitiv. Prezintă durere acută și hemoragie vaginală. Diagnostic?",
-          options: ["Sarcină normală", "Sarcină ectopică", "Avort spontan", "Chisturi ovariene"],
-          correctAnswer: 1
-        }
-      ]
-    }
-  };
+  // Use imported competition questions data
+  const miniGamesData = competitionQuestions;
 
   // Mock data for demonstration
   useEffect(() => {
@@ -168,38 +91,7 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
         }
       ]);
 
-      setCompetitions([
-        {
-          id: 1,
-          title: "📚 Fachbegriffe Speed Challenge",
-          description: "Cine răspunde mai repede la 10 termeni medicali aleatori",
-          participants: 24,
-          timeLimit: 60,
-          reward: "150 XP + Badge Specialist",
-          status: "active",
-          endsIn: "2h 15min"
-        },
-        {
-          id: 2,
-          title: "🔍 Diagnostic Challenge",
-          description: "Pune diagnosticul corect pentru 5 cazuri clinice",
-          participants: 18,
-          timeLimit: 300,
-          reward: "200 XP + Badge Detectiv",
-          status: "active",
-          endsIn: "45min"
-        },
-        {
-          id: 3,
-          title: "📝 Prezentare de Caz",
-          description: "Scrie cea mai corectă prezentare gramaticală",
-          participants: 12,
-          timeLimit: 600,
-          reward: "250 XP + Badge Komunikator",
-          status: "starting",
-          startsIn: "1h 30min"
-        }
-      ]);
+      setCompetitions(competitionConfig.competitions);
     }
   }, [isOpen]);
 
@@ -240,21 +132,52 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
     setActiveMiniGame(gameType);
   };
 
+  const handleCompetitionStart = () => {
+    if (activeCompetition && activeCompetition.gameType) {
+      // Close the competition modal
+      setActiveCompetition(null);
+      // Start the corresponding mini-game
+      startMiniGame(activeCompetition.gameType);
+    }
+  };
+
   const handleMiniGameComplete = (result) => {
     // Award points using gamification manager
     const gameResult = gamificationManager.completeQuiz(result.totalQuestions, result.correctAnswers);
+    
+    // Competition-specific bonus points based on configuration
+    let competitionBonus = 0;
+    let competitionMessage = '';
+    
+    // Find the competition that matches the current mini-game
+    const currentCompetition = competitions.find(comp => comp.gameType === activeMiniGame);
+    
+    if (currentCompetition && result.score >= currentCompetition.minScore) {
+      competitionBonus = currentCompetition.bonusPoints;
+      competitionMessage = `🏆 Bonus competiție: +${competitionBonus} XP pentru scor excelent în ${currentCompetition.title}!`;
+      
+      // Award competition bonus
+      gamificationManager.awardPoints('competition_bonus', competitionBonus);
+    }
     
     // Update local user stats (this would normally sync with backend)
     setUserRankings(prev => prev.map(user => {
       if (user.isCurrentUser) {
         return {
           ...user,
-          totalXP: user.totalXP + gameResult.points,
-          fachbegriffe: activeMiniGame === 'fachbegriffe' ? user.fachbegriffe + result.correctAnswers : user.fachbegriffe
+          totalXP: user.totalXP + gameResult.points + competitionBonus,
+          fachbegriffe: activeMiniGame === 'fachbegriffe' ? user.fachbegriffe + result.correctAnswers : user.fachbegriffe,
+          grammar: activeMiniGame === 'grammar' ? user.grammar + result.correctAnswers : user.grammar
         };
       }
       return user;
     }));
+
+    // Show competition completion message if applicable
+    if (competitionMessage) {
+      // In a real app, you might want to show a toast notification here
+      console.log(competitionMessage);
+    }
 
     // Close the mini game
     setActiveMiniGame(null);
@@ -454,7 +377,7 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
               {/* Mini Games Section */}
               <div className="mt-8">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Mini Jocuri Rapide</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="text-2xl">⚡</div>
@@ -486,6 +409,22 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
                       Joacă Acum
                     </button>
                   </div>
+
+                  <div className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="text-2xl">📝</div>
+                      <div>
+                        <h4 className="font-semibold">Gramatică Germană</h4>
+                        <p className="text-sm text-gray-600">Test gramatică 1 minut</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => startMiniGame('grammar')}
+                      className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Joacă Acum
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -496,19 +435,58 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
         {activeCompetition && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-semibold mb-4">{activeCompetition.title}</h3>
-              <p className="text-gray-600 mb-4">Competiția va începe în curând...</p>
+              <div className="text-center mb-6">
+                <div className="text-3xl mb-2">🏆</div>
+                <h3 className="text-xl font-semibold mb-2">{activeCompetition.title}</h3>
+                <p className="text-gray-600 text-sm">{activeCompetition.description}</p>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue-500" />
+                    <span>{activeCompetition.participants} participanți</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-orange-500" />
+                    <span>{activeCompetition.timeLimit}s</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    <span>{activeCompetition.reward}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Gamepad2 className="h-4 w-4 text-purple-500" />
+                    <span>{miniGamesData[activeCompetition.gameType]?.title || 'Quiz'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center mb-6">
+                <p className="text-gray-700 font-medium">
+                  {activeCompetition.gameType === 'fachbegriffe' 
+                    ? 'Răspunde la întrebări rapide despre termeni medicali germani!'
+                    : activeCompetition.gameType === 'diagnostic'
+                    ? 'Pune diagnosticul corect pentru cazuri clinice!'
+                    : activeCompetition.gameType === 'grammar'
+                    ? 'Testează-ți cunoștințele de gramatică germană!'
+                    : 'Testează-ți cunoștințele!'
+                  }
+                </p>
+              </div>
+
               <div className="flex gap-2">
                 <button 
                   onClick={() => setActiveCompetition(null)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg"
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   Anulează
                 </button>
                 <button 
-                  onClick={() => setActiveCompetition(null)}
-                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg"
+                  onClick={handleCompetitionStart}
+                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
+                  <Play className="h-4 w-4" />
                   Începe
                 </button>
               </div>
