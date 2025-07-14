@@ -2650,7 +2650,7 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobi
     };
 
     return (
-        <g className={isMobile ? 'step-node-mobile' : ''}>
+        <g className={`step-node ${isMobile ? 'step-node-mobile' : ''}`}>
             {/* Larger invisible clickable area */}
             <circle
                 cx={position.x}
