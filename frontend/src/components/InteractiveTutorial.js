@@ -423,8 +423,9 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
             Sari peste tutorial
           </button>
         </div>
-      </div>
-        {/* Header */}
+      </motion.div>
+    </AnimatePresence>
+  );
         <div className="flex items-center justify-between mb-4">
           <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
             {currentStep + 1} / {tutorialSteps.length}
