@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, ArrowRight, ArrowLeft, Check, ArrowDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Simple cleanup function
+// Complete cleanup function
 const cleanupTutorial = () => {
-  // Remove all tutorial styles
+  // Remove all tutorial classes and styles
   document.querySelectorAll('.tutorial-highlight').forEach(el => {
     el.classList.remove('tutorial-highlight');
     el.style.cssText = '';
@@ -79,10 +79,11 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
 
     let element = document.querySelector(target);
     
-    // Fallback selectors for step and bonus nodes
+    // Enhanced fallback selectors
     if (!element && target === '.step-node') {
       element = document.querySelector('.step-node-mobile') || 
                 document.querySelector('g.step-node') || 
+                document.querySelector('g.step-node-mobile') ||
                 document.querySelector('circle[class*="fill-blue-500"]') ||
                 document.querySelector('circle[class*="fill-green-500"]');
     }
@@ -90,25 +91,35 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     if (!element && target === '.bonus-node') {
       element = document.querySelector('.bonus-node-mobile') || 
                 document.querySelector('g.bonus-node') || 
+                document.querySelector('g.bonus-node-mobile') ||
                 document.querySelector('circle[class*="fill-orange-500"]');
     }
 
     if (!element && target === '.fixed.bottom-20') {
       element = document.querySelector('.progress-toggle-mobile') || 
-                document.querySelector('[class*="fixed"][class*="bottom"]');
+                document.querySelector('[class*="fixed"][class*="bottom"]') ||
+                document.querySelector('button[class*="toggle"]');
     }
 
     if (element) {
       // Clear previous highlights
       cleanupTutorial();
       
-      // Add highlight
+      // Add highlight with MAXIMUM visibility
       element.classList.add('tutorial-highlight');
+      element.style.position = 'relative';
+      element.style.zIndex = '9999';
+      element.style.outline = '4px solid #3b82f6';
+      element.style.outlineOffset = '4px';
+      element.style.borderRadius = '12px';
+      element.style.boxShadow = '0 0 0 8px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.6)';
+      element.style.animation = 'tutorialPulse 2s infinite';
+      element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
       
       // Scroll to element
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       
-      // Get element position for arrow
+      // Get element position for modal positioning
       const rect = element.getBoundingClientRect();
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
@@ -120,6 +131,8 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         height: rect.height,
         centerX: rect.left + scrollLeft + rect.width / 2,
         centerY: rect.top + scrollTop + rect.height / 2,
+        bottom: rect.bottom + scrollTop,
+        right: rect.right + scrollLeft,
       });
     } else {
       setHighlightedElement(null);
@@ -148,12 +161,13 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         
         .tutorial-highlight {
           position: relative !important;
-          z-index: 1000 !important;
+          z-index: 9999 !important;
           outline: 4px solid #3b82f6 !important;
           outline-offset: 4px !important;
-          border-radius: 8px !important;
-          box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.5) !important;
+          border-radius: 12px !important;
+          box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.6) !important;
           animation: tutorialPulse 2s infinite !important;
+          background-color: rgba(59, 130, 246, 0.1) !important;
         }
         
         @keyframes tutorialPulse {
@@ -162,17 +176,21 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
             opacity: 1;
           }
           50% { 
-            transform: scale(1.02);
+            transform: scale(1.03);
             opacity: 0.95;
           }
         }
         
         .tutorial-modal {
-          z-index: 1100 !important;
+          z-index: 8000 !important;
         }
         
         .tutorial-arrow {
-          z-index: 1050 !important;
+          z-index: 8500 !important;
+        }
+        
+        .tutorial-backdrop {
+          z-index: 7000 !important;
         }
       `;
       document.head.appendChild(style);
@@ -214,10 +232,11 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     onClose();
   };
 
-  // Get modal position
+  // Smart modal positioning to NEVER cover highlighted elements
   const getModalPosition = () => {
     const padding = 20;
     const modalWidth = 400;
+    const modalHeight = 280;
     
     if (!highlightedElement) {
       return {
@@ -229,153 +248,179 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       };
     }
 
-    // Position modal to not overlap with highlighted element
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    let top = highlightedElement.top - 350;
-    let left = highlightedElement.centerX - modalWidth / 2;
+    // Calculate available space around highlighted element
+    const spaceTop = highlightedElement.top - padding;
+    const spaceBottom = viewportHeight - highlightedElement.bottom - padding;
+    const spaceLeft = highlightedElement.left - padding;
+    const spaceRight = viewportWidth - highlightedElement.right - padding;
     
-    // Adjust if modal goes outside viewport
-    if (top < padding) {
-      top = highlightedElement.top + highlightedElement.height + 20;
-    }
-    if (left < padding) {
-      left = padding;
-    }
-    if (left + modalWidth > viewportWidth - padding) {
-      left = viewportWidth - modalWidth - padding;
-    }
-    if (top + 300 > viewportHeight - padding) {
-      top = viewportHeight - 300 - padding;
-    }
-
-    return {
+    let modalStyle = {
       position: 'fixed',
-      top: `${top}px`,
-      left: `${left}px`,
       width: `${modalWidth}px`,
     };
+    
+    // Priority: bottom -> top -> right -> left
+    if (spaceBottom >= modalHeight) {
+      // Place below element
+      modalStyle.top = `${highlightedElement.bottom + 20}px`;
+      modalStyle.left = `${Math.max(padding, Math.min(
+        highlightedElement.centerX - modalWidth / 2,
+        viewportWidth - modalWidth - padding
+      ))}px`;
+    } else if (spaceTop >= modalHeight) {
+      // Place above element
+      modalStyle.top = `${highlightedElement.top - modalHeight - 20}px`;
+      modalStyle.left = `${Math.max(padding, Math.min(
+        highlightedElement.centerX - modalWidth / 2,
+        viewportWidth - modalWidth - padding
+      ))}px`;
+    } else if (spaceRight >= modalWidth) {
+      // Place to the right
+      modalStyle.left = `${highlightedElement.right + 20}px`;
+      modalStyle.top = `${Math.max(padding, Math.min(
+        highlightedElement.centerY - modalHeight / 2,
+        viewportHeight - modalHeight - padding
+      ))}px`;
+    } else if (spaceLeft >= modalWidth) {
+      // Place to the left
+      modalStyle.left = `${highlightedElement.left - modalWidth - 20}px`;
+      modalStyle.top = `${Math.max(padding, Math.min(
+        highlightedElement.centerY - modalHeight / 2,
+        viewportHeight - modalHeight - padding
+      ))}px`;
+    } else {
+      // Fallback: center position
+      modalStyle.top = '50%';
+      modalStyle.left = '50%';
+      modalStyle.transform = 'translate(-50%, -50%)';
+    }
+    
+    return modalStyle;
   };
 
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
+      {/* Minimal backdrop - NO blur */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[1000]"
-      >
-        {/* Arrow pointing to highlighted element */}
-        {highlightedElement && currentStepData.showArrow && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="tutorial-arrow fixed"
-            style={{
-              top: highlightedElement.top - 50,
-              left: highlightedElement.centerX - 15,
-              zIndex: 1050,
-              pointerEvents: 'none',
-            }}
-          >
-            <div className="bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce">
-              <ArrowDown size={20} />
-            </div>
-          </motion.div>
-        )}
+        className="tutorial-backdrop fixed inset-0 bg-black/10"
+        style={{ zIndex: 7000 }}
+      />
 
-        {/* Tutorial Modal */}
+      {/* Arrow pointing to highlighted element */}
+      {highlightedElement && currentStepData.showArrow && (
         <motion.div
-          key={currentStep}
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="tutorial-modal bg-white rounded-xl shadow-2xl p-6"
-          style={getModalPosition()}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="tutorial-arrow fixed"
+          style={{
+            top: highlightedElement.top - 60,
+            left: highlightedElement.centerX - 20,
+            zIndex: 8500,
+            pointerEvents: 'none',
+          }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
-              {currentStep + 1} / {tutorialSteps.length}
-            </span>
-            <button
-              onClick={handleSkip}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              {currentStepData.title}
-            </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {currentStepData.content}
-            </p>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handlePrevious}
-              disabled={currentStep === 0}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              <ArrowLeft size={16} />
-              Înapoi
-            </button>
-
-            <div className="flex space-x-1">
-              {tutorialSteps.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentStep 
-                      ? 'bg-blue-600 w-6' 
-                      : index < currentStep 
-                      ? 'bg-blue-300' 
-                      : 'bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-            >
-              {currentStep === tutorialSteps.length - 1 ? (
-                <>
-                  <Check size={16} />
-                  Finalizează
-                </>
-              ) : (
-                <>
-                  Următorul
-                  <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Skip option */}
-          <div className="text-center mt-4">
-            <button
-              onClick={handleSkip}
-              className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Sari peste tutorial
-            </button>
+          <div className="bg-blue-600 text-white p-3 rounded-full shadow-lg animate-bounce">
+            <ArrowDown size={24} />
           </div>
         </motion.div>
+      )}
+
+      {/* Tutorial Modal */}
+      <motion.div
+        key={currentStep}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="tutorial-modal bg-white rounded-xl shadow-2xl p-6"
+        style={getModalPosition()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
+            {currentStep + 1} / {tutorialSteps.length}
+          </span>
+          <button
+            onClick={handleSkip}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            {currentStepData.title}
+          </h3>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {currentStepData.content}
+          </p>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Înapoi
+          </button>
+
+          <div className="flex space-x-1">
+            {tutorialSteps.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentStep 
+                    ? 'bg-blue-600 w-6' 
+                    : index < currentStep 
+                    ? 'bg-blue-300' 
+                    : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleNext}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          >
+            {currentStep === tutorialSteps.length - 1 ? (
+              <>
+                <Check size={16} />
+                Finalizează
+              </>
+            ) : (
+              <>
+                Următorul
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Skip option */}
+        <div className="text-center mt-4">
+          <button
+            onClick={handleSkip}
+            className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            Sari peste tutorial
+          </button>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
