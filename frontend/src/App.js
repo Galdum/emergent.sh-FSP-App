@@ -2747,7 +2747,7 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     const textOffset = isMobile ? 35 : 40;
 
     return (
-        <g className={isMobile ? 'bonus-node-mobile' : ''}>
+        <g className={`bonus-node ${isMobile ? 'bonus-node-mobile' : ''}`}>
             {/* Larger invisible clickable area */}
             <circle
                 cx={node.position.x}
