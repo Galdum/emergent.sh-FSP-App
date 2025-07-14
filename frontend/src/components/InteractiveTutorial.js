@@ -66,15 +66,48 @@ const cleanupAllTutorialElements = () => {
   });
 };
 
-// Spotlight component for highlighting elements
-const TutorialSpotlight = ({ elementPosition, isVisible }) => {
-  if (!isVisible || !elementPosition) return null;
+// Enhanced spotlight component that highlights elements properly
+const TutorialSpotlight = ({ elementPosition, isVisible, currentStep }) => {
+  useEffect(() => {
+    if (!isVisible || !elementPosition) {
+      // Remove blur from all elements
+      document.querySelectorAll('*').forEach(el => {
+        if (el.style && el.style.filter && el.style.filter.includes('blur')) {
+          el.style.filter = el.style.filter.replace(/blur\([^)]*\)/g, '').trim();
+          if (!el.style.filter) {
+            el.style.filter = '';
+          }
+        }
+      });
+      return;
+    }
 
-  const spotlightStyle = {
-    '--spotlight-x': `${elementPosition.centerX}px`,
-    '--spotlight-y': `${elementPosition.centerY}px`,
-    '--spotlight-radius': `${Math.max(elementPosition.width, elementPosition.height) / 2 + 20}px`,
-  };
+    // Add blur to the main app container but not to the highlighted element
+    const mainContainer = document.querySelector('.main-container, .App, [data-testid="app-container"]') || document.body;
+    
+    // Apply blur to background
+    const elementsToBlur = [
+      'main',
+      '.main-container',
+      '.journey-map-container',
+      '.svg-container',
+      '.header-container',
+      '.content-wrapper'
+    ];
+    
+    elementsToBlur.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(el => {
+        if (el.style) {
+          el.style.filter = 'blur(3px)';
+          el.style.transition = 'filter 0.3s ease';
+        }
+      });
+    });
+    
+  }, [isVisible, elementPosition]);
+
+  if (!isVisible || !elementPosition) return null;
 
   return (
     <motion.div
@@ -82,8 +115,19 @@ const TutorialSpotlight = ({ elementPosition, isVisible }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="tutorial-spotlight"
-      style={spotlightStyle}
+      className="tutorial-spotlight-overlay"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 101,
+        pointerEvents: 'none',
+        background: `radial-gradient(circle at ${elementPosition.centerX}px ${elementPosition.centerY}px, 
+          transparent ${Math.max(elementPosition.width, elementPosition.height) / 2 + 30}px, 
+          rgba(0,0,0,0.7) ${Math.max(elementPosition.width, elementPosition.height) / 2 + 50}px)`
+      }}
     />
   );
 };
