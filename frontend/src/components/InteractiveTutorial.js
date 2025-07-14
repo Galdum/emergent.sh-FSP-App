@@ -416,6 +416,83 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
             Sari peste tutorial
           </button>
         </div>
+      </div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
+            {currentStep + 1} / {tutorialSteps.length}
+          </span>
+          <button
+            onClick={handleSkip}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            {currentStepData.title}
+          </h3>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {currentStepData.content}
+          </p>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Înapoi
+          </button>
+
+          <div className="flex space-x-1">
+            {tutorialSteps.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentStep 
+                    ? 'bg-blue-600 w-6' 
+                    : index < currentStep 
+                    ? 'bg-blue-300' 
+                    : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleNext}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          >
+            {currentStep === tutorialSteps.length - 1 ? (
+              <>
+                <Check size={16} />
+                Finalizează
+              </>
+            ) : (
+              <>
+                Următorul
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Skip option */}
+        <div className="text-center mt-4">
+          <button
+            onClick={handleSkip}
+            className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            Sari peste tutorial
+          </button>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
