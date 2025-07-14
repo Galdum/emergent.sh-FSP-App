@@ -69,13 +69,15 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
           setAcceptedPrivacy(false);
           setMode('login');
           
-          // For new registrations, trigger tutorial after a brief delay
-          if (mode === 'register') {
+          // For both login and register, check if tutorial should be shown
+          const tutorialViewed = localStorage.getItem('tutorialViewed');
+          if (!tutorialViewed) {
+            // Trigger tutorial after a brief delay
             setTimeout(() => {
-              // This will be handled by the App.js useEffect when it detects 
-              // authToken exists but tutorial hasn't been viewed
-              window.location.reload(); // Simple way to trigger the flow
-            }, 500);
+              // Trigger tutorial through event that App.js can listen to
+              const tutorialEvent = new CustomEvent('showTutorial');
+              window.dispatchEvent(tutorialEvent);
+            }, 1000);
           }
         } else {
           setError(result.error);
