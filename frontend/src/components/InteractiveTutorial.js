@@ -66,47 +66,8 @@ const cleanupAllTutorialElements = () => {
   });
 };
 
-// Enhanced spotlight component that highlights elements properly
-const TutorialSpotlight = ({ elementPosition, isVisible, currentStep }) => {
-  useEffect(() => {
-    if (!isVisible || !elementPosition) {
-      // Remove blur from all elements
-      document.querySelectorAll('*').forEach(el => {
-        if (el.style && el.style.filter && el.style.filter.includes('blur')) {
-          el.style.filter = el.style.filter.replace(/blur\([^)]*\)/g, '').trim();
-          if (!el.style.filter) {
-            el.style.filter = '';
-          }
-        }
-      });
-      return;
-    }
-
-    // Add blur to the main app container but not to the highlighted element
-    const mainContainer = document.querySelector('.main-container, .App, [data-testid="app-container"]') || document.body;
-    
-    // Apply blur to background
-    const elementsToBlur = [
-      'main',
-      '.main-container',
-      '.journey-map-container',
-      '.svg-container',
-      '.header-container',
-      '.content-wrapper'
-    ];
-    
-    elementsToBlur.forEach(selector => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach(el => {
-        if (el.style) {
-          el.style.filter = 'blur(3px)';
-          el.style.transition = 'filter 0.3s ease';
-        }
-      });
-    });
-    
-  }, [isVisible, elementPosition]);
-
+// Simple spotlight - just highlight the element, don't blur anything else
+const TutorialSpotlight = ({ elementPosition, isVisible }) => {
   if (!isVisible || !elementPosition) return null;
 
   return (
@@ -115,18 +76,19 @@ const TutorialSpotlight = ({ elementPosition, isVisible, currentStep }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="tutorial-spotlight-overlay"
+      className="tutorial-spotlight-ring"
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: 101,
+        top: elementPosition.top - 20,
+        left: elementPosition.left - 20,
+        width: elementPosition.width + 40,
+        height: elementPosition.height + 40,
+        border: '4px solid #3b82f6',
+        borderRadius: '12px',
+        boxShadow: '0 0 0 8px rgba(59, 130, 246, 0.3), 0 0 30px rgba(59, 130, 246, 0.5)',
+        zIndex: 104,
         pointerEvents: 'none',
-        background: `radial-gradient(circle at ${elementPosition.centerX}px ${elementPosition.centerY}px, 
-          transparent ${Math.max(elementPosition.width, elementPosition.height) / 2 + 30}px, 
-          rgba(0,0,0,0.7) ${Math.max(elementPosition.width, elementPosition.height) / 2 + 50}px)`
+        animation: 'tutorialPulse 2s infinite'
       }}
     />
   );
