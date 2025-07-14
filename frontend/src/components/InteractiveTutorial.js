@@ -94,62 +94,45 @@ const TutorialSpotlight = ({ elementPosition, isVisible }) => {
   );
 };
 
-// Enhanced floating arrow component that points accurately to highlighted elements
+// Simple arrow - only show when it makes sense
 const TutorialArrow = ({ elementPosition, position, isVisible, stepData }) => {
-  if (!isVisible || !elementPosition) return null;
+  if (!isVisible || !elementPosition || !shouldShowArrow(stepData)) return null;
 
-  const getArrowPosition = () => {
-    const offset = 40;
-    const arrowSize = 32;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // Convert viewport coordinates to absolute coordinates
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
-    let left, top, rotate, ArrowComponent;
+  const getArrowStyle = () => {
+    const offset = 50;
     
     switch (position) {
       case 'top':
-        left = elementPosition.centerX - arrowSize / 2;
-        top = elementPosition.top - offset - arrowSize;
-        rotate = 'rotate(180deg)';
-        ArrowComponent = ArrowDown;
-        break;
+        return {
+          top: elementPosition.top - offset,
+          left: elementPosition.centerX - 15,
+          transform: 'rotate(180deg)'
+        };
       case 'bottom':
-        left = elementPosition.centerX - arrowSize / 2;
-        top = elementPosition.bottom + offset;
-        rotate = 'rotate(0deg)';
-        ArrowComponent = ArrowDown;
-        break;
+        return {
+          top: elementPosition.bottom + 20,
+          left: elementPosition.centerX - 15,
+          transform: 'rotate(0deg)'
+        };
       case 'left':
-        left = elementPosition.left - offset - arrowSize;
-        top = elementPosition.centerY - arrowSize / 2;
-        rotate = 'rotate(90deg)';
-        ArrowComponent = ArrowRight;
-        break;
+        return {
+          top: elementPosition.centerY - 15,
+          left: elementPosition.left - offset,
+          transform: 'rotate(90deg)'
+        };
       case 'right':
-        left = elementPosition.right + offset;
-        top = elementPosition.centerY - arrowSize / 2;
-        rotate = 'rotate(-90deg)';
-        ArrowComponent = ArrowLeft;
-        break;
+        return {
+          top: elementPosition.centerY - 15,
+          left: elementPosition.right + 20,
+          transform: 'rotate(-90deg)'
+        };
       default:
-        left = elementPosition.centerX - arrowSize / 2;
-        top = elementPosition.top - offset - arrowSize;
-        rotate = 'rotate(180deg)';
-        ArrowComponent = ArrowDown;
+        return null;
     }
-    
-    // Ensure arrow stays within viewport
-    left = Math.max(10, Math.min(left, viewportWidth - arrowSize - 10));
-    top = Math.max(10, Math.min(top, viewportHeight - arrowSize - 10));
-    
-    return { left, top, rotate, ArrowComponent };
   };
 
-  const arrowStyle = getArrowPosition();
+  const arrowStyle = getArrowStyle();
+  if (!arrowStyle) return null;
 
   return (
     <motion.div
@@ -160,18 +143,25 @@ const TutorialArrow = ({ elementPosition, position, isVisible, stepData }) => {
       className="tutorial-arrow"
       style={{
         position: 'fixed',
-        left: arrowStyle.left,
-        top: arrowStyle.top,
-        zIndex: 103,
+        zIndex: 105,
         pointerEvents: 'none',
-        transform: arrowStyle.rotate,
+        ...arrowStyle
       }}
     >
       <div className="bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce">
-        <arrowStyle.ArrowComponent size={24} />
+        <ArrowDown size={20} />
       </div>
     </motion.div>
   );
+};
+
+// Helper function to determine if arrow should be shown
+const shouldShowArrow = (stepData) => {
+  if (!stepData || !stepData.target) return false;
+  
+  // Only show arrow for specific steps that need pointing
+  const arrowSteps = ['highlight_settings', 'highlight_toggle_bar', 'highlight_personal_files'];
+  return arrowSteps.includes(stepData.action);
 };
 
 const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
