@@ -28,6 +28,9 @@ const AdminPanel = ({ isOpen, onClose }) => {
   const [newUtilDoc, setNewUtilDoc] = useState(null);
   const [editingUtilDoc, setEditingUtilDoc] = useState(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [miniGamesTab, setMiniGamesTab] = useState('fachbegriffe');
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   
   const intervalRef = useRef(null);
   const tutorialRef = useRef(null);
@@ -222,6 +225,45 @@ const AdminPanel = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleUploadMiniGameFile = async (file, gameType) => {
+    if (!file) return;
+    
+    setUploadingFile(true);
+    setUploadProgress(0);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const endpoint = gameType === 'fachbegriffe' 
+        ? '/mini-games/upload-fachbegriffe-questions'
+        : '/mini-games/upload-clinical-cases';
+      
+      const response = await api.post(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(progress);
+        }
+      });
+      
+      addNotification(`Successfully uploaded ${response.questions_saved || response.cases_saved} questions for ${gameType}`, 'success');
+      
+      // Reset form
+      const fileInput = document.getElementById(`${gameType}-file-input`);
+      if (fileInput) fileInput.value = '';
+      
+    } catch (error) {
+      console.error('Failed to upload file:', error);
+      addNotification(`Failed to upload ${gameType} file: ${error.response?.data?.detail || error.message}`, 'error');
+    } finally {
+      setUploadingFile(false);
+      setUploadProgress(0);
+    }
+  };
+
   const startTutorial = () => {
     setShowTutorial(true);
     setTutorialStep(0);
@@ -331,6 +373,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
     { id: 'users', name: 'Users', icon: Users, description: 'Gestiunea utilizatorilor' },
     { id: 'transactions', name: 'Payments', icon: DollarSign, description: 'Monitorizare plăți' },
     { id: 'content', name: 'Content', icon: FileText, description: 'Management conținut' },
+    { id: 'mini-games', name: 'Mini Games', icon: Gamepad2, description: 'Gestionare quiz-uri și întrebări' },
     { id: 'errors', name: 'Errors', icon: AlertTriangle, description: 'Rapoarte erori' },
     { id: 'settings', name: 'Settings', icon: Settings, description: 'Configurări sistem' }
   ];
@@ -1196,6 +1239,144 @@ const AdminPanel = ({ isOpen, onClose }) => {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'mini-games' && (
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">Mini Games Management</h3>
+                  <p className="text-gray-600">Upload Word documents to add questions for Fachbegriffe and Clinical Cases quizzes</p>
+                </div>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="flex gap-4 mb-6">
+                <button
+                  onClick={() => setMiniGamesTab('fachbegriffe')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    miniGamesTab === 'fachbegriffe' 
+                      ? 'bg-blue-600 text-white font-semibold' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  ⚡ Fachbegriffe Flash
+                </button>
+                <button
+                  onClick={() => setMiniGamesTab('clinical-cases')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    miniGamesTab === 'clinical-cases' 
+                      ? 'bg-blue-600 text-white font-semibold' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  🔍 Clinical Cases
+                </button>
+              </div>
+
+              {/* Upload Section */}
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                  {miniGamesTab === 'fachbegriffe' ? 'Upload Fachbegriffe Questions' : 'Upload Clinical Cases'}
+                </h4>
+                
+                <div className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h5 className="font-semibold text-blue-800 mb-2">📋 Document Format Requirements</h5>
+                    <div className="text-sm text-blue-700 space-y-1">
+                      {miniGamesTab === 'fachbegriffe' ? (
+                        <>
+                          <p>• <strong>Format:</strong> Word document (.docx)</p>
+                          <p>• <strong>Structure:</strong> Each question on a new line</p>
+                          <p>• <strong>Example:</strong></p>
+                          <div className="bg-white p-3 rounded border-l-4 border-blue-400 mt-2">
+                            <p className="text-xs">Ce înseamnă 'Schmerzen' în română?</p>
+                            <p className="text-xs">a) Dureri</p>
+                            <p className="text-xs">b) Febră</p>
+                            <p className="text-xs">c) Greață</p>
+                            <p className="text-xs">d) Amețeală</p>
+                            <p className="text-xs">Răspuns: a</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p>• <strong>Format:</strong> Word document (.docx)</p>
+                          <p>• <strong>Structure:</strong> Clinical case description followed by options</p>
+                          <p>• <strong>Example:</strong></p>
+                          <div className="bg-white p-3 rounded border-l-4 border-blue-400 mt-2">
+                            <p className="text-xs">Pacient de 45 ani, bărbat, prezintă durere toracică intensă, irradiată în brațul stâng, transpirații reci și dispnee. Care este cel mai probabil diagnostic?</p>
+                            <p className="text-xs">a) Pneumonie</p>
+                            <p className="text-xs">b) Infarct miocardic acut</p>
+                            <p className="text-xs">c) Reflux gastroesofagian</p>
+                            <p className="text-xs">d) Anxietate</p>
+                            <p className="text-xs">Răspuns: b</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      id={`${miniGamesTab}-file-input`}
+                      accept=".docx"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          handleUploadMiniGameFile(file, miniGamesTab);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor={`${miniGamesTab}-file-input`}
+                      className="cursor-pointer"
+                    >
+                      <div className="space-y-4">
+                        <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                          <FileText size={24} className="text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="text-lg font-medium text-gray-700">
+                            {uploadingFile ? 'Uploading...' : 'Click to upload Word document'}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Only .docx files are supported
+                          </p>
+                        </div>
+                        {uploadingFile && (
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${uploadProgress}%` }}
+                            ></div>
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+
+                  {uploadingFile && (
+                    <div className="text-center text-sm text-gray-600">
+                      Processing document... Please wait.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h5 className="font-semibold text-yellow-800 mb-2">💡 Tips for Best Results</h5>
+                <div className="text-sm text-yellow-700 space-y-1">
+                  <p>• Ensure your Word document follows the format shown above</p>
+                  <p>• Use clear, unambiguous questions and answers</p>
+                  <p>• Include 4 options (a, b, c, d) for each question</p>
+                  <p>• Mark the correct answer with "Răspuns: [letter]"</p>
+                  <p>• Questions will be automatically added to the mini-games</p>
+                </div>
               </div>
             </div>
           )}

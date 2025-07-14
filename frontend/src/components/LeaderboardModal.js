@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, Medal, Crown, Star, Zap, Target, Clock, Award, Users, Gamepad2, Play, RefreshCw, X } from 'lucide-react';
 import { InteractiveQuiz } from './InteractiveQuiz';
 import { gamificationManager } from '../utils/gamificationManager';
+import { api } from '../services/api';
 
 /**
  * Leaderboard and Competitions Component
@@ -14,13 +15,56 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
   const [activeMiniGame, setActiveMiniGame] = useState(null);
   const [userRankings, setUserRankings] = useState([]);
   const [competitions, setCompetitions] = useState([]);
+  const [miniGamesData, setMiniGamesData] = useState({
+    fachbegriffe: { title: "⚡ Fachbegriffe Flash", timeLimit: 0.5, questions: [] },
+    diagnostic: { title: "🔍 Diagnostic Express", timeLimit: null, questions: [] }
+  });
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
 
-  // Mini Games Quiz Data
-  const miniGamesData = {
-    fachbegriffe: {
-      title: "⚡ Fachbegriffe Flash",
-      timeLimit: 0.5, // 0.5 minutes = 30 seconds
-      questions: [
+  // Load questions from backend
+  const loadQuestions = async (gameType) => {
+    if (miniGamesData[gameType].questions.length > 0) return; // Already loaded
+    
+    setLoadingQuestions(true);
+    try {
+      const category = gameType === 'fachbegriffe' ? 'fachbegriffe' : 'clinical_cases';
+      const response = await api.get(`/mini-games/quiz-questions?category=${category}&limit=20`);
+      
+      if (response && response.length > 0) {
+        const formattedQuestions = response.map(q => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        }));
+        
+        setMiniGamesData(prev => ({
+          ...prev,
+          [gameType]: {
+            ...prev[gameType],
+            questions: formattedQuestions
+          }
+        }));
+      }
+    } catch (error) {
+      console.error(`Failed to load ${gameType} questions:`, error);
+      // Fallback to sample questions if backend fails
+      const fallbackQuestions = getFallbackQuestions(gameType);
+      setMiniGamesData(prev => ({
+        ...prev,
+        [gameType]: {
+          ...prev[gameType],
+          questions: fallbackQuestions
+        }
+      }));
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
+  // Fallback questions in case backend is unavailable
+  const getFallbackQuestions = (gameType) => {
+    if (gameType === 'fachbegriffe') {
+      return [
         {
           question: "Ce înseamnă 'Schmerzen' în română?",
           options: ["Dureri", "Febră", "Greață", "Amețeală"],
@@ -45,28 +89,10 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
           question: "Ce înseamnă 'Übelkeit'?",
           options: ["Durere", "Febră", "Greață", "Oboseală"],
           correctAnswer: 2
-        },
-        {
-          question: "Cum se spune 'cap' în germană?",
-          options: ["Kopf", "Hals", "Arm", "Bein"],
-          correctAnswer: 0
-        },
-        {
-          question: "Ce înseamnă 'Fieber'?",
-          options: ["Durere", "Febră", "Tuse", "Răceală"],
-          correctAnswer: 1
-        },
-        {
-          question: "Cum se spune 'sânge' în germană?",
-          options: ["Wasser", "Blut", "Luft", "Haut"],
-          correctAnswer: 1
         }
-      ]
-    },
-    diagnostic: {
-      title: "🔍 Diagnostic Express",
-      timeLimit: null, // No time limit
-      questions: [
+      ];
+    } else {
+      return [
         {
           question: "Pacient de 45 ani, bărbat, prezintă durere toracică intensă, irradiată în brațul stâng, transpirații reci și dispnee. Care este cel mai probabil diagnostic?",
           options: ["Pneumonie", "Infarct miocardic acut", "Reflux gastroesofagian", "Anxietate"],
@@ -81,18 +107,8 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
           question: "Copil de 6 ani cu febră, durere în gât, ganglioni măriți și placaj alb pe amigdale. Diagnostic?",
           options: ["Laringită", "Angină streptococică", "Gripă", "Bronșită"],
           correctAnswer: 1
-        },
-        {
-          question: "Pacient de 60 ani cu durere abdominală în fosă iliacă dreaptă, febră și leucocitoză. Diagnostic?",
-          options: ["Gastrită", "Apendicită", "Colecistită", "Pancreatită"],
-          correctAnswer: 1
-        },
-        {
-          question: "Femeie de 35 ani cu durere pelvină, amenoree de 6 săptămâni și test de sarcină pozitiv. Prezintă durere acută și hemoragie vaginală. Diagnostic?",
-          options: ["Sarcină normală", "Sarcină ectopică", "Avort spontan", "Chisturi ovariene"],
-          correctAnswer: 1
         }
-      ]
+      ];
     }
   };
 
@@ -236,8 +252,10 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
     // Here would be the actual game logic
   };
 
-  const startMiniGame = (gameType) => {
+  const startMiniGame = async (gameType) => {
     setActiveMiniGame(gameType);
+    // Load questions if not already loaded
+    await loadQuestions(gameType);
   };
 
   const handleMiniGameComplete = (result) => {
@@ -465,9 +483,17 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
                     </div>
                     <button 
                       onClick={() => startMiniGame('fachbegriffe')}
-                      className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      disabled={loadingQuestions}
+                      className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                     >
-                      Joacă Acum
+                      {loadingQuestions && activeMiniGame === 'fachbegriffe' ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                          Se încarcă...
+                        </>
+                      ) : (
+                        'Joacă Acum'
+                      )}
                     </button>
                   </div>
 
@@ -481,9 +507,17 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
                     </div>
                     <button 
                       onClick={() => startMiniGame('diagnostic')}
-                      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      disabled={loadingQuestions}
+                      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                     >
-                      Joacă Acum
+                      {loadingQuestions && activeMiniGame === 'diagnostic' ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                          Se încarcă...
+                        </>
+                      ) : (
+                        'Joacă Acum'
+                      )}
                     </button>
                   </div>
                 </div>
