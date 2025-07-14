@@ -2,6 +2,46 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, ArrowRight, ArrowLeft, Check, ArrowDown, ArrowUp, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Enhanced cleanup function to ensure all tutorial elements are properly reset
+const cleanupAllTutorialElements = () => {
+  // Remove tutorial highlight classes
+  document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
+    el.classList.remove('tutorial-highlight', 'tutorial-ring');
+    if (el.style) {
+      el.style.animation = '';
+      el.style.outline = '';
+      el.style.boxShadow = '';
+      el.style.background = '';
+    }
+  });
+
+  // Explicitly target specific elements that might have been highlighted
+  const specificSelectors = [
+    '[title="Dosarul Meu Personal"]',
+    '[title="Setări"]',
+    '.step-node',
+    '.bonus-node',
+    '.progress-toggle-mobile',
+    '.fixed.bottom-20'
+  ];
+
+  specificSelectors.forEach(selector => {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+      el.classList.remove('tutorial-highlight', 'tutorial-ring');
+      if (el.style) {
+        el.style.animation = '';
+        el.style.outline = '';
+        el.style.boxShadow = '';
+        el.style.background = '';
+      }
+    });
+  });
+
+  // Remove any tutorial-related CSS classes from body
+  document.body.classList.remove('tutorial-open');
+};
+
 // Spotlight component for highlighting elements
 const TutorialSpotlight = ({ elementPosition, isVisible }) => {
   if (!isVisible || !elementPosition) return null;
@@ -31,39 +71,39 @@ const TutorialArrow = ({ elementPosition, position, isVisible }) => {
   const getArrowPosition = () => {
     const offset = 30;
     const arrowSize = 24;
-    
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    let left, top, transform;
     switch (position) {
       case 'top':
-        return {
-          left: elementPosition.centerX - arrowSize / 2,
-          top: elementPosition.top - offset - arrowSize,
-          transform: 'rotate(180deg)'
-        };
+        left = elementPosition.centerX - arrowSize / 2;
+        top = elementPosition.top - offset - arrowSize;
+        transform = 'rotate(0deg)';
+        break;
       case 'bottom':
-        return {
-          left: elementPosition.centerX - arrowSize / 2,
-          top: elementPosition.top + elementPosition.height + offset,
-          transform: 'rotate(0deg)'
-        };
+        left = elementPosition.centerX - arrowSize / 2;
+        top = elementPosition.top + elementPosition.height + offset;
+        transform = 'rotate(180deg)';
+        break;
       case 'left':
-        return {
-          left: elementPosition.left - offset - arrowSize,
-          top: elementPosition.centerY - arrowSize / 2,
-          transform: 'rotate(90deg)'
-        };
+        left = elementPosition.left - offset - arrowSize;
+        top = elementPosition.centerY - arrowSize / 2;
+        transform = 'rotate(90deg)';
+        break;
       case 'right':
-        return {
-          left: elementPosition.left + elementPosition.width + offset,
-          top: elementPosition.centerY - arrowSize / 2,
-          transform: 'rotate(-90deg)'
-        };
+        left = elementPosition.left + elementPosition.width + offset;
+        top = elementPosition.centerY - arrowSize / 2;
+        transform = 'rotate(-90deg)';
+        break;
       default:
-        return {
-          left: elementPosition.centerX - arrowSize / 2,
-          top: elementPosition.top - offset - arrowSize,
-          transform: 'rotate(180deg)'
-        };
+        left = elementPosition.centerX - arrowSize / 2;
+        top = elementPosition.top - offset - arrowSize;
+        transform = 'rotate(0deg)';
     }
+    // Clamp to viewport
+    left = Math.max(0, Math.min(left, viewportWidth - arrowSize));
+    top = Math.max(0, Math.min(top, viewportHeight - arrowSize));
+    return { left, top, transform };
   };
 
   const arrowStyle = getArrowPosition();
@@ -330,46 +370,6 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     cleanupAllTutorialElements();
     localStorage.setItem('tutorialViewed', 'true');
     onClose();
-  };
-
-  // Enhanced cleanup function to ensure all tutorial elements are properly reset
-  const cleanupAllTutorialElements = () => {
-    // Remove tutorial highlight classes
-    document.querySelectorAll('.tutorial-highlight, .tutorial-ring').forEach(el => {
-      el.classList.remove('tutorial-highlight', 'tutorial-ring');
-      if (el.style) {
-        el.style.animation = '';
-        el.style.outline = '';
-        el.style.boxShadow = '';
-        el.style.background = '';
-      }
-    });
-
-    // Explicitly target specific elements that might have been highlighted
-    const specificSelectors = [
-      '[title="Dosarul Meu Personal"]',
-      '[title="Setări"]',
-      '.step-node',
-      '.bonus-node',
-      '.progress-toggle-mobile',
-      '.fixed.bottom-20'
-    ];
-
-    specificSelectors.forEach(selector => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach(el => {
-        el.classList.remove('tutorial-highlight', 'tutorial-ring');
-        if (el.style) {
-          el.style.animation = '';
-          el.style.outline = '';
-          el.style.boxShadow = '';
-          el.style.background = '';
-        }
-      });
-    });
-
-    // Remove any tutorial-related CSS classes from body
-    document.body.classList.remove('tutorial-open');
   };
 
   const getModalPosition = () => {
