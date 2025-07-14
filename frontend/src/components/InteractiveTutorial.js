@@ -263,49 +263,47 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
   return (
     <AnimatePresence>
       <motion.div
-        key="tutorial-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[1000]"
       >
-        {/* Enhanced spotlight effect */}
-        <TutorialSpotlight 
-          elementPosition={elementPosition} 
-          isVisible={currentStepData.showSpotlight && !!elementPosition}
-          currentStep={currentStep}
-        />
-        
-        {/* Enhanced floating arrow */}
-        <TutorialArrow 
-          elementPosition={elementPosition} 
-          position={currentStepData.position}
-          isVisible={currentStepData.showSpotlight && !!elementPosition}
-          stepData={currentStepData}
-        />
-        
+        {/* Arrow pointing to highlighted element */}
+        {highlightedElement && currentStepData.showArrow && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="tutorial-arrow fixed"
+            style={{
+              top: highlightedElement.top - 50,
+              left: highlightedElement.centerX - 15,
+              zIndex: 1050,
+              pointerEvents: 'none',
+            }}
+          >
+            <div className="bg-blue-600 text-white p-2 rounded-full shadow-lg animate-bounce">
+              <ArrowDown size={20} />
+            </div>
+          </motion.div>
+        )}
+
+        {/* Tutorial Modal */}
         <motion.div
           key={currentStep}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="bg-white rounded-xl shadow-2xl p-6 tutorial-modal-responsive"
+          className="tutorial-modal bg-white rounded-xl shadow-2xl p-6"
           style={getModalPosition()}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
-                {currentStep + 1} / {tutorialSteps.length}
-              </span>
-              {getArrowComponent() && (
-                <div className="ml-2">
-                  {getArrowComponent()}
-                </div>
-              )}
-            </div>
+            <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full">
+              {currentStep + 1} / {tutorialSteps.length}
+            </span>
             <button
               onClick={handleSkip}
               className="text-gray-400 hover:text-gray-600 transition-colors"
