@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from fastapi.security import HTTPBearer
 from typing import List, Optional
 from datetime import datetime, timedelta
 import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import json
+import re
+from docx import Document
+import io
+import uuid
 
 from ..models import (
     GameResult, GameResultCreate, GameResultResponse, ClinicalCase, 
@@ -31,6 +36,7 @@ game_results_collection = db.game_results
 clinical_cases_collection = db.clinical_cases
 fachbegriffe_collection = db.fachbegriffe_terms
 user_game_stats_collection = db.user_game_stats
+quiz_questions_collection = db.quiz_questions
 
 @router.post("/game-result", response_model=GameResultResponse)
 async def save_game_result(
@@ -411,4 +417,266 @@ async def initialize_sample_data(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error initializing sample data: {str(e)}"
+        )
+
+# Quiz Question Management Endpoints
+def parse_docx_content(file_content: bytes) -> str:
+    """Parse DOCX file content and extract text."""
+    try:
+        doc = Document(io.BytesIO(file_content))
+        text = []
+        for paragraph in doc.paragraphs:
+            if paragraph.text.strip():
+                text.append(paragraph.text.strip())
+        return '\n'.join(text)
+    except Exception as e:
+        logger.error(f"Error parsing DOCX file: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid DOCX file format: {str(e)}"
+        )
+
+def parse_fachbegriffe_text(text: str) -> List[dict]:
+    """Parse Fachbegriffe questions from text."""
+    questions = []
+    lines = text.split('\n')
+    current_question = None
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Look for question patterns
+        if '?' in line and ('înseamnă' in line.lower() or 'spune' in line.lower()):
+            if current_question:
+                questions.append(current_question)
+            
+            current_question = {
+                "question": line,
+                "options": [],
+                "correctAnswer": 0
+            }
+        elif current_question and line.startswith(('a)', 'b)', 'c)', 'd)', 'A)', 'B)', 'C)', 'D)')):
+            # Extract option
+            option_text = line[2:].strip()
+            if option_text:
+                current_question["options"].append(option_text)
+    
+    # Add the last question
+    if current_question and current_question["options"]:
+        questions.append(current_question)
+    
+    return questions
+
+def parse_clinical_cases_text(text: str) -> List[dict]:
+    """Parse clinical cases from text."""
+    cases = []
+    lines = text.split('\n')
+    current_case = None
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Look for case patterns (patient info, symptoms, etc.)
+        if any(keyword in line.lower() for keyword in ['pacient', 'ani', 'prezintă', 'durere', 'febră']):
+            if current_case:
+                cases.append(current_case)
+            
+            current_case = {
+                "question": line,
+                "options": [],
+                "correctAnswer": 0
+            }
+        elif current_case and line.startswith(('a)', 'b)', 'c)', 'd)', 'A)', 'B)', 'C)', 'D)')):
+            # Extract option
+            option_text = line[2:].strip()
+            if option_text:
+                current_case["options"].append(option_text)
+    
+    # Add the last case
+    if current_case and current_case["options"]:
+        cases.append(current_case)
+    
+    return cases
+
+@router.post("/upload-fachbegriffe-questions")
+async def upload_fachbegriffe_questions(
+    file: UploadFile = File(...),
+    admin_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Upload Fachbegriffe questions from a Word document."""
+    try:
+        if not file.filename.endswith('.docx'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only .docx files are supported"
+            )
+        
+        # Read file content
+        content = await file.read()
+        
+        # Parse DOCX content
+        text_content = parse_docx_content(content)
+        
+        # Parse questions
+        questions = parse_fachbegriffe_text(text_content)
+        
+        if not questions:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No valid questions found in the document"
+            )
+        
+        # Save questions to database
+        saved_count = 0
+        for question in questions:
+            if len(question["options"]) >= 2:  # Ensure we have at least 2 options
+                question_data = {
+                    "id": str(uuid.uuid4()),
+                    "question": question["question"],
+                    "options": question["options"],
+                    "correctAnswer": question["correctAnswer"],
+                    "category": "fachbegriffe",
+                    "difficulty": "medium",
+                    "created_by": admin_user.id,
+                    "created_at": datetime.utcnow().isoformat(),
+                    "updated_at": datetime.utcnow().isoformat(),
+                    "is_active": True
+                }
+                
+                await quiz_questions_collection.insert_one(question_data)
+                saved_count += 1
+        
+        logger.info(f"Uploaded {saved_count} Fachbegriffe questions from {file.filename}")
+        
+        return {
+            "message": f"Successfully uploaded {saved_count} Fachbegriffe questions",
+            "questions_parsed": len(questions),
+            "questions_saved": saved_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error uploading Fachbegriffe questions: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error uploading questions: {str(e)}"
+        )
+
+@router.post("/upload-clinical-cases")
+async def upload_clinical_cases(
+    file: UploadFile = File(...),
+    admin_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Upload clinical cases from a Word document."""
+    try:
+        if not file.filename.endswith('.docx'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only .docx files are supported"
+            )
+        
+        # Read file content
+        content = await file.read()
+        
+        # Parse DOCX content
+        text_content = parse_docx_content(content)
+        
+        # Parse cases
+        cases = parse_clinical_cases_text(text_content)
+        
+        if not cases:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No valid clinical cases found in the document"
+            )
+        
+        # Save cases to database
+        saved_count = 0
+        for case in cases:
+            if len(case["options"]) >= 2:  # Ensure we have at least 2 options
+                case_data = {
+                    "id": str(uuid.uuid4()),
+                    "question": case["question"],
+                    "options": case["options"],
+                    "correctAnswer": case["correctAnswer"],
+                    "category": "clinical_cases",
+                    "difficulty": "medium",
+                    "created_by": admin_user.id,
+                    "created_at": datetime.utcnow().isoformat(),
+                    "updated_at": datetime.utcnow().isoformat(),
+                    "is_active": True
+                }
+                
+                await quiz_questions_collection.insert_one(case_data)
+                saved_count += 1
+        
+        logger.info(f"Uploaded {saved_count} clinical cases from {file.filename}")
+        
+        return {
+            "message": f"Successfully uploaded {saved_count} clinical cases",
+            "cases_parsed": len(cases),
+            "cases_saved": saved_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error uploading clinical cases: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error uploading clinical cases: {str(e)}"
+        )
+
+@router.get("/quiz-questions")
+async def get_quiz_questions(
+    category: str,
+    limit: int = 20,
+    current_user: UserInDB = Depends(get_current_user)
+):
+    """Get quiz questions for mini-games."""
+    try:
+        query = {"category": category, "is_active": True}
+        
+        cursor = quiz_questions_collection.find(query).limit(limit)
+        questions = await cursor.to_list(length=limit)
+        
+        return questions
+        
+    except Exception as e:
+        logger.error(f"Error fetching quiz questions: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching quiz questions: {str(e)}"
+        )
+
+@router.delete("/quiz-questions/{question_id}")
+async def delete_quiz_question(
+    question_id: str,
+    admin_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Delete a quiz question (admin only)."""
+    try:
+        result = await quiz_questions_collection.delete_one({"id": question_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Question not found"
+            )
+        
+        logger.info(f"Deleted quiz question {question_id}")
+        return {"message": "Question deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting quiz question: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting question: {str(e)}"
         )
