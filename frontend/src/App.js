@@ -3024,9 +3024,22 @@ const AppContent = () => {
             // Show tutorial for registered users who haven't seen it
             setTimeout(() => {
                 setModalStates(prev => ({...prev, tutorial: true}));
-            }, 500);
+            }, 1000);
         }
-        // If both auth and tutorial are done, show main interface
+        
+        // Listen for tutorial trigger events from authentication
+        const handleShowTutorial = () => {
+            const tutorialViewed = localStorage.getItem('tutorialViewed');
+            if (!tutorialViewed) {
+                setModalStates(prev => ({...prev, tutorial: true}));
+            }
+        };
+        
+        window.addEventListener('showTutorial', handleShowTutorial);
+        
+        return () => {
+            window.removeEventListener('showTutorial', handleShowTutorial);
+        };
     }, []);
 
     const handleGDPRAccept = (consentData) => {
