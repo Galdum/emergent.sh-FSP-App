@@ -15,6 +15,7 @@ import GDPRConsentModal from './components/GDPRConsentModal';
 import SettingsModal from './components/SettingsModal';
 import InteractiveTutorial from './components/InteractiveTutorial';
 import LegalModal from './components/LegalModal';
+import CommunityChatModal from './components/CommunityChatModal';
 
 // Import new utilities
 import { renderMarkdown } from './utils/markdownRenderer';
@@ -824,7 +825,9 @@ const bonusNodes = [
     { id: 'email_gen', icon: Mail, title: 'Generator Email', position: { x: 50, y: 270 }, action: { type: 'gemini_email_generator' } },
     { id: 'land_rec', icon: Compass, title: 'Recomandare Land', position: { x: 350, y: 370 }, action: { type: 'gemini_land_recommender' } },
     { id: 'info_hub', icon: Info, title: 'Informații Utile', position: { x: 50, y: 440 }, action: { type: 'info_hub' } },
-    { id: 'leaderboard', icon: Trophy, title: 'Clasament', position: { x: 350, y: 500 }, action: { type: 'leaderboard' } }
+    { id: 'leaderboard', icon: Trophy, title: 'Clasament', position: { x: 350, y: 500 }, action: { type: 'leaderboard' } },
+    // Premium-only community chat node
+    { id: 'premium_chat', icon: Users, title: 'Chat Comunitate', position: { x: 200, y: 550 }, action: { type: 'premium_chat' } }
 ];
 
 // --- Personal File Modal Component - Updated to use new API integration ---
@@ -2710,34 +2713,35 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobi
 
 // --- Bonus Node Component ---
 const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
-    const { hasAIAccess } = useSubscription();
+    const { hasAIAccess, subscriptionTier } = useSubscription();
     const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
-    
-    // Color logic based on AI access and subscription
+    const isPremiumOnly = node.id === 'premium_chat';
+    // Color logic based on AI access, subscription, and premium-only
     const getNodeColor = () => {
         if (!isAccessible) return 'fill-gray-300';
-        // For AI nodes: gray for free users, orange for premium users
+        if (isPremiumOnly) {
+            return subscriptionTier === 'PREMIUM' ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-300';
+        }
         if (needsAIAccess) {
             return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-400 hover:fill-gray-500';
         }
         return 'fill-orange-500 hover:fill-orange-600';
     };
-    
     const getIconColor = () => {
         if (!isAccessible) return 'text-gray-400';
-        // For AI nodes: gray for free users, white for premium users
+        if (isPremiumOnly) {
+            return subscriptionTier === 'PREMIUM' ? 'text-white' : 'text-gray-400';
+        }
         if (needsAIAccess) {
             return hasAIAccess() ? 'text-white' : 'text-gray-500';
         }
         return 'text-white';
     };
-
     const handleClick = () => {
         if (isAccessible) {
             onClick(node.action);
         }
     };
-
     // Define all size constants consistently for bonus nodes
     const radius = isMobile ? 22 : 25;
     const clickableRadius = isMobile ? 32 : 35;
@@ -2788,7 +2792,8 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
             >
                 {isMobile && node.title.length > 10 ? node.title.substring(0, 10) + '...' : node.title}
             </text>
-            {(!isAccessible || (needsAIAccess && !hasAIAccess())) && (
+            {/* Lock icon for inaccessible or premium-only nodes */}
+            {((!isAccessible) || (isPremiumOnly && subscriptionTier !== 'PREMIUM')) && (
                 <foreignObject 
                     x={node.position.x + (radius * 0.6)} 
                     y={node.position.y - (radius * 0.6)} 
@@ -2993,7 +2998,8 @@ const AppContent = () => {
         legal: false,
         badgeSystem: false,
         clinicalCasesGame: false,
-        fachbegriffeGame: false
+        fachbegriffeGame: false,
+        communityChat: false,
     });
     
     // Gamification states
@@ -3057,12 +3063,18 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
-        // Make InfoHub (index 3) and Leaderboard (index 4) accessible for all users
-        if (nodeIndex === 3 || nodeIndex === 4) {
-            return true;
+        const node = bonusNodes[nodeIndex];
+        const { subscriptionTier } = useSubscription();
+        if (node.id === 'premium_chat') {
+            return subscriptionTier === 'PREMIUM';
         }
-        // Other nodes require premium subscription
-        return canAccessOrangeNode(nodeIndex);
+        // Make InfoHub (index 3) and Leaderboard (index 4) accessible for all users
+        if (nodeIndex === 3 || nodeIndex === 4) return true;
+        // AI nodes require AI access
+        if ([0, 1, 2].includes(nodeIndex)) {
+            return useSubscription().hasAIAccess();
+        }
+        return true;
     };
 
 
@@ -3210,6 +3222,10 @@ const AppContent = () => {
                 setModalStates(prev => ({...prev, fachbegriffeGame: true}));
                 break;
                 
+            case 'premium_chat':
+                setModalStates(prev => ({...prev, communityChat: true}));
+                break;
+                
             default:
                 console.log('Unknown action type:', action.type);
         }
@@ -3286,6 +3302,7 @@ const AppContent = () => {
         // since GDPR consent is handled during registration
     };
     const closeLegal = () => setModalStates(prev => ({...prev, legal: false}));
+    const closeCommunityChat = () => setModalStates(prev => ({...prev, communityChat: false}));
 
     // Mini-game completion handlers
     const handleClinicalCasesComplete = (result) => {
@@ -3764,6 +3781,7 @@ const AppContent = () => {
                 <FeedbackWidget />
             </div>
             
+            {modalStates.communityChat && <CommunityChatModal onClose={closeCommunityChat} />}
 
         </div>
     );
