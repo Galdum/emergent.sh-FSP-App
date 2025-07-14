@@ -1,0 +1,84 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /workspace
+plugins: anyio-4.9.0
+collected 0 items / 2 errors
+
+==================================== ERRORS ====================================
+____________ ERROR collecting test/test_backup_background_tasks.py _____________
+ImportError while importing test module '/workspace/test/test_backup_background_tasks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/networks.py:946: in import_email_validator
+    import email_validator
+E   ModuleNotFoundError: No module named 'email_validator'
+
+The above exception was the direct cause of the following exception:
+/usr/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test/test_backup_background_tasks.py:6: in <module>
+    from backend.routes.backup import _create_backup_with_logging, _create_files_backup_with_logging
+backend/routes/backup.py:4: in <module>
+    from backend.auth import get_current_user, get_current_admin_user
+backend/auth.py:9: in <module>
+    from backend.models import UserInDB, User
+backend/models.py:34: in <module>
+    class User(BaseModel):
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_model_construction.py:237: in __new__
+    complete_model_class(
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_model_construction.py:597: in complete_model_class
+    schema = gen_schema.generate_schema(cls)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:711: in generate_schema
+    schema = self._generate_schema_inner(obj)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:1004: in _generate_schema_inner
+    return self._model_schema(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:837: in _model_schema
+    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:1206: in _generate_md_field_schema
+    common_field = self._common_field_schema(name, field_info, decorators)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:1372: in _common_field_schema
+    schema = self._apply_annotations(
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:2297: in _apply_annotations
+    schema = get_inner_schema(source_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_schema_generation_shared.py:83: in __call__
+    schema = self._handler(source_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:2276: in inner_handler
+    schema = self._generate_schema_from_get_schema_method(obj, source_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:900: in _generate_schema_from_get_schema_method
+    schema = get_schema(
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/networks.py:986: in __get_pydantic_core_schema__
+    import_email_validator()
+/home/ubuntu/.local/lib/python3.13/site-packages/pydantic/networks.py:948: in import_email_validator
+    raise ImportError('email-validator is not installed, run `pip install pydantic[email]`') from e
+E   ImportError: email-validator is not installed, run `pip install pydantic[email]`
+______________ ERROR collecting test/test_celery_backup_tasks.py _______________
+test/test_celery_backup_tasks.py:4: in <module>
+    from backend.tasks import backup_tasks
+backend/tasks/backup_tasks.py:9: in <module>
+    from backend.database import get_database
+backend/database.py:10: in <module>
+    mongo_url = os.environ['MONGO_URL']
+                ^^^^^^^^^^^^^^^^^^^^^^^
+<frozen os>:716: in __getitem__
+    ???
+E   KeyError: 'MONGO_URL'
+=============================== warnings summary ===============================
+backend/models.py:56
+  /workspace/backend/models.py:56: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('email')
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR test/test_backup_background_tasks.py
+ERROR test/test_celery_backup_tasks.py - KeyError: 'MONGO_URL'
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+========================= 1 warning, 2 errors in 0.57s =========================
