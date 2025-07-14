@@ -2716,18 +2716,18 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     // Color logic based on AI access and subscription
     const getNodeColor = () => {
         if (!isAccessible) return 'fill-gray-300';
-        // For AI nodes: gray for free users, orange for premium users
+        // For AI nodes: check if user has AI access
         if (needsAIAccess) {
-            return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-400 hover:fill-gray-500';
+            return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-300 hover:fill-gray-400';
         }
         return 'fill-orange-500 hover:fill-orange-600';
     };
     
     const getIconColor = () => {
         if (!isAccessible) return 'text-gray-400';
-        // For AI nodes: gray for free users, white for premium users
+        // For AI nodes: check if user has AI access
         if (needsAIAccess) {
-            return hasAIAccess() ? 'text-white' : 'text-gray-500';
+            return hasAIAccess() ? 'text-white' : 'text-gray-400';
         }
         return 'text-white';
     };
@@ -3057,11 +3057,7 @@ const AppContent = () => {
     }, []);
 
     const isBonusNodeAccessible = (nodeIndex) => {
-        // Make InfoHub (index 3) and Leaderboard (index 4) accessible for all users
-        if (nodeIndex === 3 || nodeIndex === 4) {
-            return true;
-        }
-        // Other nodes require premium subscription
+        // All bonus nodes are now controlled by subscription tier
         return canAccessOrangeNode(nodeIndex);
     };
 
@@ -3245,7 +3241,10 @@ const AppContent = () => {
 
     const handleBonusNodeClick = (action) => {
         const nodeIndex = bonusNodes.findIndex(node => node.action.type === action.type);
-        if (!isBonusNodeAccessible(nodeIndex)) {
+        const node = bonusNodes[nodeIndex];
+        const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
+        
+        if (!isBonusNodeAccessible(nodeIndex) || (needsAIAccess && !hasAIAccess())) {
             setModalStates(prev => ({...prev, subscriptionUpgrade: true}));
             return;
         }
