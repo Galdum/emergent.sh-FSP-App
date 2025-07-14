@@ -501,75 +501,30 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     }
   };
 
-  // Enhanced manage body scroll lock and styling while tutorial is open
+  // Simplified styling
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('tutorial-open');
-      // Enhanced custom CSS for tutorial overlay
+      // Simple CSS for tutorial
       const style = document.createElement('style');
       style.textContent = `
         .tutorial-open {
           overflow: hidden;
         }
         
-        .tutorial-highlight {
-          position: relative !important;
-          z-index: 105 !important;
-          outline: 4px solid #3b82f6 !important;
-          outline-offset: 8px !important;
-          border-radius: 16px !important;
-          box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.6) !important;
-          animation: tutorialHighlight 2s infinite !important;
-          background: rgba(59, 130, 246, 0.1) !important;
-          filter: none !important;
-        }
-        
-        .tutorial-spotlight-active {
-          filter: none !important;
-          transform: scale(1.05) !important;
-          transition: all 0.3s ease !important;
-        }
-        
-        @keyframes tutorialHighlight {
-          0%, 100% { 
-            outline-color: #3b82f6; 
-            box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.6);
-            transform: scale(1.05);
-          }
-          50% { 
-            outline-color: #1d4ed8; 
-            box-shadow: 0 0 0 12px rgba(29, 78, 216, 0.5), 0 0 60px rgba(29, 78, 216, 0.7);
-            transform: scale(1.08);
-          }
-        }
-        
         @keyframes tutorialPulse {
           0%, 100% { 
-            transform: scale(1.05); 
+            transform: scale(1); 
             opacity: 1;
           }
           50% { 
-            transform: scale(1.1); 
+            transform: scale(1.05); 
             opacity: 0.9;
           }
         }
         
-        /* Enhanced SVG node highlighting */
-        g.tutorial-highlight circle,
-        g.tutorial-spotlight-active circle {
-          filter: none !important;
-          transform: scale(1.2) !important;
-          transition: all 0.3s ease !important;
-        }
-        
-        /* Make sure tutorial modal is above everything */
         .tutorial-modal-responsive {
           z-index: 110 !important;
-        }
-        
-        /* Enhanced arrow visibility */
-        .tutorial-arrow {
-          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)) !important;
         }
       `;
       style.id = 'tutorial-styles';
@@ -580,7 +535,6 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       if (existingStyle) {
         existingStyle.remove();
       }
-      // Clean up any remaining highlights when tutorial closes
       cleanupAllTutorialElements();
     }
     
@@ -590,7 +544,6 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       if (existingStyle) {
         existingStyle.remove();
       }
-      // Clean up any remaining highlights on component unmount
       cleanupAllTutorialElements();
     };
   }, [isOpen]);
