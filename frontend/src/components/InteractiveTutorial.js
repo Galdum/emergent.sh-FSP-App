@@ -232,11 +232,14 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     onClose();
   };
 
-  // Smart modal positioning to NEVER cover highlighted elements
+  // Smart modal positioning to NEVER cover highlighted elements OR UI elements
   const getModalPosition = () => {
     const padding = 20;
-    const modalWidth = 400;
+    const modalWidth = 380;
     const modalHeight = 280;
+    
+    // Reserved space for right-side UI elements (chat, settings, etc.)
+    const rightUISpace = 120;
     
     if (!highlightedElement) {
       return {
@@ -251,51 +254,46 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
+    // Calculate safe viewport dimensions (avoiding right UI elements)
+    const safeViewportWidth = viewportWidth - rightUISpace;
+    
     // Calculate available space around highlighted element
     const spaceTop = highlightedElement.top - padding;
     const spaceBottom = viewportHeight - highlightedElement.bottom - padding;
     const spaceLeft = highlightedElement.left - padding;
-    const spaceRight = viewportWidth - highlightedElement.right - padding;
+    const spaceRight = safeViewportWidth - highlightedElement.right - padding;
     
     let modalStyle = {
       position: 'fixed',
       width: `${modalWidth}px`,
     };
     
-    // Priority: bottom -> top -> right -> left
-    if (spaceBottom >= modalHeight) {
-      // Place below element
-      modalStyle.top = `${highlightedElement.bottom + 20}px`;
-      modalStyle.left = `${Math.max(padding, Math.min(
-        highlightedElement.centerX - modalWidth / 2,
-        viewportWidth - modalWidth - padding
-      ))}px`;
-    } else if (spaceTop >= modalHeight) {
-      // Place above element
-      modalStyle.top = `${highlightedElement.top - modalHeight - 20}px`;
-      modalStyle.left = `${Math.max(padding, Math.min(
-        highlightedElement.centerX - modalWidth / 2,
-        viewportWidth - modalWidth - padding
-      ))}px`;
-    } else if (spaceRight >= modalWidth) {
-      // Place to the right
-      modalStyle.left = `${highlightedElement.right + 20}px`;
-      modalStyle.top = `${Math.max(padding, Math.min(
-        highlightedElement.centerY - modalHeight / 2,
-        viewportHeight - modalHeight - padding
-      ))}px`;
-    } else if (spaceLeft >= modalWidth) {
+    // Priority: left -> bottom -> top -> center
+    if (spaceLeft >= modalWidth) {
       // Place to the left
       modalStyle.left = `${highlightedElement.left - modalWidth - 20}px`;
       modalStyle.top = `${Math.max(padding, Math.min(
         highlightedElement.centerY - modalHeight / 2,
         viewportHeight - modalHeight - padding
       ))}px`;
+    } else if (spaceBottom >= modalHeight) {
+      // Place below element
+      modalStyle.top = `${highlightedElement.bottom + 20}px`;
+      modalStyle.left = `${Math.max(padding, Math.min(
+        highlightedElement.centerX - modalWidth / 2,
+        safeViewportWidth - modalWidth - padding
+      ))}px`;
+    } else if (spaceTop >= modalHeight) {
+      // Place above element
+      modalStyle.top = `${highlightedElement.top - modalHeight - 20}px`;
+      modalStyle.left = `${Math.max(padding, Math.min(
+        highlightedElement.centerX - modalWidth / 2,
+        safeViewportWidth - modalWidth - padding
+      ))}px`;
     } else {
-      // Fallback: center position
-      modalStyle.top = '50%';
-      modalStyle.left = '50%';
-      modalStyle.transform = 'translate(-50%, -50%)';
+      // Fallback: center-left position (safe from right UI)
+      modalStyle.left = `${Math.max(padding, (safeViewportWidth - modalWidth) / 2)}px`;
+      modalStyle.top = `${Math.max(padding, (viewportHeight - modalHeight) / 2)}px`;
     }
     
     return modalStyle;
