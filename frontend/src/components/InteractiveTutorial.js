@@ -70,8 +70,11 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
 
   const currentStepData = tutorialSteps[currentStep];
 
-  // Find and highlight element
+  // Find and highlight element - FIXED VERSION
   const findAndHighlightElement = useCallback((target) => {
+    // Clear previous highlights first
+    cleanupTutorial();
+    
     if (!target) {
       setHighlightedElement(null);
       return;
@@ -80,33 +83,30 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     let element = document.querySelector(target);
     
     // Enhanced fallback selectors
-    if (!element && target === '.step-node') {
-      element = document.querySelector('.step-node-mobile') || 
-                document.querySelector('g.step-node') || 
-                document.querySelector('g.step-node-mobile') ||
-                document.querySelector('circle[class*="fill-blue-500"]') ||
-                document.querySelector('circle[class*="fill-green-500"]');
-    }
-    
-    if (!element && target === '.bonus-node') {
-      element = document.querySelector('.bonus-node-mobile') || 
-                document.querySelector('g.bonus-node') || 
-                document.querySelector('g.bonus-node-mobile') ||
-                document.querySelector('circle[class*="fill-orange-500"]');
-    }
-
-    if (!element && target === '.fixed.bottom-20') {
-      element = document.querySelector('.progress-toggle-mobile') || 
-                document.querySelector('[class*="fixed"][class*="bottom"]') ||
-                document.querySelector('button[class*="toggle"]');
+    if (!element) {
+      if (target === '.step-node') {
+        element = document.querySelector('.step-node-mobile') || 
+                  document.querySelector('g.step-node') || 
+                  document.querySelector('g.step-node-mobile') ||
+                  document.querySelector('circle[class*="fill-blue-500"]') ||
+                  document.querySelector('circle[class*="fill-green-500"]');
+      } else if (target === '.bonus-node') {
+        element = document.querySelector('.bonus-node-mobile') || 
+                  document.querySelector('g.bonus-node') || 
+                  document.querySelector('g.bonus-node-mobile') ||
+                  document.querySelector('circle[class*="fill-orange-500"]');
+      } else if (target === '.fixed.bottom-20') {
+        element = document.querySelector('.progress-toggle-mobile') || 
+                  document.querySelector('[class*="fixed"][class*="bottom"]') ||
+                  document.querySelector('button[class*="toggle"]');
+      }
     }
 
     if (element) {
-      // Clear previous highlights
-      cleanupTutorial();
-      
       // Add highlight with MAXIMUM visibility
       element.classList.add('tutorial-highlight');
+      
+      // Force styles to ensure visibility
       element.style.position = 'relative';
       element.style.zIndex = '9999';
       element.style.outline = '4px solid #3b82f6';
@@ -139,14 +139,19 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     }
   }, []);
 
-  // Update highlight when step changes
+  // Update highlight when step changes - FIXED VERSION
   useEffect(() => {
-    if (isOpen) {
-      findAndHighlightElement(currentStepData.target);
+    if (isOpen && currentStepData) {
+      // Add a small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        findAndHighlightElement(currentStepData.target);
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
-  }, [currentStep, isOpen, findAndHighlightElement, currentStepData.target]);
+  }, [currentStep, isOpen, findAndHighlightElement, currentStepData]);
 
-  // Setup tutorial styles
+  // Setup tutorial styles - FIXED VERSION
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('tutorial-active');
@@ -183,14 +188,17 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         
         .tutorial-modal {
           z-index: 8000 !important;
+          pointer-events: auto !important;
         }
         
         .tutorial-arrow {
           z-index: 8500 !important;
+          pointer-events: none !important;
         }
         
         .tutorial-backdrop {
           z-index: 7000 !important;
+          pointer-events: none !important;
         }
       `;
       document.head.appendChild(style);
@@ -199,9 +207,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
     }
     
     return () => {
-      if (!isOpen) {
-        cleanupTutorial();
-      }
+      cleanupTutorial();
     };
   }, [isOpen]);
 
