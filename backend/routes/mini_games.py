@@ -441,32 +441,34 @@ def parse_fachbegriffe_text(text: str) -> List[dict]:
     questions = []
     lines = text.split('\n')
     current_question = None
+    option_letters = ['a', 'b', 'c', 'd']
     
     for line in lines:
         line = line.strip()
         if not line:
             continue
-            
+        
         # Look for question patterns
         if '?' in line and ('înseamnă' in line.lower() or 'spune' in line.lower()):
-            if current_question:
+            if current_question and len(current_question["options"]) >= 2 and "correctAnswer" in current_question:
                 questions.append(current_question)
-            
             current_question = {
                 "question": line,
                 "options": [],
-                "correctAnswer": 0
             }
-        elif current_question and line.startswith(('a)', 'b)', 'c)', 'd)', 'A)', 'B)', 'C)', 'D)')):
+        elif current_question and line[:2].lower() in [f"{l})" for l in option_letters]:
             # Extract option
             option_text = line[2:].strip()
             if option_text:
                 current_question["options"].append(option_text)
-    
+        elif current_question and line.lower().startswith('răspuns:'):
+            # Extract correct answer letter
+            answer_letter = line.split(':', 1)[-1].strip().lower()
+            if answer_letter in option_letters:
+                current_question["correctAnswer"] = option_letters.index(answer_letter)
     # Add the last question
-    if current_question and current_question["options"]:
+    if current_question and len(current_question["options"]) >= 2 and "correctAnswer" in current_question:
         questions.append(current_question)
-    
     return questions
 
 def parse_clinical_cases_text(text: str) -> List[dict]:
@@ -474,32 +476,33 @@ def parse_clinical_cases_text(text: str) -> List[dict]:
     cases = []
     lines = text.split('\n')
     current_case = None
+    option_letters = ['a', 'b', 'c', 'd']
     
     for line in lines:
         line = line.strip()
         if not line:
             continue
-            
         # Look for case patterns (patient info, symptoms, etc.)
         if any(keyword in line.lower() for keyword in ['pacient', 'ani', 'prezintă', 'durere', 'febră']):
-            if current_case:
+            if current_case and len(current_case["options"]) >= 2 and "correctAnswer" in current_case:
                 cases.append(current_case)
-            
             current_case = {
                 "question": line,
                 "options": [],
-                "correctAnswer": 0
             }
-        elif current_case and line.startswith(('a)', 'b)', 'c)', 'd)', 'A)', 'B)', 'C)', 'D)')):
+        elif current_case and line[:2].lower() in [f"{l})" for l in option_letters]:
             # Extract option
             option_text = line[2:].strip()
             if option_text:
                 current_case["options"].append(option_text)
-    
+        elif current_case and line.lower().startswith('răspuns:'):
+            # Extract correct answer letter
+            answer_letter = line.split(':', 1)[-1].strip().lower()
+            if answer_letter in option_letters:
+                current_case["correctAnswer"] = option_letters.index(answer_letter)
     # Add the last case
-    if current_case and current_case["options"]:
+    if current_case and len(current_case["options"]) >= 2 and "correctAnswer" in current_case:
         cases.append(current_case)
-    
     return cases
 
 @router.post("/upload-fachbegriffe-questions")
