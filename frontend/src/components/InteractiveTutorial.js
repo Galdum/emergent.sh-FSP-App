@@ -304,41 +304,87 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
       case 'highlight_personal_files':
         const personalFileBtn = document.querySelector('[title="Dosarul Meu Personal"]');
         if (personalFileBtn) {
-          personalFileBtn.classList.add('tutorial-highlight');
+          personalFileBtn.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
           personalFileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Add pulse effect
-          personalFileBtn.style.animation = 'pulse 2s infinite';
-          // Note: Removed auto-click to prevent hidden modals during tutorial
+          // Enhanced styling for visibility
+          personalFileBtn.style.position = 'relative';
+          personalFileBtn.style.zIndex = '105';
+          personalFileBtn.style.filter = 'none';
+          personalFileBtn.style.animation = 'tutorialPulse 2s infinite';
         }
         break;
         
       case 'highlight_progress_steps':
-        const stepNodes = document.querySelectorAll('.step-node');
+        // Target both regular and mobile step nodes
+        const stepSelectors = [
+          '.step-node',
+          '.step-node-mobile',
+          'g.step-node-mobile',
+          'g:has(.step-node)',
+          'circle[class*="fill-blue-500"], circle[class*="fill-green-500"]'
+        ];
+        
+        let stepNodes = [];
+        stepSelectors.forEach(selector => {
+          const nodes = document.querySelectorAll(selector);
+          nodes.forEach(node => {
+            if (!stepNodes.includes(node)) {
+              stepNodes.push(node);
+            }
+          });
+        });
+        
         stepNodes.forEach((node, index) => {
-          node.classList.add('tutorial-highlight');
+          node.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
+          node.style.position = 'relative';
+          node.style.zIndex = '105';
+          node.style.filter = 'none';
           // Stagger the animations
           setTimeout(() => {
             if (node.style) {
-              node.style.animation = 'pulse 2s infinite';
+              node.style.animation = 'tutorialPulse 2s infinite';
             }
-          }, index * 100);
+          }, index * 150);
         });
+        
         if (stepNodes.length > 0) {
           stepNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         break;
         
       case 'highlight_bonus_nodes':
-        const bonusNodes = document.querySelectorAll('.bonus-node');
+        // Target both regular and mobile bonus nodes
+        const bonusSelectors = [
+          '.bonus-node',
+          '.bonus-node-mobile',
+          'g.bonus-node-mobile',
+          'g:has(.bonus-node)',
+          'circle[class*="fill-orange-500"]'
+        ];
+        
+        let bonusNodes = [];
+        bonusSelectors.forEach(selector => {
+          const nodes = document.querySelectorAll(selector);
+          nodes.forEach(node => {
+            if (!bonusNodes.includes(node)) {
+              bonusNodes.push(node);
+            }
+          });
+        });
+        
         bonusNodes.forEach((node, index) => {
-          node.classList.add('tutorial-highlight');
+          node.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
+          node.style.position = 'relative';
+          node.style.zIndex = '105';
+          node.style.filter = 'none';
           // Stagger the animations
           setTimeout(() => {
             if (node.style) {
-              node.style.animation = 'pulse 2s infinite';
+              node.style.animation = 'tutorialPulse 2s infinite';
             }
           }, index * 200);
         });
+        
         if (bonusNodes.length > 0) {
           bonusNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -346,23 +392,39 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
         
       case 'highlight_toggle_bar':
         // Try both mobile and desktop toggle bar selectors
-        const toggleBarMobile = document.querySelector('.progress-toggle-mobile');
-        const toggleBarDesktop = document.querySelector('.fixed.bottom-20');
-        const toggleBar = toggleBarMobile || toggleBarDesktop;
+        const toggleBarSelectors = [
+          '.progress-toggle-mobile',
+          '.fixed.bottom-20',
+          '[class*="fixed"][class*="bottom"]',
+          'button[class*="toggle"]'
+        ];
+        
+        let toggleBar = null;
+        toggleBarSelectors.forEach(selector => {
+          if (!toggleBar) {
+            toggleBar = document.querySelector(selector);
+          }
+        });
         
         if (toggleBar) {
-          toggleBar.classList.add('tutorial-highlight');
+          toggleBar.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
           toggleBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          toggleBar.style.animation = 'pulse 2s infinite';
+          toggleBar.style.position = 'relative';
+          toggleBar.style.zIndex = '105';
+          toggleBar.style.filter = 'none';
+          toggleBar.style.animation = 'tutorialPulse 2s infinite';
         }
         break;
         
       case 'highlight_settings':
         const settingsBtn = document.querySelector('[title="Setări"]');
         if (settingsBtn) {
-          settingsBtn.classList.add('tutorial-highlight');
+          settingsBtn.classList.add('tutorial-highlight', 'tutorial-spotlight-active');
           settingsBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          settingsBtn.style.animation = 'pulse 2s infinite';
+          settingsBtn.style.position = 'relative';
+          settingsBtn.style.zIndex = '105';
+          settingsBtn.style.filter = 'none';
+          settingsBtn.style.animation = 'tutorialPulse 2s infinite';
         }
         break;
     }
