@@ -500,7 +500,7 @@ const InteractiveTutorial = ({ isOpen, onClose, onComplete }) => {
             Sari peste tutorial
           </button>
         </div>
-      </div>
+      </motion.div>
     </AnimatePresence>
   );
 };
