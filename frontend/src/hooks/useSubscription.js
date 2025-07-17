@@ -39,6 +39,18 @@ export const useSubscription = () => {
     return tier.hasAI;
   };
 
+  // Helper pentru a identifica nodurile AI/extra
+  const isAIFeatureNode = (nodeId) => {
+    // Lista de id-uri pentru noduri AI/extra (bonus)
+    return ['fsp_tutor', 'email_gen', 'land_rec'].includes(nodeId);
+  };
+
+  // Acces la noduri AI/extra (bonus)
+  const canAccessAIFeatureNode = (nodeId) => {
+    // Doar la PREMIUM ai acces la AI/extra
+    return subscriptionTier === 'PREMIUM' && isAIFeatureNode(nodeId);
+  };
+
   const upgradeSubscription = async (newTier) => {
     try {
       if (isAuthenticated) {
@@ -69,6 +81,8 @@ export const useSubscription = () => {
     canAccessOrangeNode,
     hasAIAccess,
     upgradeSubscription,
-    SUBSCRIPTION_TIERS
+    SUBSCRIPTION_TIERS,
+    isAIFeatureNode,
+    canAccessAIFeatureNode
   };
 };

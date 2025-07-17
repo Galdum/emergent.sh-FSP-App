@@ -2710,29 +2710,34 @@ const StepNode = ({ step, position, onStepClick, isCurrent, isAccessible, isMobi
 
 // --- Bonus Node Component ---
 const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
-    const { hasAIAccess } = useSubscription();
-    const needsAIAccess = ['fsp_tutor', 'email_gen', 'land_rec'].includes(node.id);
-    
-    // Color logic based on AI access and subscription
+    const { subscriptionTier, isAIFeatureNode, canAccessAIFeatureNode } = useSubscription();
+    const needsAIAccess = isAIFeatureNode(node.id);
+
+    // Culoare si lacat pentru AI/extra la FREE si BASIC - identic
     const getNodeColor = () => {
-        if (!isAccessible) return 'fill-gray-300';
-        // For AI nodes: check if user has AI access
-        if (needsAIAccess) {
-            return hasAIAccess() ? 'fill-orange-500 hover:fill-orange-600' : 'fill-gray-300 hover:fill-gray-400';
+        if (needsAIAccess && subscriptionTier !== 'PREMIUM') {
+            return 'fill-gray-300';
         }
+        if (!isAccessible) return 'fill-gray-300';
         return 'fill-orange-500 hover:fill-orange-600';
     };
-    
+
     const getIconColor = () => {
-        if (!isAccessible) return 'text-gray-400';
-        // For AI nodes: check if user has AI access
-        if (needsAIAccess) {
-            return hasAIAccess() ? 'text-white' : 'text-gray-400';
+        if (needsAIAccess && subscriptionTier !== 'PREMIUM') {
+            return 'text-gray-400';
         }
+        if (!isAccessible) return 'text-gray-400';
         return 'text-white';
     };
 
+    const showLock = () => {
+        // La FREE si BASIC, AI/extra au lacat; la PREMIUM nu
+        return (needsAIAccess && subscriptionTier !== 'PREMIUM') || !isAccessible;
+    };
+
     const handleClick = () => {
+        // La FREE si BASIC, AI/extra nu sunt accesibile
+        if (needsAIAccess && subscriptionTier !== 'PREMIUM') return;
         if (isAccessible) {
             onClick(node.action);
         }
@@ -2788,7 +2793,7 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
             >
                 {isMobile && node.title.length > 10 ? node.title.substring(0, 10) + '...' : node.title}
             </text>
-            {(!isAccessible || (needsAIAccess && !hasAIAccess())) && (
+            {showLock() && (
                 <foreignObject 
                     x={node.position.x + (radius * 0.6)} 
                     y={node.position.y - (radius * 0.6)} 
@@ -3614,7 +3619,15 @@ const AppContent = () => {
                                 position={nodePositions[index]} 
                                 onStepClick={handleStepClick} 
                                 isCurrent={currentStep?.id === step.id} 
-                                isAccessible={canAccessStep(index + 1)}
+                                isAccessible={(() => {
+                                    // FREE: doar primele 2 main accesibile
+                                    if (subscriptionTier === 'FREE') return index < 2;
+                                    // BASIC: toate main accesibile
+                                    if (subscriptionTier === 'BASIC') return true;
+                                    // PREMIUM: toate accesibile
+                                    if (subscriptionTier === 'PREMIUM') return true;
+                                    return false;
+                                })()}
                                 isMobile={isMobile}
                             /> 
                         ))}
