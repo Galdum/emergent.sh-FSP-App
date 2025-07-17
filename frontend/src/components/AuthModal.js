@@ -143,7 +143,7 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[80] p-4 animate-fade-in-fast">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg text-gray-800 p-6 relative transform animate-scale-in">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg text-gray-800 p-6 relative transform animate-scale-in max-h-[90vh] overflow-y-auto" style={{maxWidth: 'min(100vw - 32px, 420px)'}}>
         <button onClick={onClose} className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10">
           <X size={24} />
         </button>

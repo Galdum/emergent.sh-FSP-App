@@ -450,7 +450,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[90] p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" style={{maxWidth: 'min(100vw - 32px, 700px)'}}>
         <div className="flex">
           {/* Sidebar */}
           <div className="w-1/4 bg-gray-50 p-4 border-r">
