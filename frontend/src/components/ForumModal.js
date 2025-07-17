@@ -11,45 +11,55 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
   const [messages, setMessages] = useState([]);
   const [newThreadTitle, setNewThreadTitle] = useState("");
   const [newMessage, setNewMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  // Loading states separate
+  const [loadingChannels, setLoadingChannels] = useState(false);
+  const [loadingThreads, setLoadingThreads] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [creatingThread, setCreatingThread] = useState(false);
+  const [creatingMessage, setCreatingMessage] = useState(false);
+  // Error state
   const [error, setError] = useState("");
 
   // Fetch channels
   useEffect(() => {
     if (!isOpen || !isPremium) return;
-    setLoading(true);
+    setLoadingChannels(true);
+    setError("");
     fetch(`${API}/channels`)
       .then((r) => r.json())
       .then(setChannels)
       .catch(() => setError("Eroare la încărcarea canalelor."))
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingChannels(false));
   }, [isOpen, isPremium]);
 
   // Fetch threads when channel changes
   useEffect(() => {
     if (!selectedChannel || !isPremium) return;
-    setLoading(true);
+    setLoadingThreads(true);
+    setError("");
     fetch(`${API}/channels/${selectedChannel.id}/threads`)
       .then((r) => r.json())
       .then(setThreads)
       .catch(() => setError("Eroare la încărcarea discuțiilor."))
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingThreads(false));
   }, [selectedChannel, isPremium]);
 
   // Fetch messages when thread changes
   useEffect(() => {
     if (!selectedThread || !isPremium) return;
-    setLoading(true);
+    setLoadingMessages(true);
+    setError("");
     fetch(`${API}/threads/${selectedThread.id}/messages`)
       .then((r) => r.json())
       .then(setMessages)
       .catch(() => setError("Eroare la încărcarea mesajelor."))
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingMessages(false));
   }, [selectedThread, isPremium]);
 
   const handleCreateThread = () => {
     if (!newThreadTitle.trim()) return;
-    setLoading(true);
+    setCreatingThread(true);
+    setError("");
     fetch(`${API}/channels/${selectedChannel.id}/threads`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -61,12 +71,13 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
         setNewThreadTitle("");
       })
       .catch(() => setError("Eroare la crearea discuției."))
-      .finally(() => setLoading(false));
+      .finally(() => setCreatingThread(false));
   };
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
-    setLoading(true);
+    setCreatingMessage(true);
+    setError("");
     fetch(`${API}/threads/${selectedThread.id}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,7 +89,7 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
         setNewMessage("");
       })
       .catch(() => setError("Eroare la trimiterea mesajului."))
-      .finally(() => setLoading(false));
+      .finally(() => setCreatingMessage(false));
   };
 
   if (!isOpen) return null;
@@ -116,7 +127,7 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
                 <Hash size={20} />
                 Canale
               </h3>
-              {loading ? (
+              {loadingChannels ? (
                 <div>Se încarcă...</div>
               ) : channels.length === 0 ? (
                 <div className="text-gray-400">Niciun canal.</div>
@@ -158,7 +169,8 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
                     />
                     <button
                       onClick={handleCreateThread}
-                      className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 flex items-center gap-1"
+                      disabled={creatingThread}
+                      className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 flex items-center gap-1 disabled:opacity-50"
                     >
                       <PlusCircle size={18} />
                       Creează
@@ -169,7 +181,9 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
               <div className="flex flex-1 overflow-hidden">
                 {/* Thread list */}
                 <div className="w-1/3 bg-orange-100 p-3 overflow-y-auto border-r border-orange-200">
-                  {selectedChannel ? (
+                  {loadingThreads ? (
+                    <div>Se încarcă...</div>
+                  ) : selectedChannel ? (
                     threads.length === 0 ? (
                       <div className="text-gray-400">Nicio discuție.</div>
                     ) : (
@@ -192,7 +206,9 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
                 </div>
                 {/* Messages */}
                 <div className="flex-1 flex flex-col bg-white p-4 overflow-y-auto">
-                  {selectedThread ? (
+                  {loadingMessages ? (
+                    <div>Se încarcă...</div>
+                  ) : selectedThread ? (
                     <>
                       <div className="flex-1 overflow-y-auto mb-2">
                         {messages.length === 0 ? (
@@ -227,7 +243,8 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
                         />
                         <button
                           onClick={handleSendMessage}
-                          className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex items-center gap-1"
+                          disabled={creatingMessage}
+                          className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex items-center gap-1 disabled:opacity-50"
                         >
                           <Send size={18} />
                           Trimite
@@ -241,6 +258,7 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
                   )}
                 </div>
               </div>
+              {error && <div className="text-red-500 text-center p-2 font-semibold">{error}</div>}
             </div>
           </div>
         )}
