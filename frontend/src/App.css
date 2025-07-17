@@ -83,10 +83,6 @@ body {
     cursor: pointer;
 }
 
-.step-node:hover {
-    transform: scale(1.1);
-}
-
 .step-node.locked {
     cursor: not-allowed;
 }
@@ -95,10 +91,6 @@ body {
 .bonus-node {
     transition: all 0.3s ease;
     cursor: pointer;
-}
-
-.bonus-node:hover {
-    transform: scale(1.1);
 }
 
 /* Modal transitions */
