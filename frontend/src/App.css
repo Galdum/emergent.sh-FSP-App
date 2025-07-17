@@ -87,10 +87,18 @@ body {
     cursor: not-allowed;
 }
 
+.step-node:hover {
+    transform: scale(1.03);
+}
+
 /* Enhanced bonus node visibility for tutorial */
 .bonus-node {
     transition: all 0.3s ease;
     cursor: pointer;
+}
+
+.bonus-node:hover {
+    transform: scale(1.03);
 }
 
 /* Modal transitions */
