@@ -83,12 +83,12 @@ body {
     cursor: pointer;
 }
 
-.step-node:hover {
-    transform: scale(1.1);
-}
-
 .step-node.locked {
     cursor: not-allowed;
+}
+
+.step-node:hover {
+    transform: scale(1.03);
 }
 
 /* Enhanced bonus node visibility for tutorial */
@@ -98,7 +98,7 @@ body {
 }
 
 .bonus-node:hover {
-    transform: scale(1.1);
+    transform: scale(1.03);
 }
 
 /* Modal transitions */

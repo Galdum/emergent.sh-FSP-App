@@ -4781,51 +4781,104 @@ Erstelle die komplette E-Mail. Sie soll perfekt korrekt sein, aber menschlich un
               disabled={loading}
               className="w-full bg-green-600 text-white font-bold p-3 rounded-lg hover:bg-green-700 disabled:bg-green-400 flex items-center justify-center gap-2"
             >
-              {loading ? (
-                <RefreshCw className="animate-spin" size={20} />
-              ) : (
-                <Sparkles size={20} />
-              )}
-              {loading ? "Generez emailul..." : "Generează Email"}
-            </button>
-          </div>
-        )}
+// --- Bonus Node Component ---
+const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
+    const { subscriptionTier, isAIFeatureNode, canAccessAIFeatureNode } = useSubscription();
+    const needsAIAccess = isAIFeatureNode(node.id);
 
-        {view === "result" && (
-          <div className="flex flex-col flex-grow min-h-0">
-            <div className="flex items-center mb-4">
-              <button
-                onClick={() => setView("form")}
-                className="mr-4 p-2 rounded-full hover:bg-gray-200 transition-colors"
-              >
-                <ChevronLeft size={24} />
-              </button>
-              <h3 className="text-lg font-semibold">Email Generat</h3>
-            </div>
+    // Culoare si lacat pentru AI/extra la FREE si BASIC - identic
+    const getNodeColor = () => {
+        if (needsAIAccess && subscriptionTier !== 'PREMIUM') {
+            return 'fill-gray-300';
+        }
+        if (!isAccessible) return 'fill-gray-300';
+        return 'fill-orange-500 hover:fill-orange-600';
+    };
 
+    const getIconColor = () => {
+        if (needsAIAccess && subscriptionTier !== 'PREMIUM') {
+            return 'text-gray-400';
+        }
+        if (!isAccessible) return 'text-gray-400';
+        return 'text-white';
+    };
+
+    const showLock = () => {
+        // La FREE si BASIC, AI/extra au lacat; la PREMIUM nu
+        return (needsAIAccess && subscriptionTier !== 'PREMIUM') || !isAccessible;
+    };
+
+    const handleClick = () => {
+        // La FREE si BASIC, AI/extra nu sunt accesibile
+        if (needsAIAccess && subscriptionTier !== 'PREMIUM') return;
+        if (isAccessible) {
+            onClick(node.action);
+        }
+    };
+
+    // ... restul codului pentru SVG ...
+};
             <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4 border">
               <div className="prose max-w-none">{renderMarkdown(result)}</div>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => navigator.clipboard.writeText(result)}
-                className="flex-1 bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
-              >
-                <Clipboard size={20} /> Copiază
-              </button>
-              <button
-                onClick={() => setView("menu")}
-                className="flex-1 bg-gray-600 text-white font-bold p-3 rounded-lg hover:bg-gray-700"
-              >
-                Email Nou
-              </button>
+return (
+    <g className={`bonus-node ${isMobile ? 'bonus-node-mobile' : ''}`}>
+        {/* Larger invisible clickable area */}
+        <circle
+            cx={node.position.x}
+            cy={node.position.y}
+            r={clickableRadius}
+            className="fill-transparent cursor-pointer"
+            onClick={handleClick}
+            style={{ 
+                cursor: isAccessible ? 'pointer' : 'not-allowed',
+                touchAction: isMobile ? 'manipulation' : 'auto'
+            }}
+        />
+        {/* Visible circle */}
+        <circle
+            cx={node.position.x}
+            cy={node.position.y}
+            r={radius}
+            className={`transition-all duration-300 ${getNodeColor()} ${isMobile ? 'no-select-mobile' : ''}`}
+            style={{ pointerEvents: 'none' }}
+        />
+        <foreignObject 
+            x={node.position.x - iconOffset} 
+            y={node.position.y - iconOffset} 
+            width={iconContainerSize} 
+            height={iconContainerSize} 
+            style={{ pointerEvents: 'none' }}
+        >
+            <div className={`flex items-center justify-center w-full h-full ${getIconColor()}`}>
+                <node.icon size={iconSize} />
             </div>
-          </div>
+        </foreignObject>
+        <text 
+            x={node.position.x} 
+            y={node.position.y + textOffset} 
+            textAnchor="middle" 
+            className={`${isMobile ? 'text-xs' : 'text-xs'} font-semibold pointer-events-none ${isAccessible ? 'fill-gray-700' : 'fill-gray-400'}`}
+            style={{ userSelect: 'none' }}
+        >
+            {isMobile && node.title.length > 10 ? node.title.substring(0, 10) + '...' : node.title}
+        </text>
+        {showLock() && (
+            <foreignObject 
+                x={node.position.x + (radius * 0.6)} 
+                y={node.position.y - (radius * 0.6)} 
+                width={iconSize * 0.75} 
+                height={iconSize * 0.75}
+                style={{ pointerEvents: 'none' }}
+            >
+                <div className="flex items-center justify-center w-full h-full">
+                    <Lock size={iconSize * 0.6} className="text-gray-400" />
+                </div>
+            </foreignObject>
         )}
-      </div>
-    </div>
-  );
+    </g>
+);
 };
 
 // --- Step Node Component ---
@@ -5979,82 +6032,77 @@ const AppContent = () => {
         </button>
       </div>
 
-      {/* Progress toggle bar - mobile optimized */}
-      <div
-        className={`${isMobile ? "progress-toggle-mobile" : "fixed bottom-20 right-4 z-40"} flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm`}
-      >
-        <span
-          className={`${isMobile ? "text-xs" : "text-sm"} font-bold ${!freeMode ? "text-blue-600" : "text-gray-500"}`}
-        >
-          Progresiv
-        </span>
-        <button
-          onClick={() => setFreeMode(!freeMode)}
-          className={`${isMobile ? "w-8 h-4" : "w-12 h-6"} rounded-full p-1 transition-colors duration-300 ${freeMode ? "bg-green-500" : "bg-gray-300"}`}
-        >
-          <span
-            className={`block ${isMobile ? "w-2 h-2" : "w-4 h-4"} bg-white rounded-full shadow-md transform transition-transform duration-300 ${freeMode ? (isMobile ? "translate-x-4" : "translate-x-6") : "translate-x-0"}`}
-          ></span>
-        </button>
-        <span
-          className={`${isMobile ? "text-xs" : "text-sm"} font-bold ${freeMode ? "text-green-600" : "text-gray-500"}`}
-        >
-          Liber
-        </span>
-      </div>
+<div className={`w-full max-w-md mx-auto ${isMobile ? 'mobile-main-content mobile-text-scale' : ''}`}>
+    <header className="text-center mb-6 bg-white/70 backdrop-blur-sm p-4 rounded-xl shadow-md">
+        <h1 className="text-3xl md:text-4xl font-black text-gray-800">Approbation în Germania</h1>
+        <p className="text-gray-500 mt-1">Ghidul tău interactiv pas cu pas.</p>
+        
+        <div className="w-full bg-gray-200 rounded-full h-4 mt-4 overflow-hidden border border-gray-300">
+            <div className="bg-green-500 h-4 rounded-full transition-all duration-500" style={{ width: `${progressPercentage}%` }}></div>
+        </div>
+    </header>
+    
 
-      <div
-        className={`w-full max-w-md mx-auto ${isMobile ? "mobile-main-content mobile-text-scale" : ""}`}
-      >
-        <header className="text-center mb-6 bg-white/70 backdrop-blur-sm p-4 rounded-xl shadow-md">
-          <h1 className="text-3xl md:text-4xl font-black text-gray-800">
-            Approbation în Germania
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Ghidul tău interactiv pas cu pas.
-          </p>
-
-          <div className="w-full bg-gray-200 rounded-full h-4 mt-4 overflow-hidden border border-gray-300">
-            <div
-              className="bg-green-500 h-4 rounded-full transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
-          </div>
-        </header>
-
-        <main
-          className={`relative w-full h-[600px] ${isMobile ? "journey-map-mobile smooth-scroll-mobile" : ""}`}
+    
+    <main className={`relative w-full h-[600px] ${isMobile ? 'journey-map-mobile smooth-scroll-mobile' : ''}`}>
+        <Cloud style={{ top: '5%', left: '10%', width: isMobile ? '60px' : '80px', height: isMobile ? '60px' : '80px' }} />
+        <Cloud style={{ top: '60%', right: '5%', width: isMobile ? '40px' : '60px', height: isMobile ? '40px' : '60px' }} />
+        
+        <svg 
+            width="100%" 
+            height="100%" 
+            viewBox={isMobile ? "0 0 400 650" : "0 0 400 600"} 
+            preserveAspectRatio="xMidYMid meet" 
+            className={`absolute top-0 left-0 ${isMobile ? 'no-select-mobile' : ''}`}
         >
-          <Cloud
-            style={{
-              top: "5%",
-              left: "10%",
-              width: isMobile ? "60px" : "80px",
-              height: isMobile ? "60px" : "80px",
-            }}
-          />
-          <Cloud
-            style={{
-              top: "60%",
-              right: "5%",
-              width: isMobile ? "40px" : "60px",
-              height: isMobile ? "40px" : "60px",
-            }}
-          />
-
-          <svg
-            width="100%"
-            height="100%"
-            viewBox={isMobile ? "0 0 400 650" : "0 0 400 600"}
-            preserveAspectRatio="xMidYMid meet"
-            className={`absolute top-0 left-0 ${isMobile ? "no-select-mobile" : ""}`}
-          >
-            <path
-              d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480"
-              stroke="#d6a770"
-              strokeWidth={isMobile ? "6" : "8"}
-              fill="none"
-              strokeLinecap="round"
+            <path 
+                d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" 
+                stroke="#d6a770" 
+                strokeWidth={isMobile ? "6" : "8"} 
+                fill="none" 
+                strokeLinecap="round" 
+            />
+            <path 
+                d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480" 
+                stroke="white" 
+                strokeWidth={isMobile ? "2" : "3"} 
+                fill="none" 
+                strokeLinecap="round" 
+                strokeDasharray="1 10" 
+            />
+            
+            {displayedSteps.map((step, index) => ( 
+                <StepNode 
+                    key={step.id} 
+                    step={step} 
+                    position={nodePositions[index]} 
+                    onStepClick={handleStepClick} 
+                    isCurrent={currentStep?.id === step.id} 
+                    isAccessible={(() => {
+                        // FREE: doar primele 2 main accesibile
+                        if (subscriptionTier === 'FREE') return index < 2;
+                        // BASIC: toate main accesibile
+                        if (subscriptionTier === 'BASIC') return true;
+                        // PREMIUM: toate accesibile
+                        if (subscriptionTier === 'PREMIUM') return true;
+                        return false;
+                    })()}
+                    isMobile={isMobile}
+                /> 
+            ))}
+            
+            {bonusNodes.map((node, index) => 
+                <BonusNode 
+                    key={node.id} 
+                    node={node} 
+                    onClick={handleBonusNodeClick} 
+                    isAccessible={isBonusNodeAccessible(index)}
+                    isMobile={isMobile}
+                />
+            )}
+        </svg>
+    </main>
+</div>
             />
             <path
               d="M 200 80 Q 120 115, 120 160 T 280 240 Q 340 275, 160 320 T 240 400 Q 280 435, 140 480"
