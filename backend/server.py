@@ -141,6 +141,7 @@ except ModuleNotFoundError:
     AI_ROUTER_AVAILABLE = False
 
 from backend.routes.mongodb_example import router as mongodb_example_router
+from backend.routes.forum import router as forum_router
 # from routes.fsp_preparation import router as fsp_router
 # from routes.gamification import router as gamification_router
 
@@ -175,6 +176,7 @@ api_router.include_router(mini_games_router)
 if AI_ROUTER_AVAILABLE:
     api_router.include_router(ai_assistant_router)
 api_router.include_router(mongodb_example_router)
+api_router.include_router(forum_router)
 # api_router.include_router(fsp_router)
 # api_router.include_router(gamification_router)
 
