@@ -541,3 +541,29 @@ class Leaderboard(BaseModel):
     
     class Config:
         use_enum_values = True
+
+# --- Forum Models ---
+class ForumChannel(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
+class ForumThread(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    channel_id: str
+    title: str
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_locked: bool = False
+
+class ForumMessage(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    thread_id: str
+    user_id: str
+    content: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    edited_at: Optional[datetime] = None
+    is_deleted: bool = False
