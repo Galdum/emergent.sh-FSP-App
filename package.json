@@ -44,6 +44,7 @@
   "devDependencies": {
     "@craco/craco": "^5.9.0",
     "@craco/types": "^7.1.0",
+    "cross-env": "^7.0.3",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0"
   },
