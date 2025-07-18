@@ -1,3 +1,24 @@
+# FSP Navigator – Development & Preview Workflow
+
+## 🚀 New Workflow (2024)
+
+### Local Development
+- Run `npm start` in the `frontend` directory.
+- Opens the app at [http://localhost:3000](http://localhost:3000) with hot reload and source maps.
+- Uses `frontend/public/index.html` (now customized and committed).
+
+### Production Preview
+- Run `node scripts/simple-enhanced-build.js` in the `frontend` directory to generate the enhanced build.
+- Serve the build with `npx serve build -l 8000`.
+- Opens the app at [http://localhost:8000](http://localhost:8000) as it will appear in production.
+- Uses `frontend/build/index.html` (auto-generated, not tracked in git).
+
+**Note:**
+- Always re-run the enhanced build script if you want to preview the latest changes in production mode.
+- For local development, just use `npm start`.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
