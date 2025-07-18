@@ -15,13 +15,14 @@
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
-    "build:enhanced": "node scripts/simple-enhanced-build.js",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build:clean": "rm -rf build && npm run build",
-    "build:production": "npm run build:clean",
+    "start": "cd frontend && npm start",
+    "dev": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "build:enhanced": "cd frontend && npm run build:enhanced",
+    "test": "cd frontend && npm test",
+    "eject": "cd frontend && npm run eject",
+    "build:clean": "cd frontend && npm run build:clean",
+    "build:production": "cd frontend && npm run build:production",
     "postinstall": "patch-package"
   },
   "engines": {
