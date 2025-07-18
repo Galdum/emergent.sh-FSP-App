@@ -190,3 +190,10 @@ The application is ready for immediate deployment and can serve thousands of Rom
 For technical support or feature requests, please refer to the comprehensive documentation in the `/docs` folder or contact the development team.
 
 **ApprobMed - Making German medical licensing accessible for Romanian doctors! 🇷🇴 ➡️ 🇩🇪**
+
+## How to run locally
+```bash
+cd frontend
+npm ci
+npm run dev    # or react-scripts start
+```
