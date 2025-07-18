@@ -6,8 +6,8 @@
     "@paypal/react-paypal-js": "^8.8.3",
     "@react-oauth/google": "^0.12.1",
     "axios": "^1.8.4",
-    "lucide-react": "^0.522.0",
     "framer-motion": "^11.0.0",
+    "lucide-react": "^0.522.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.8.1",
@@ -26,8 +26,12 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@craco/types": "^7.1.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "glob": "^9.3.5",
     "patch-package": "^8.0.0",
-    "postinstall-postinstall": "^2.1.0"
+    "postinstall-postinstall": "^2.1.0",
+    "rimraf": "^4.4.1",
+    "svgo": "^2.8.0"
   },
   "engines": {
     "node": ">=18.0.0",
