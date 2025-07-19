@@ -259,7 +259,54 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
     setShowEmojiPicker(false);
   };
 
-  // Create thread
+  // Create forum
+  const handleCreateForum = async () => {
+    if (!newForumTitle.trim() || !newForumDescription.trim()) {
+      setError('Titlul și descrierea sunt obligatorii');
+      return;
+    }
+
+    // Generate slug from title if not provided
+    let slug = newForumSlug.trim();
+    if (!slug) {
+      slug = newForumTitle.trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim('-');
+    }
+
+    setCreatingForum(true);
+    setError("");
+    
+    try {
+      const response = await api.post('/forums/', {
+        title: newForumTitle.trim(),
+        description: newForumDescription.trim(),
+        slug: slug,
+        premium_only: true
+      });
+
+      // Add new forum to the list
+      setForums(prev => [response.data, ...prev]);
+      
+      // Reset form
+      setNewForumTitle("");
+      setNewForumDescription("");
+      setNewForumSlug("");
+      setShowCreateForum(false);
+    } catch (err) {
+      console.error('Error creating forum:', err);
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError('Eroare la crearea forumului');
+      }
+    } finally {
+      setCreatingForum(false);
+    }
+  };
   const handleCreateThread = async () => {
     if (!newThreadTitle.trim() || !newThreadBody.trim()) {
       setError('Titlul și conținutul sunt obligatorii');
