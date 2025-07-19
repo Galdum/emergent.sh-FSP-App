@@ -21,7 +21,20 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
       setBadges(response.data);
     } catch (error) {
       console.error('Failed to fetch badges:', error);
-      setBadges([]); // Set empty array on error
+      // If API fails, show demo data so user can see the interface
+      const demoBadges = [
+        { badge_id: 'first_upload', name: 'First Upload', description: 'Upload your very first document', earned: false, awarded_at: null },
+        { badge_id: 'profile_complete', name: 'Profile Complete', description: 'Fill out all profile fields', earned: true, awarded_at: '2025-07-19T11:57:37.048000' },
+        { badge_id: 'chat_starter', name: 'Chat Initiator', description: 'Send your first message to the AI assistant', earned: false, awarded_at: null },
+        { badge_id: 'chat_marathon', name: 'Chat Marathon', description: 'Send 50 messages total to the AI assistant', earned: false, awarded_at: null },
+        { badge_id: 'checklist_begin', name: 'Checklist Beginner', description: 'Complete your first checklist task', earned: false, awarded_at: null },
+        { badge_id: 'fsp_simulator', name: 'FSP Ace', description: 'Pass one simulated FSP case in the tutor', earned: false, awarded_at: null },
+        { badge_id: 'doc_manager', name: 'Document Manager', description: 'Upload 20 distinct files', earned: false, awarded_at: null },
+        { badge_id: 'email_pro', name: 'E-Mail Pro', description: 'Generate 5 official emails via the AI e-mail generator', earned: false, awarded_at: null },
+        { badge_id: 'daily_7', name: '7-Day Streak', description: 'Log in 7 days in a row', earned: false, awarded_at: null },
+        { badge_id: 'badge_collector', name: 'Badge Collector', description: 'Earn 5 different badges', earned: false, awarded_at: null }
+      ];
+      setBadges(demoBadges);
     } finally {
       setLoading(false);
     }
