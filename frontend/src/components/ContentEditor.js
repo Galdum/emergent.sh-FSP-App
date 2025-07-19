@@ -388,10 +388,10 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{ zIndex: 9999 }}>
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Type className="h-6 w-6" />
@@ -450,7 +450,7 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
         <div className="flex h-[calc(95vh-140px)]">
           {/* Sidebar - Block Types & Tools */}
           {!isPreviewMode && (
-            <div className="w-64 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto">
+            <div className="w-64 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto flex-shrink-0">
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700 mb-2">Add Content Blocks</h3>
@@ -504,7 +504,7 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4 mx-auto"></div>
                   <p className="text-gray-600">Loading content...</p>
                 </div>
               </div>
@@ -601,7 +601,7 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <div className="border-t border-gray-200 p-4 bg-gray-50 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <span>Last updated: {content?.updated_at ? new Date(content.updated_at).toLocaleString() : 'Never'}</span>
