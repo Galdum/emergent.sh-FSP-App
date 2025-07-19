@@ -68,7 +68,7 @@ async def create_forum(
     forum_data: ForumCreateRequest, 
     user: UserInDB = Depends(require_premium)
 ):
-    """Create a new forum (available to all authenticated users)"""
+    """Create a new forum (available to premium users)"""
     try:
         # Check if slug already exists
         existing = await db.forums.find_one({"slug": forum_data.slug})
