@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Lock, MessageCircle, Send, Hash, PlusCircle } from "react-feather";
-
-const API = "/api/forum";
+import { api } from "../services/api";
 
 export default function ForumModal({ isOpen, onClose, isPremium }) {
   const [channels, setChannels] = useState([]);
