@@ -81,26 +81,24 @@ def test_admin_login_with_existing_user():
     
     # Try to login with the system admin user
     system_admin_email = "system@fspnavigator.com"
+    system_admin_password = "admin123secure"  # We set this password
     
-    # We don't know the password, so let's try common ones or check if we can find it
-    possible_passwords = ["admin", "password", "system", "admin123", "system123"]
-    
-    for password in possible_passwords:
-        try:
-            response = requests.post(
-                f"{API_URL}/auth/login",
-                json={"email": system_admin_email, "password": password}
-            )
-            
-            if response.status_code == 200 and "access_token" in response.json():
-                admin_token = response.json().get("access_token")
-                print_test_result(f"Admin Login (system user with password: {password})", True, response)
-                return True
-        except Exception as e:
-            continue
-    
-    print_test_result("Admin Login (system user)", False, error="Could not find correct password for system admin")
-    return False
+    try:
+        response = requests.post(
+            f"{API_URL}/auth/login",
+            json={"email": system_admin_email, "password": system_admin_password}
+        )
+        
+        if response.status_code == 200 and "access_token" in response.json():
+            admin_token = response.json().get("access_token")
+            print_test_result("Admin Login (system user)", True, response)
+            return True
+        else:
+            print_test_result("Admin Login (system user)", False, response)
+            return False
+    except Exception as e:
+        print_test_result("Admin Login (system user)", False, error=str(e))
+        return False
 
 def test_create_admin_user():
     """Test creating a new admin user."""
