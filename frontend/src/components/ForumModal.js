@@ -312,7 +312,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     setError("");
     
     try {
-      const response = await api.post('/forums', {
+      const response = await api.post('/forums/', {
         title: newForumTitle.trim(),
         description: newForumDescription.trim(),
         slug: slug,
