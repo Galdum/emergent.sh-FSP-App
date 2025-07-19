@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Lock, MessageCircle, Send, Hash, PlusCircle, ArrowLeft, ChevronUp, ChevronDown, Clock, Users, TrendingUp, X, Link, User, Reply } from "react-feather";
 import { api } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 // Import enhanced text formatting components
 import { FormatText, EnhancedTextarea, LinkInput, LinkAttachment, EmojiPicker } from "./forum/TextFormatter";
 
-const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
+const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
+  // Get user data from AuthContext
+  const { user, isAuthenticated } = useAuth();
+  const isPremium = user?.subscription_tier === 'PREMIUM';
   // Navigation state
   const [currentView, setCurrentView] = useState('forums'); // 'forums', 'threads', 'thread'
   const [selectedForum, setSelectedForum] = useState(null);
