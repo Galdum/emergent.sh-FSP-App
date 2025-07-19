@@ -808,8 +808,8 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                                   {Math.floor((Date.now() - new Date(comment.created_at)) / (1000 * 60))}min în urmă
                                 </span>
                               </div>
-                              <div className="text-gray-800 whitespace-pre-wrap">
-                                {comment.body}
+                              <div className="text-gray-800">
+                                <FormatText text={comment.body} />
                               </div>
                             </div>
                           </div>
