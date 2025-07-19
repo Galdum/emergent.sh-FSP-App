@@ -125,7 +125,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
         }
       });
       
-      const newThreads = response.data;
+      const newThreads = Array.isArray(response) ? response : [];
       
       if (reset) {
         setThreads(newThreads);
