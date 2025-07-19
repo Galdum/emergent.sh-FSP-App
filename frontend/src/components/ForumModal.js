@@ -697,7 +697,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                         <div className="mb-4">
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Link-uri:</h4>
                           <div className="space-y-2">
-                            {selectedThread.attachments.map((attachment, index) => (
+                            {(selectedThread.attachments || []).map((attachment, index) => (
                               <LinkAttachment 
                                 key={index} 
                                 url={attachment.url}
