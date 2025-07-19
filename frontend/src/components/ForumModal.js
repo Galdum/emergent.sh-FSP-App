@@ -191,7 +191,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       
       // Update threads list if we're viewing threads
       if (currentView === 'threads') {
-        setThreads(prev => prev.map(thread => {
+        setThreads(prev => (prev || []).map(thread => {
           if (thread.id === threadId) {
             const oldVote = thread.user_vote || 0;
             let upChange = 0;
