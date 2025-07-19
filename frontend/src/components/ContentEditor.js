@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Save, Eye, X, Plus, Trash2, Upload, Image, FileText, 
-  Link, List, Table, Divider, Bold, Italic, Underline,
+  Link, List, Table, Minus, Bold, Italic, Underline,
   AlignLeft, AlignCenter, AlignRight, Palette, Type,
   Monitor, Smartphone, History, RotateCcw
 } from 'lucide-react';
