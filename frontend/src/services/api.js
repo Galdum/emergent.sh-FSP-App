@@ -356,16 +356,16 @@ class ApiService {
     return response.data;
   }
 
-  async voteThread(threadId, voteType) {
+  async voteThread(threadId, voteValue) {
     const response = await this.client.post(`/forums/thread/${threadId}/vote`, {
-      vote_type: voteType
+      value: voteValue
     });
     return response.data;
   }
 
-  async voteComment(commentId, voteType) {
+  async voteComment(commentId, voteValue) {
     const response = await this.client.post(`/forums/comment/${commentId}/vote`, {
-      vote_type: voteType
+      value: voteValue
     });
     return response.data;
   }
