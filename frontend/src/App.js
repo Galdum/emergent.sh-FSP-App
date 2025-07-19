@@ -6053,6 +6053,30 @@ const AppContent = () => {
     </main>
   </div>
 
+      {/* Progress toggle bar - mobile optimized */}
+      <div
+        className={`${isMobile ? "progress-toggle-mobile" : "fixed bottom-20 right-4 z-40"} flex items-center space-x-2 bg-white/80 p-2 rounded-full shadow-lg backdrop-blur-sm`}
+      >
+        <span
+          className={`${isMobile ? "text-xs" : "text-sm"} font-bold ${!freeMode ? "text-blue-600" : "text-gray-500"}`}
+        >
+          Progresiv
+        </span>
+        <button
+          onClick={() => setFreeMode(!freeMode)}
+          className={`${isMobile ? "w-8 h-4" : "w-12 h-6"} rounded-full p-1 transition-colors duration-300 ${freeMode ? "bg-green-500" : "bg-gray-300"}`}
+        >
+          <span
+            className={`block ${isMobile ? "w-2 h-2" : "w-4 h-4"} bg-white rounded-full shadow-md transform transition-transform duration-300 ${freeMode ? (isMobile ? "translate-x-4" : "translate-x-6") : "translate-x-0"}`}
+          ></span>
+        </button>
+        <span
+          className={`${isMobile ? "text-xs" : "text-sm"} font-bold ${freeMode ? "text-green-600" : "text-gray-500"}`}
+        >
+          Liber
+        </span>
+      </div>
+
       <StepModal
         step={modalStates.selectedStep}
         onTaskToggle={handleTaskToggle}
