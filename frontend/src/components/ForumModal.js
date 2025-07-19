@@ -693,19 +693,19 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                             onClick={() => handleNavigateToThread(thread)}
                           >
                             <h3 className="text-lg font-semibold text-gray-900 hover:text-orange-600 transition-colors mb-2">
-                              {thread.title}
+                              {thread?.title || 'Untitled Thread'}
                             </h3>
                             <div className="text-gray-700 mb-3">
-                              <FormatText text={thread.body} className="line-clamp-2" />
+                              <FormatText text={thread?.body || 'No content'} className="line-clamp-2" />
                             </div>
                             
                             <div className="flex items-center justify-between text-sm text-gray-500">
                               <div className="flex items-center space-x-4">
-                                <span>u/{thread.author_id}</span>
-                                <span>{thread.comment_count || 0} comentarii</span>
+                                <span>u/{thread?.author_id || 'anonymous'}</span>
+                                <span>{thread?.comment_count || 0} comentarii</span>
                               </div>
                               <span>
-                                {Math.floor((Date.now() - new Date(thread.created_at)) / (1000 * 60 * 60))}h în urmă
+                                {thread?.created_at ? Math.floor((Date.now() - new Date(thread.created_at)) / (1000 * 60 * 60)) : 0}h în urmă
                               </span>
                             </div>
                           </div>
