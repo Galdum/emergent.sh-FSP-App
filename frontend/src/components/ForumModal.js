@@ -839,7 +839,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                           <div className="absolute top-8 left-0 z-50">
                             <EmojiPicker 
                               onEmojiSelect={(emoji) => {
-                                setCommentText(prev => prev + emoji);
+                                setCommentText(prev => (prev || '') + emoji);
                                 setShowEmojiPicker(false);
                               }}
                             />
