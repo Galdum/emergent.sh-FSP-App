@@ -31,6 +31,12 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
   const [creatingThread, setCreatingThread] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
+  // Forum creation state
+  const [newForumTitle, setNewForumTitle] = useState("");
+  const [newForumDescription, setNewForumDescription] = useState("");
+  const [newForumSlug, setNewForumSlug] = useState("");
+  const [creatingForum, setCreatingForum] = useState(false);
+  
   // Comment state
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
