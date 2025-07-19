@@ -5602,10 +5602,6 @@ const AppContent = () => {
     setModalStates((prev) => ({ ...prev, selectedStep: null }));
 
   const handleBonusNodeClick = (action) => {
-    if (action.type === "forum_premium") {
-      setForumModalOpen(true);
-      return;
-    }
     const nodeIndex = bonusNodes.findIndex(
       (node) => node.action.type === action.type,
     );
