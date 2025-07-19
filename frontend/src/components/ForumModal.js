@@ -216,7 +216,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
   // Handle thread voting
   const handleThreadVote = async (threadId, value) => {
     try {
-      await api.post(`/forums/thread/${threadId}/vote`, { value });
+      await api.voteThread(threadId, value);
       
       // Update threads list if we're viewing threads
       if (currentView === 'threads') {
