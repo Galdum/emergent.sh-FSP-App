@@ -76,9 +76,8 @@ class ApiService {
     return response.data;
   }
 
-  // Authentication endpoints
   async register(email, password) {
-    const response = await this.client.post('/auth/register/', { email, password });
+    const response = await this.client.post('/auth/register', { email, password });
     return response.data;
   }
 
@@ -88,18 +87,18 @@ class ApiService {
   }
 
   async getCurrentUser() {
-    const response = await this.client.get('/auth/me/');
+    const response = await this.client.get('/auth/me');
     return response.data;
   }
 
   // Progress endpoints
   async getProgress() {
-    const response = await this.client.get('/progress/');
+    const response = await this.client.get('/progress');
     return response.data;
   }
 
   async updateProgress(stepId, taskId, completed, viewed = true) {
-    const response = await this.client.put('/progress/', {
+    const response = await this.client.put('/progress', {
       step_id: stepId,
       task_id: taskId,
       completed,
@@ -109,35 +108,35 @@ class ApiService {
   }
 
   async syncProgress(progressData) {
-    const response = await this.client.post('/progress/sync/', progressData);
+    const response = await this.client.post('/progress/sync', progressData);
     return response.data;
   }
 
   // Personal files endpoints
   async getFiles() {
-    const response = await this.client.get('/files/');
+    const response = await this.client.get('/files');
     return response.data;
   }
 
   async createFile(fileData) {
-    const response = await this.client.post('/files/', fileData);
+    const response = await this.client.post('/files', fileData);
     return response.data;
   }
 
   async updateFile(fileId, fileData) {
-    const response = await this.client.put(`/files/${fileId}/`, fileData);
+    const response = await this.client.put(`/files/${fileId}`, fileData);
     return response.data;
   }
 
   async deleteFile(fileId) {
-    const response = await this.client.delete(`/files/${fileId}/`);
+    const response = await this.client.delete(`/files/${fileId}`);
     return response.data;
   }
 
   async uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await this.client.post('/files/upload/', formData, {
+    const response = await this.client.post('/files/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -146,13 +145,13 @@ class ApiService {
   }
 
   async syncFiles(filesData) {
-    const response = await this.client.post('/files/sync/', filesData);
+    const response = await this.client.post('/files/sync', filesData);
     return response.data;
   }
 
   // Subscription endpoints
   async getSubscription() {
-    const response = await this.client.get('/subscription/');
+    const response = await this.client.get('/subscription');
     return response.data;
   }
 
