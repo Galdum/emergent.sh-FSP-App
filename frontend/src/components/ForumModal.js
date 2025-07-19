@@ -357,14 +357,10 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     setError("");
     
     try {
-      const response = await api.post(`/forums/${selectedForum.slug}/threads`, {
-        title: newThreadTitle.trim(),
-        body: newThreadBody.trim(),
-        attachments: threadAttachments
-      });
+      const response = await api.createThread(selectedForum.slug, newThreadTitle.trim(), newThreadBody.trim());
 
       // Add new thread to the list
-      setThreads(prev => [response.data, ...(prev || [])]);
+      setThreads(prev => [response, ...(prev || [])]);
       
       // Reset form
       setNewThreadTitle("");
@@ -373,7 +369,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       setShowCreateThread(false);
     } catch (err) {
       console.error('Error creating thread:', err);
-      setError('Eroare la crearea discuției');
+      setError("Eroare la crearea thread-ului: " + (err.response?.data?.detail || err.message));
     } finally {
       setCreatingThread(false);
     }
