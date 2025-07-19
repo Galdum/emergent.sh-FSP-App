@@ -8,6 +8,7 @@ from backend.auth import get_current_user, get_current_admin_user
 from backend.database import get_database
 from backend.models import UserInDB
 from backend.security import sanitize_regex_pattern, AuditLogger, safe_rate_limit
+from backend.middleware.ip_security import verify_admin_ip_access
 from datetime import datetime, timedelta
 import logging
 import os
@@ -20,9 +21,18 @@ from backend.models import UtilInfoDocument, UtilInfoDocumentCreate, UtilInfoDoc
 
 @router.get("/stats", response_model=AdminStatsResponse)
 async def get_admin_stats(
+    request: Request,
     admin_user: UserInDB = Depends(get_current_admin_user),
     db = Depends(get_database)
 ):
+    """Get admin dashboard statistics with IP verification."""
+    
+    # Verify IP access for admin
+    if not await verify_admin_ip_access(request, admin_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied from this IP address"
+        )
     """Get admin dashboard statistics."""
     
     # Get total users

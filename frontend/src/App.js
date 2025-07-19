@@ -5987,6 +5987,19 @@ const AppContent = () => {
         >
           <Info size={isMobile ? 20 : 28} />
         </button>
+
+        {/* Admin Panel Button - Only visible for admin users */}
+        {(user?.is_admin || user?.role === 'admin') && (
+          <button
+            onClick={() =>
+              setModalStates((prev) => ({ ...prev, adminPanel: true }))
+            }
+            className={`bg-red-600 text-white ${isMobile ? "touch-target-mobile" : "w-14 h-14"} rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-transform duration-300 hover:scale-110 no-select-mobile`}
+            title="Admin Panel"
+          >
+            <Users size={isMobile ? 20 : 28} />
+          </button>
+        )}
       </div>
 
 <div className={`w-full max-w-md mx-auto ${isMobile ? 'mobile-main-content mobile-text-scale' : ''}`}>
