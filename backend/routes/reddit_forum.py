@@ -522,45 +522,14 @@ async def vote_comment(
         logger.error(f"Error voting on comment: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-# --- File Upload ---
+# --- File Upload (DISABLED) ---
+# File upload functionality has been disabled
+# Only link attachments are supported
 
-@router.post("/upload", response_model=Attachment)
-async def upload_attachment(
-    file: UploadFile = File(...),
-    user: UserInDB = Depends(require_premium)
-):
-    """Upload a file attachment for forum posts"""
-    try:
-        # Validate file size (max 5MB for images, 10MB for other files)
-        file_size = 0
-        file_content = await file.read()
-        file_size = len(file_content)
-        
-        max_size = 5 * 1024 * 1024 if file.content_type.startswith('image/') else 10 * 1024 * 1024
-        if file_size > max_size:
-            raise HTTPException(status_code=413, detail="File too large")
-        
-        # Upload file
-        file_url = await upload_file(file_content, file.filename, file.content_type)
-        
-        # Determine attachment type
-        if file.content_type.startswith('image/'):
-            attachment_type = AttachmentType.IMAGE
-        else:
-            attachment_type = AttachmentType.FILE
-        
-        # Create attachment record
-        attachment = Attachment(
-            type=attachment_type,
-            url=file_url,
-            file_name=file.filename,
-            mime_type=file.content_type,
-            size=file_size
-        )
-        
-        return attachment
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error uploading file: {e}")
-        raise HTTPException(status_code=500, detail="File upload failed")
+# @router.post("/upload", response_model=Attachment)
+# async def upload_attachment(
+#     file: UploadFile = File(...),
+#     user: UserInDB = Depends(require_premium)
+# ):
+#     """Upload a file attachment for forum posts (DISABLED)"""
+#     raise HTTPException(status_code=501, detail="File uploads are currently disabled")
