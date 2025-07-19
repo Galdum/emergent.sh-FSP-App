@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Competition Questions Data snapshot test for data structure 1`] = `
+Object {
+  "diagnostic": Object {
+    "description": "Ghicește diagnosticul corect",
+    "questions": Array [
+      Object {
+        "correct": 0,
+        "options": Array [
+          "Infarct miocardic",
+          "Pneumonie",
+          "Gastrită",
+          "Anxietate",
+        ],
+        "question": "Pacient cu durere în piept, dispnee și transpirație. Care este cel mai probabil diagnostic?",
+      },
+      Object {
+        "correct": 1,
+        "options": Array [
+          "Migrenă",
+          "Meningită",
+          "Hipertensiune",
+          "Tumoră cerebrală",
+        ],
+        "question": "Pacient cu cefalee intensă, fotofobie și rigiditate nucală. Care este diagnosticul?",
+      },
+      Object {
+        "correct": 1,
+        "options": Array [
+          "Bronșită acută",
+          "Pneumonie",
+          "Astm",
+          "Tuberculoză",
+        ],
+        "question": "Pacient cu febră, tuse productivă și dispnee. Care este diagnosticul?",
+      },
+    ],
+    "title": "Diagnostic Express",
+  },
+  "fachbegriffe": Object {
+    "description": "Test rapid de termeni medicali germani",
+    "questions": Array [
+      Object {
+        "correct": 0,
+        "options": Array [
+          "Istoricul medical al pacientului",
+          "Examenul fizic",
+          "Diagnosticul",
+          "Tratamentul",
+        ],
+        "question": "Ce înseamnă 'Anamnese' în germană?",
+      },
+      Object {
+        "correct": 0,
+        "options": Array [
+          "Tensiunea arterială",
+          "Frecvența cardiacă",
+          "Temperatura",
+          "Glicemia",
+        ],
+        "question": "Care este traducerea corectă pentru 'Blutdruck'?",
+      },
+      Object {
+        "correct": 1,
+        "options": Array [
+          "Accident vascular cerebral",
+          "Infarct miocardic",
+          "Angină pectorală",
+          "Aritmie",
+        ],
+        "question": "Ce înseamnă 'Herzinfarkt'?",
+      },
+      Object {
+        "correct": 2,
+        "options": Array [
+          "Diabetes",
+          "Zuckerkrankheit",
+          "Beide sunt corecte",
+          "Niciunul",
+        ],
+        "question": "Care este termenul german pentru 'diabet'?",
+      },
+      Object {
+        "correct": 1,
+        "options": Array [
+          "Infarct miocardic",
+          "Accident vascular cerebral",
+          "Epilepsie",
+          "Migrenă",
+        ],
+        "question": "Ce înseamnă 'Schlaganfall'?",
+      },
+    ],
+    "title": "Fachbegriffe Flash",
+  },
+  "grammar": Object {
+    "description": "Test rapid de gramatică germană",
+    "questions": Array [
+      Object {
+        "correct": 0,
+        "options": Array [
+          "bin",
+          "bist",
+          "ist",
+          "sind",
+        ],
+        "question": "Care este forma corectă: 'Ich ___ Arzt'?",
+      },
+      Object {
+        "correct": 2,
+        "options": Array [
+          "der",
+          "die",
+          "das",
+          "den",
+        ],
+        "question": "Care este articolul corect pentru 'Krankenhaus'?",
+      },
+      Object {
+        "correct": 1,
+        "options": Array [
+          "zu",
+          "in",
+          "nach",
+          "auf",
+        ],
+        "question": "Care este forma corectă: 'Ich gehe ___ Krankenhaus'?",
+      },
+    ],
+    "title": "Gramatică Germană",
+  },
+}
+`;
+
+exports[`Competition Questions Data snapshot test for data structure 2`] = `
+Object {
+  "competitions": Array [
+    Object {
+      "bonusPoints": 25,
+      "description": "Concurs rapid de termeni medicali germani",
+      "endsIn": "2h 15m",
+      "gameType": "fachbegriffe",
+      "id": 1,
+      "minScore": 4,
+      "participants": 45,
+      "reward": "50 XP",
+      "status": "active",
+      "timeLimit": 30,
+      "title": "Fachbegriffe Challenge",
+    },
+    Object {
+      "bonusPoints": 35,
+      "description": "Testează-ți abilitățile de diagnostic",
+      "endsIn": "1h 30m",
+      "gameType": "diagnostic",
+      "id": 2,
+      "minScore": 2,
+      "participants": 32,
+      "reward": "75 XP",
+      "status": "active",
+      "timeLimit": 45,
+      "title": "Diagnostic Master",
+    },
+    Object {
+      "bonusPoints": 20,
+      "description": "Quiz rapid de gramatică germană",
+      "gameType": "grammar",
+      "id": 3,
+      "minScore": 2,
+      "participants": 28,
+      "reward": "40 XP",
+      "startsIn": "30m",
+      "status": "starting_soon",
+      "timeLimit": 60,
+      "title": "Grammar Sprint",
+    },
+  ],
+}
+`;
