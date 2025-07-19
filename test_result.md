@@ -125,11 +125,11 @@ backend:
 
   - task: "User Authentication System"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/auth.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
@@ -137,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "User registration, login, and protected endpoints tested successfully. JWT tokens working correctly."
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL ISSUE: Authentication system failing. User registration and login endpoints not working, blocking access to all protected endpoints. This is preventing full backend functionality."
 
   - task: "Database Models and API Routes"
     implemented: true
