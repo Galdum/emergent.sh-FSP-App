@@ -5042,8 +5042,7 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
           : node.title}
       </text>
       {(!isAccessible ||
-        (needsAIAccess && !hasAIAccess()) ||
-        (isForumPremium && subscriptionTier !== "PREMIUM")) && (
+        (needsAIAccess && !hasAIAccess())) && (
         <foreignObject
           x={node.position.x + radius * 0.6}
           y={node.position.y - radius * 0.6}
