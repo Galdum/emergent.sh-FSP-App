@@ -5078,6 +5078,27 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
           </div>
         </foreignObject>
       )}
+      
+      {/* Admin Edit Button */}
+      <foreignObject
+        x={node.position.x - 50}
+        y={node.position.y - 50}
+        width={100}
+        height={100}
+        style={{ pointerEvents: "auto" }}
+      >
+        <div className="relative w-full h-full">
+          <AdminNodeEditor
+            nodeId={node.id}
+            nodeType="bonus"
+            nodeName={node.title}
+            onContentUpdate={() => {
+              // Handle content update if needed
+              console.log('Content updated for bonus node:', node.id);
+            }}
+          />
+        </div>
+      </foreignObject>
     </g>
   );
 };
