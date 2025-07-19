@@ -350,7 +350,7 @@ class ApiService {
 
   async createComment(threadId, content, parentId = null) {
     const response = await this.client.post(`/forums/thread/${threadId}/comments`, {
-      content,
+      body: content,
       parent_id: parentId
     });
     return response.data;
