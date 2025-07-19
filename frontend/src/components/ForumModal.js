@@ -885,7 +885,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                       {(threadAttachments || []).length > 0 && (
                         <div className="space-y-2">
                           <h4 className="text-sm font-medium text-gray-700">Link-uri adăugate:</h4>
-                          {threadAttachments.map((attachment, index) => (
+                          {(threadAttachments || []).map((attachment, index) => (
                             <LinkAttachment
                               key={index}
                               url={attachment.url}
