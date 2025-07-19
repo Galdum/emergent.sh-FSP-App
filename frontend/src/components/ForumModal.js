@@ -339,7 +339,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       });
 
       // Add new thread to the list
-      setThreads(prev => [response.data, ...prev]);
+      setThreads(prev => [response.data, ...(prev || [])]);
       
       // Reset form
       setNewThreadTitle("");
