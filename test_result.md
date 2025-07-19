@@ -338,9 +338,9 @@ frontend:
   
   - task: "Personal File Management"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/hooks/usePersonalFiles.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
