@@ -117,13 +117,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     
     try {
       const page = reset ? 1 : threadsPage;
-      const response = await api.get(`/forums/${forumSlug}/threads`, {
-        params: {
-          page,
-          limit: 20,
-          sort: threadSort
-        }
-      });
+      const response = await api.getForumThreads(forumSlug, page, threadSort);
       
       const newThreads = Array.isArray(response) ? response : [];
       
