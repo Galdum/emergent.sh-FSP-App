@@ -48,6 +48,7 @@ import { useSubscription } from "./hooks/useSubscription";
 import SubscriptionUpgrade from "./components/SubscriptionUpgrade";
 import FeedbackWidget from "./components/FeedbackWidget";
 import AdminPanel from "./components/AdminPanel";
+import AdminNodeEditor from "./components/AdminNodeEditor";
 import AuthModal from "./components/AuthModal";
 import GDPRConsentModal from "./components/GDPRConsentModal";
 import SettingsModal from "./components/SettingsModal";
