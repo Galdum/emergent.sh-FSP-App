@@ -671,10 +671,10 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                             </button>
                             
                             <span className={`text-sm font-semibold py-1 ${
-                              (thread.up_votes - thread.down_votes) > 0 ? 'text-orange-600' : 
-                              (thread.up_votes - thread.down_votes) < 0 ? 'text-red-600' : 'text-gray-600'
+                              ((thread?.up_votes || 0) - (thread?.down_votes || 0)) > 0 ? 'text-orange-600' : 
+                              ((thread?.up_votes || 0) - (thread?.down_votes || 0)) < 0 ? 'text-red-600' : 'text-gray-600'
                             }`}>
-                              {thread.up_votes - thread.down_votes}
+                              {(thread?.up_votes || 0) - (thread?.down_votes || 0)}
                             </span>
                             
                             <button
