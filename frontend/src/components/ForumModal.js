@@ -304,7 +304,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       });
 
       // Add new forum to the list
-      setForums(prev => [response.data, ...prev]);
+      setForums(prev => [response.data, ...(prev || [])]);
       
       // Reset form
       setNewForumTitle("");
