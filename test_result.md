@@ -491,12 +491,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Leaderboard Modal"
-    - "Payment Integration UI"
+    - "Personal File Management"
     - "InfoHub Modal with New Sections"
-    - "Journey Map with Steps and Bonus Nodes"
   stuck_tasks:
-    - "Medical Licensing Guide React Application"
+    - "Personal File Management"
+    - "InfoHub Modal with New Sections"
   test_all: false
   test_priority: "high_first"
 
