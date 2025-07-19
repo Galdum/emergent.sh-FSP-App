@@ -4964,14 +4964,9 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
   const needsAIAccess = ["fsp_tutor", "email_gen", "land_rec"].includes(
     node.id,
   );
-  const isForumPremium = node.id === "forum_premium";
+  
   // Color logic
   const getNodeColor = () => {
-    if (isForumPremium) {
-      if (subscriptionTier === "PREMIUM")
-        return "fill-orange-500 hover:fill-orange-600";
-      return "fill-gray-300";
-    }
     if (!isAccessible) return "fill-gray-300";
     if (needsAIAccess) {
       return hasAIAccess()
