@@ -361,9 +361,9 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
                 <div className={`inline-block px-3 py-1 rounded-full text-sm ${
                   selectedBadge.earned 
                     ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-orange-100 text-orange-800'
                 }`}>
-                  {selectedBadge.earned ? 'Câștigat' : selectedBadge.criteria}
+                  {selectedBadge.earned ? '✅ Câștigat' : `🔒 ${getBadgeCriteria(selectedBadge.badge_id)}`}
                 </div>
                 {selectedBadge.earned && selectedBadge.awarded_at && (
                   <div className="text-sm text-gray-500 mt-2">
