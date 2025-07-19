@@ -369,7 +369,8 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       setShowCreateThread(false);
     } catch (err) {
       console.error('Error creating thread:', err);
-      setError("Eroare la crearea thread-ului: " + (err.response?.data?.detail || err.message));
+      const errorMsg = err.response?.data?.detail || err.message || 'Eroare necunoscută';
+      setError("Eroare la crearea thread-ului: " + (typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg));
     } finally {
       setCreatingThread(false);
     }
