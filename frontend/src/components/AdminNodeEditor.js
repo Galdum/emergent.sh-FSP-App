@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Edit, Settings, Save, X } from 'lucide-react';
-import ContentEditor from './ContentEditor';
+import SimpleContentEditor from './SimpleContentEditor';
 import { useAuth } from '../contexts/AuthContext';
 
 const AdminNodeEditor = ({ nodeId, nodeType, nodeName, onContentUpdate }) => {
