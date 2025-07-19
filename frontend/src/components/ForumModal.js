@@ -78,15 +78,21 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     
     try {
       console.log('Loading forums...');
+      console.log('Auth token from localStorage:', localStorage.getItem('auth_token'));
+      console.log('User object:', user);
+      
       const response = await api.get('/forums/');
       console.log('Forums loaded:', response.data);
       setForums(response.data);
     } catch (err) {
       console.error('Error loading forums:', err);
-      if (err.response?.status === 403) {
+      console.error('Error response:', err.response);
+      if (err.response?.status === 401) {
+        setError("Problemă de autentificare. Te rugăm să te conectezi din nou.");
+      } else if (err.response?.status === 403) {
         setError("Acces premium necesar pentru forum.");
       } else {
-        setError("Eroare la încărcarea forumurilor.");
+        setError("Eroare la încărcarea forumurilor: " + (err.response?.data?.detail || err.message));
       }
     } finally {
       setLoading(false);
