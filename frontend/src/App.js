@@ -6264,6 +6264,10 @@ const AppContent = () => {
         isOpen={forumModalOpen}
         onClose={() => setForumModalOpen(false)}
         isPremium={subscriptionTier === "PREMIUM"}
+        onUpgrade={() => {
+          setForumModalOpen(false);
+          setSubscriptionUpgradeOpen(true);
+        }}
       />
     </div>
   );
