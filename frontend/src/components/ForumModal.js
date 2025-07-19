@@ -392,16 +392,12 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     setError("");
     
     try {
-      await api.post(`/forums/thread/${selectedThread.id}/comments`, {
-        body: commentText.trim()
-      });
+      await api.createComment(selectedThread.id, commentText.trim());
       
       setCommentText("");
       
       // Reload comments
-      const response = await api.get(`/forums/thread/${selectedThread.id}/comments`, {
-        params: { sort: commentSort }
-      });
+      const response = await api.getThreadComments(selectedThread.id, commentSort);
       setComments(Array.isArray(response) ? response : []);
       
       // Update thread comment count
