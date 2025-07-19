@@ -4929,6 +4929,28 @@ const StepNode = ({
           {getIcon()}
         </div>
       </foreignObject>
+      
+      {/* Admin Edit Button */}
+      <foreignObject
+        x={position.x - 50}
+        y={position.y - 50}
+        width={100}
+        height={100}
+        style={{ pointerEvents: "auto" }}
+      >
+        <div className="relative w-full h-full">
+          <AdminNodeEditor
+            nodeId={step.id}
+            nodeType="step"
+            nodeName={step.title}
+            onContentUpdate={() => {
+              // Handle content update if needed
+              console.log('Content updated for step:', step.id);
+            }}
+          />
+        </div>
+      </foreignObject>
+      
       {isAccessible && (
         <text
           x={position.x}
