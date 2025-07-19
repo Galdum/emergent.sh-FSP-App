@@ -4976,9 +4976,6 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     return "fill-orange-500 hover:fill-orange-600";
   };
   const getIconColor = () => {
-    if (isForumPremium) {
-      return subscriptionTier === "PREMIUM" ? "text-white" : "text-gray-400";
-    }
     if (!isAccessible) return "text-gray-400";
     if (needsAIAccess) {
       return hasAIAccess() ? "text-white" : "text-gray-400";
@@ -4986,8 +4983,7 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
     return "text-white";
   };
   const handleClick = () => {
-    if (isForumPremium && subscriptionTier !== "PREMIUM") return;
-    if (isAccessible || isForumPremium) {
+    if (isAccessible) {
       onClick(node.action);
     }
   };
