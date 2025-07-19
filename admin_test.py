@@ -413,8 +413,10 @@ def test_create_util_info_document():
     try:
         doc_data = {
             "title": "Test Document",
-            "content": "This is a test document created by the admin test suite.",
+            "description": "This is a test document created by the admin test suite.",
             "category": "test",
+            "content_type": "rich-content",
+            "rich_content": "This is a test document with rich content.",
             "order_priority": 999,
             "is_active": True
         }
