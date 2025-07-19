@@ -330,7 +330,8 @@ class ApiService {
   async createThread(forumSlug, title, content) {
     const response = await this.client.post(`/forums/${forumSlug}/threads`, {
       title,
-      content
+      body: content,
+      attachments: []
     });
     return response.data;
   }
