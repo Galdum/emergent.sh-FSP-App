@@ -911,13 +911,13 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-                                <span>u/{comment.author_id}</span>
+                                <span>u/{comment?.author_id || 'anonymous'}</span>
                                 <span>
-                                  {Math.floor((Date.now() - new Date(comment.created_at)) / (1000 * 60))}min în urmă
+                                  {comment?.created_at ? Math.floor((Date.now() - new Date(comment.created_at)) / (1000 * 60)) : 0}min în urmă
                                 </span>
                               </div>
                               <div className="text-gray-800">
-                                <FormatText text={comment.body} />
+                                <FormatText text={comment?.body || 'No content'} />
                               </div>
                             </div>
                           </div>
