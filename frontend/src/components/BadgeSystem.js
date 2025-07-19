@@ -10,12 +10,9 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [activeTab, setActiveTab] = useState('badges');
-  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
     fetchBadges();
-    fetchLeaderboard();
   }, []);
 
   const fetchBadges = async () => {
