@@ -137,6 +137,7 @@ from backend.routes.documents import router as documents_router
 from backend.routes.badges import router as badges_router
 from backend.routes.mini_games import router as mini_games_router
 from backend.routes.reddit_forum import router as reddit_forum_router
+from backend.routes.content_management import router as content_management_router
 try:
     from backend.routes.ai_assistant import router as ai_assistant_router
     AI_ROUTER_AVAILABLE = True
