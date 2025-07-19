@@ -54,7 +54,12 @@ async def update_progress(
         progress = UserProgress(
             user_id=current_user.id,
             steps=[
-                StepProgress(step_id=i, unlocked=(i == 1)) 
+                StepProgress(
+                    step_id=str(i), 
+                    title=f"Step {i}",
+                    order=i,
+                    unlocked=(i == 1)
+                ) 
                 for i in range(1, 7)
             ]
         )
