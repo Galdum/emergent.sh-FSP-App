@@ -32,7 +32,7 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
     { type: 'link', label: 'Link', icon: Link, description: 'Add clickable links' },
     { type: 'list', label: 'List', icon: List, description: 'Bulleted or numbered lists' },
     { type: 'table', label: 'Table', icon: Table, description: 'Data tables' },
-    { type: 'divider', label: 'Divider', icon: Divider, description: 'Section separator' }
+    { type: 'divider', label: 'Divider', icon: Minus, description: 'Section separator' }
   ];
 
   // Load content when editor opens
