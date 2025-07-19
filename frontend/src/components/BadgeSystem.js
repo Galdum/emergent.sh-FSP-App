@@ -271,10 +271,10 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
                         <div className={`font-medium text-sm ${badge.earned ? 'text-gray-800' : 'text-gray-500'}`}>
                           {badge.name}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-500 mt-1">
                           {badge.earned 
-                            ? new Date(badge.awarded_at).toLocaleDateString('ro-RO')
-                            : 'Blocat'
+                            ? `Obținut: ${new Date(badge.awarded_at).toLocaleDateString('ro-RO')}`
+                            : getBadgeCriteria(badge.badge_id)
                           }
                         </div>
                       </div>
