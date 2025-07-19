@@ -20,10 +20,14 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/forums", tags=["reddit-forum"])
 
-# Premium subscription decorator (DISABLED - Allow all authenticated users)
+# Premium subscription decorator
 def require_premium(user: UserInDB = Depends(get_current_user)):
-    """Allow all authenticated users to access forum (premium requirement removed)"""
-    # Simply return the authenticated user without premium check
+    """Verify user has premium subscription"""
+    if user.subscription_tier != "PREMIUM":
+        raise HTTPException(
+            status_code=403, 
+            detail="Premium subscription required for forum access"
+        )
     return user
 
 # --- Forum Management ---
