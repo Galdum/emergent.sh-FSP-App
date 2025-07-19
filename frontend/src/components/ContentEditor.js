@@ -662,15 +662,6 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
           </div>
         </div>
 
-        {/* Version History Modal */}
-        {showVersionHistory && (
-          <VersionHistoryModal
-            versions={versions}
-            onClose={() => setShowVersionHistory(false)}
-            onRevert={revertToVersion}
-            onLoad={loadVersionHistory}
-          />
-        )}
       </div>
     </div>
   );
