@@ -4809,7 +4809,7 @@ Erstelle die komplette E-Mail. Sie soll perfekt korrekt sein, aber menschlich un
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(result);
-                  toast.success("Email copiat în clipboard!");
+                  alert("Email copiat în clipboard!");
                 }}
                 className="flex-1 bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
               >
