@@ -2128,14 +2128,6 @@ const bonusNodes = [
     position: { x: 350, y: 500 },
     action: { type: "leaderboard" },
   },
-  // Forum premium node
-  {
-    id: "forum_premium",
-    icon: MessageCircle,
-    title: "Forum Premium",
-    position: { x: 200, y: 540 },
-    action: { type: "forum_premium" },
-  },
 ];
 
 // --- Personal File Modal Component - Updated to use new API integration ---
