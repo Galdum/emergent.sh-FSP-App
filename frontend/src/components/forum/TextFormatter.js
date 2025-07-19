@@ -121,8 +121,10 @@ export const EnhancedTextarea = ({
   showToolbar = true,
   ...props 
 }) => {
+  const textareaRef = useRef(null);
+  
   const insertText = (beforeText, afterText = '') => {
-    const textarea = document.activeElement;
+    const textarea = textareaRef.current;
     
     // Check if textarea exists and has the required methods
     if (!textarea || !textarea.setSelectionRange || typeof textarea.selectionStart !== 'number') {
