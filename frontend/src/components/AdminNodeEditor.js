@@ -34,11 +34,19 @@ const AdminNodeEditor = ({ nodeId, nodeType, nodeName, onContentUpdate }) => {
       {/* Admin Edit Button */}
       <button
         onClick={handleOpenEditor}
-        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 transition-all duration-200 hover:scale-110 z-10"
+        className="absolute top-0 right-0 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-all duration-200 hover:scale-110 z-50"
         title={`Edit ${nodeName} content`}
-        style={{ fontSize: '12px' }}
+        style={{ 
+          width: '20px', 
+          height: '20px',
+          fontSize: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transform: 'translate(5px, -5px)'
+        }}
       >
-        <Edit size={14} />
+        <Edit size={12} />
       </button>
 
       {/* Content Editor Modal */}
