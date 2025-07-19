@@ -35,6 +35,11 @@ paypal_approval_url = None
 test_thread_id = None
 test_comment_id = None
 
+# Store content management test data
+test_node_id = "step1"
+test_preview_id = None
+test_file_id = None
+
 def random_string(length=8):
     """Generate a random string for testing."""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
