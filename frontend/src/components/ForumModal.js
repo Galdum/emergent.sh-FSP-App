@@ -398,10 +398,21 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
             <div className="flex-1 flex flex-col">
               {/* Header */}
               <div className="p-6 border-b bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                <h2 className="text-2xl font-bold mb-2">Forum Premium FSP Navigator</h2>
-                <p className="text-orange-100">
-                  Comunitatea exclusivă pentru medicii care doresc să practice în Germania
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2">Forum Premium FSP Navigator</h2>
+                    <p className="text-orange-100">
+                      Comunitatea exclusivă pentru medicii care doresc să practice în Germania
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateForum(true)}
+                    className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                  >
+                    <PlusCircle size={16} />
+                    <span>Forum nou</span>
+                  </button>
+                </div>
               </div>
 
               {/* Content */}
