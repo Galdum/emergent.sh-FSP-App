@@ -176,6 +176,7 @@ api_router.include_router(gdpr_router)
 api_router.include_router(documents_router)
 api_router.include_router(badges_router)
 api_router.include_router(mini_games_router)
+api_router.include_router(reddit_forum_router)
 if AI_ROUTER_AVAILABLE:
     api_router.include_router(ai_assistant_router)
 api_router.include_router(mongodb_example_router)
