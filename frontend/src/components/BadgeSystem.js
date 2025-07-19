@@ -256,14 +256,16 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
                       <div className={`aspect-square rounded-2xl ${
                         badge.earned 
                           ? getBadgeColor(badge.badge_id) 
-                          : 'bg-gray-300'
-                      } text-white p-4 flex items-center justify-center shadow-lg hover:shadow-xl transition-all relative`}>
-                        <span className={`text-3xl ${badge.earned ? '' : 'opacity-50'}`}>
+                          : 'bg-gray-300 border-2 border-gray-400'
+                      } text-white p-4 flex items-center justify-center shadow-lg hover:shadow-xl transition-all relative overflow-hidden`}>
+                        <span className={`text-3xl ${badge.earned ? '' : 'opacity-30'}`}>
                           {getBadgeIcon(badge.badge_id)}
                         </span>
                         {!badge.earned && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Lock className="h-6 w-6 text-gray-600" />
+                          <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                            <div className="bg-white rounded-full p-2 shadow-lg">
+                              <Lock className="h-5 w-5 text-gray-600" />
+                            </div>
                           </div>
                         )}
                       </div>
