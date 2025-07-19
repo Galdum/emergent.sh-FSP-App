@@ -17,7 +17,7 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
 
   const fetchBadges = async () => {
     try {
-      const response = await api.get('/badges');
+      const response = await api.get('/badges/');
       setBadges(response.data);
     } catch (error) {
       console.error('Failed to fetch badges:', error);
