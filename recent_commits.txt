@@ -1,0 +1,23 @@
+757b550 2025-07-18 Fix frontend build: cross-env, dependency cleanup, JSX fix, add missing competitionQuestions.js
+cbca3ac 2025-07-18 Merge pull request #57 from Galdum/cursor/enable-local-front-end-preview-2280
+274ed77 2025-07-18 docs: add 'How to run locally' instructions
+ff304f4 2025-07-18 Downgrade TypeScript to 4.9.5 and adjust Node engine requirement
+83b3fc7 2025-07-18 chore: update deprecated packages (glob, rimraf, svgo)
+51e9e26 2025-07-18 chore: align CRA root
+c324f45 2025-07-18 Merge pull request #56 from Galdum/cursor/fix-frontend-build-and-preview-10a4
+accf04b 2025-07-18 Upgrade rimraf to v4, replace rollup-plugin-terser with @rollup/plugin-terser, bump glob to ^9, svgo to ^2
+7bf1ccb 2025-07-18 Update package dependencies and versions
+75f3364 2025-07-18 Merge pull request #55 from Galdum/cursor/fix-frontend-preview-startup-cbe7
+6ffbd57 2025-07-18 docs(frontend): update index.html and README for unified dev/preview workflow and improved meta tags
+502932b 2025-07-18 chore(frontend): scaffold minimal public/index.html for local development (npm start)
+2f2c394 2025-07-17 Merge pull request #54 from Galdum/cursor/creeaz-nod-forum-premium-68f5
+565cd6f 2025-07-17 Merge branch 'main' into cursor/creeaz-nod-forum-premium-68f5
+ebd5964 2025-07-17 Update forum routes and frontend to use async/await and improve loading states
+fc87c37 2025-07-17 Merge pull request #53 from Galdum/cursor/corectare-dep-ire-ferestre-ecran-6769
+4fdc11d 2025-07-17 Fix modal responsiveness with max-width and scrollable content
+4ff2176 2025-07-17 Merge pull request #52 from Galdum/cursor/ajusteaz-vizual-nodurile-dup-abonament-d672
+3668c56 2025-07-17 Refactor subscription access logic for AI and bonus nodes
+e447b3d 2025-07-17 Merge pull request #51 from Galdum/cursor/dezactiveaz-anima-ia-nodurilor-la-hover-8b69
+40bc27c 2025-07-17 Add hover effects for step and bonus nodes with subtle scaling
+e0e3635 2025-07-17 Add forum models, routes, and frontend component integration
+c179a03 2025-07-17 Remove hover scale effect on step and bonus nodes
