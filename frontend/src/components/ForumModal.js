@@ -81,7 +81,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       console.log('Auth token from localStorage:', localStorage.getItem('auth_token'));
       console.log('User object:', user);
       
-      const response = await api.get('/forums');
+      const response = await api.get('/forums/');
       console.log('API response:', response);
       console.log('Forums data:', response);
       
