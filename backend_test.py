@@ -21,7 +21,7 @@ API_URL = f"{BACKEND_URL}/api"
 # Test user credentials
 TEST_EMAIL = "test@example.com"
 TEST_PASSWORD = "testpassword123"
-ADMIN_EMAIL = "admin@medicalguidegermany.com"
+ADMIN_EMAIL = "system@fspnavigator.com"
 ADMIN_PASSWORD = "admin123secure"
 
 # Store auth tokens
