@@ -238,7 +238,7 @@ frontend:
         comment: "Frontend is running successfully in development mode. The application is accessible and responding with 200 status code. Core components (InfoHub, Journey Map, Authentication, Personal File Management, AI features) are implemented in the codebase."
       - working: true
         agent: "main"
-        comment: "Fixed AdminPanel import error - removed duplicate import statements for AdminPanel and AuthModal. Frontend now compiles successfully and preview is accessible at https://95280a35-935b-47bc-b7d5-5fa4abdb40ed.preview.emergentagent.com with 200 status code."
+        comment: "Fixed AdminPanel import error - removed duplicate import statements for AdminPanel and AuthModal. Frontend now compiles successfully and preview is accessible at https://6ebe632a-4242-488d-b857-c5467f0bf6b2.preview.emergentagent.com with 200 status code."
       - working: false
         agent: "testing"
         comment: "Critical error in GDPRConsentModal component: 'Cannot read properties of undefined (reading 'replace')'. The application is not loading properly. Backend API endpoints for GDPR content (/api/gdpr/privacy-policy and /api/gdpr/terms-of-service) are returning 404 errors."
@@ -520,4 +520,4 @@ agent_communication:
   - agent: "testing"
     message: "Code analysis for the Payment Integration UI issue shows that the Upgrade button is correctly set to call setSubscriptionUpgradeOpen(true), and the SubscriptionUpgrade component is properly implemented. The issue might be related to event propagation or a conflict with other UI elements. Further investigation is needed to determine the exact cause of the issue."
   - agent: "main"
-    message: "🚀 ACTUALIZARE COMPLETĂ GITHUB MAIN BRANCH: ✅ Sincronizat cu ultimele 28 commits din repository ✅ Rezolvat toate erorile de compilare (sintaxă JSX, import Refresh→RefreshCw, API import, Brain2→Brain) ✅ Updated dependencies (pymongo, motor) ✅ Toate serviciile funcționale ✅ Frontend compilează perfect ✅ Screenshot confirmat - aplicația funcționează complet! Ready for preview: https://95280a35-935b-47bc-b7d5-5fa4abdb40ed.preview.emergentagent.com"
+    message: "🚀 ACTUALIZARE COMPLETĂ GITHUB MAIN BRANCH: ✅ Sincronizat cu ultimele 28 commits din repository ✅ Rezolvat toate erorile de compilare (sintaxă JSX, import Refresh→RefreshCw, API import, Brain2→Brain) ✅ Updated dependencies (pymongo, motor) ✅ Toate serviciile funcționale ✅ Frontend compilează perfect ✅ Screenshot confirmat - aplicația funcționează complet! Ready for preview: https://6ebe632a-4242-488d-b857-c5467f0bf6b2.preview.emergentagent.com"
