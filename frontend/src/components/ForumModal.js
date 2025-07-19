@@ -22,6 +22,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
   
   // Modal states
   const [showCreateThread, setShowCreateThread] = useState(false);
+  const [showCreateForum, setShowCreateForum] = useState(false);
   
   // Thread creation state
   const [newThreadTitle, setNewThreadTitle] = useState("");
