@@ -50,11 +50,13 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
+      console.log('Forum modal opened, isPremium:', isPremium);
       setCurrentView('forums');
       setSelectedForum(null);
       setSelectedThread(null);
       setError("");
       if (isPremium) {
+        console.log('Loading forums for premium user...');
         loadForums();
       }
     }
