@@ -5,12 +5,16 @@ Seeds the database with initial forum data for the FSP Navigator application
 
 import asyncio
 import sys
+import os
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
+
+# Add the backend directory to Python path
+backend_dir = Path(__file__).parent.parent
+sys.path.append(str(backend_dir))
 
 from motor.motor_asyncio import AsyncIOMotorClient
-from backend.settings import settings
-from backend.models import Forum
+from settings import settings
+from models import Forum, UserInDB
 import logging
 from datetime import datetime
 
