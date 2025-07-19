@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from typing import List
 from backend.models import ForumChannel, ForumThread, ForumMessage, UserInDB
-from backend.security import get_current_active_user
+from backend.auth import get_current_user
 from backend.database import db
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/forum", tags=["forum"])
 
 # Helper: verifică dacă userul e premium
 
-def require_premium(user: UserInDB = Depends(get_current_active_user)):
+def require_premium(user: UserInDB = Depends(get_current_user)):
     if user.subscription_tier != "PREMIUM":
         raise HTTPException(status_code=403, detail="Acces permis doar pentru utilizatorii premium.")
     return user
