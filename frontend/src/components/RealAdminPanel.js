@@ -304,7 +304,8 @@ const APIManagementPanel = ({ configs, onSave }) => {
       access_key_id: '', 
       secret_access_key: '', 
       bucket_name: '',
-      endpoint_url: ''
+      endpoint_url: '',
+      region: 'auto'
     },
     stripe: { 
       public_key: '', 
