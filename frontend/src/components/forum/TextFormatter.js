@@ -190,6 +190,7 @@ export const EnhancedTextarea = ({
         </div>
       )}
       <textarea
+        ref={textareaRef}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
