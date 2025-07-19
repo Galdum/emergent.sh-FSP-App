@@ -653,7 +653,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(threads || []).map((thread) => (
+                    {(threads || []).filter(thread => thread && thread.title).map((thread) => (
                       <div
                         key={thread.id}
                         className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
