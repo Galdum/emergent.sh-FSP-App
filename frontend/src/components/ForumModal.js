@@ -406,7 +406,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
 
               {/* Content */}
               <div className="flex-1 p-6 overflow-y-auto">
-                {loading && forums.length === 0 ? (
+                {loading && (forums || []).length === 0 ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
@@ -425,7 +425,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                       </button>
                     </div>
                   </div>
-                ) : forums.length === 0 ? (
+                ) : (forums || []).length === 0 ? (
                   <div className="text-center py-12">
                     <MessageCircle className="mx-auto mb-4 text-gray-400" size={64} />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
