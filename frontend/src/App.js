@@ -47,7 +47,7 @@ import { usePersonalFiles } from "./hooks/usePersonalFiles";
 import { useSubscription } from "./hooks/useSubscription";
 import SubscriptionUpgrade from "./components/SubscriptionUpgrade";
 import FeedbackWidget from "./components/FeedbackWidget";
-import AdminPanel from "./components/AdminPanel";
+import AdminPanel from "./components/RealAdminPanel";
 import AdminNodeEditor from "./components/AdminNodeEditor";
 import AuthModal from "./components/AuthModal";
 import GDPRConsentModal from "./components/GDPRConsentModal";
