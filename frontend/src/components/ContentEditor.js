@@ -458,7 +458,7 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
         </div>
 
         {/* Content Area */}
-        <div className="flex h-[calc(95vh-140px)]">
+        <div className="flex flex-1 min-h-0">
           {/* Sidebar - Block Types & Tools */}
           {!isPreviewMode && (
             <div className="w-64 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto flex-shrink-0">
@@ -520,7 +520,7 @@ const ContentEditor = ({ nodeId, nodeType, isOpen, onClose, onSave }) => {
                 </div>
               </div>
             ) : (
-              <div className="p-6">
+              <div className="p-6 h-full">
                 {/* Content Header */}
                 <div className="mb-6">
                   {!isPreviewMode ? (
