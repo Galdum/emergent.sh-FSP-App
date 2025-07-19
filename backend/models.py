@@ -607,7 +607,7 @@ class ForumCreateRequest(BaseModel):
     slug: str
     title: str
     description: str
-    premium_only: bool = True
+    premium_only: bool = False  # Changed default to False
 
 class ThreadCreateRequest(BaseModel):
     title: str
