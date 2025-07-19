@@ -109,7 +109,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
   };
 
   // Load threads for a forum
-  const loadThreads = async (forumSlug, reset = false) => {
+  const loadThreads = async (forumSlug, reset = false, sortOrder = null) => {
     if (!isPremium) return;
     
     setLoading(reset);
@@ -117,7 +117,8 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     
     try {
       const page = reset ? 1 : threadsPage;
-      const response = await api.getForumThreads(forumSlug, page, threadSort);
+      const sort = sortOrder || threadSort; // Use provided sort or current state
+      const response = await api.getForumThreads(forumSlug, page, sort);
       
       const newThreads = Array.isArray(response) ? response : [];
       
