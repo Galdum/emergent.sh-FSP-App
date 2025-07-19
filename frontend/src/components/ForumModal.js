@@ -81,9 +81,18 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       console.log('Auth token from localStorage:', localStorage.getItem('auth_token'));
       console.log('User object:', user);
       
-      const response = await api.get('/forums/');
-      console.log('Forums loaded:', response.data);
-      setForums(response.data);
+      const response = await api.get('/forums');
+      console.log('API response:', response);
+      console.log('Forums data:', response);
+      
+      // The API service returns response.data directly, so response is the forums array
+      if (Array.isArray(response)) {
+        setForums(response);
+        console.log('Forums set to state:', response);
+      } else {
+        console.error('Unexpected response format:', response);
+        setError("Format răspuns API neașteptat");
+      }
     } catch (err) {
       console.error('Error loading forums:', err);
       console.error('Error response:', err.response);
