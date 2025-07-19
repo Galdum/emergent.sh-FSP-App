@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, Flame, Award, Lock, X, Users, Crown, Medal } from 'lucide-react';
+import { api } from '../services/api';
 
 /**
  * Badge System Component - Modal principal cu toate badge-urile
@@ -19,15 +20,11 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
 
   const fetchBadges = async () => {
     try {
-      const response = await fetch('/api/badges/', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const badgeData = await response.json();
-      setBadges(badgeData);
+      const response = await api.get('/badges');
+      setBadges(response.data);
     } catch (error) {
       console.error('Failed to fetch badges:', error);
+      setBadges([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -35,15 +32,11 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch('/api/badges/leaderboard', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const leaderboardData = await response.json();
-      setLeaderboard(leaderboardData);
+      const response = await api.get('/badges/leaderboard');
+      setLeaderboard(response.data);
     } catch (error) {
       console.error('Failed to fetch leaderboard:', error);
+      setLeaderboard([]); // Set empty array on error
     }
   };
 
