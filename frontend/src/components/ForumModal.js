@@ -26,9 +26,9 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
   // Thread creation state
   const [newThreadTitle, setNewThreadTitle] = useState("");
   const [newThreadBody, setNewThreadBody] = useState("");
-  const [threadAttachments, setThreadAttachments] = useState([]);
+  const [threadAttachments, setThreadAttachments] = useState([]); // Only links now
   const [creatingThread, setCreatingThread] = useState(false);
-  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
   // Comment state
   const [commentText, setCommentText] = useState("");
