@@ -299,6 +299,75 @@ class ApiService {
     const response = await this.client.post('/backup/files');
     return response.data;
   }
+
+  // Forum endpoints
+  async getForums() {
+    const response = await this.client.get('/forums/');
+    return response.data;
+  }
+
+  async createForum(title, description, slug) {
+    const response = await this.client.post('/forums/', {
+      title,
+      description, 
+      slug
+    });
+    return response.data;
+  }
+
+  async getForum(forumSlug) {
+    const response = await this.client.get(`/forums/${forumSlug}`);
+    return response.data;
+  }
+
+  async getForumThreads(forumSlug, page = 1, sort = 'recent') {
+    const response = await this.client.get(`/forums/${forumSlug}/threads`, {
+      params: { page, sort }
+    });
+    return response.data;
+  }
+
+  async createThread(forumSlug, title, content) {
+    const response = await this.client.post(`/forums/${forumSlug}/threads`, {
+      title,
+      content
+    });
+    return response.data;
+  }
+
+  async getThread(threadId) {
+    const response = await this.client.get(`/forums/thread/${threadId}`);
+    return response.data;
+  }
+
+  async getThreadComments(threadId, sort = 'oldest') {
+    const response = await this.client.get(`/forums/thread/${threadId}/comments`, {
+      params: { sort }
+    });
+    return response.data;
+  }
+
+  async createComment(threadId, content, parentId = null) {
+    const response = await this.client.post(`/forums/thread/${threadId}/comments`, {
+      content,
+      parent_id: parentId
+    });
+    return response.data;
+  }
+
+  async voteThread(threadId, voteType) {
+    const response = await this.client.post(`/forums/thread/${threadId}/vote`, {
+      vote_type: voteType
+    });
+    return response.data;
+  }
+
+  async voteComment(commentId, voteType) {
+    const response = await this.client.post(`/forums/comment/${commentId}/vote`, {
+      vote_type: voteType
+    });
+    return response.data;
+  }
 }
 
 export const api = new ApiService();
