@@ -548,18 +548,18 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                         className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200"
                       >
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                          {forum.title}
+                          {forum?.title || 'Untitled Forum'}
                         </h3>
-                        <p className="text-gray-600 mb-3">{forum.description}</p>
+                        <p className="text-gray-600 mb-3">{forum?.description || 'No description'}</p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center space-x-1">
                             <MessageCircle size={14} />
-                            <span>{forum.thread_count || 0} discuții</span>
+                            <span>{forum?.thread_count || 0} discuții</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <Clock size={14} />
                             <span>
-                              Ultima activitate: {forum.recent_activity ? 
+                              Ultima activitate: {forum?.recent_activity ? 
                                 new Date(forum.recent_activity).toLocaleDateString('ro-RO') : 
                                 'Niciodată'
                               }
