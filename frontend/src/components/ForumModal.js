@@ -629,7 +629,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                       onClick={() => {
                         setThreadSort(sort);
                         // Pass sort directly instead of relying on state
-                        loadThreadsWithSort(selectedForum.slug, sort);
+                        loadThreads(selectedForum.slug, true, sort);
                       }}
                       className={`px-3 py-1 rounded-full text-sm transition-colors ${
                         threadSort === sort 
