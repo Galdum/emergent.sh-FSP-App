@@ -830,57 +830,64 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                       onChange={(e) => setNewThreadTitle(e.target.value)}
                       className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                       placeholder="Introdu un titlu descriptiv..."
+                      maxLength={200}
                     />
+                    <div className="text-xs text-gray-500 mt-1">
+                      {newThreadTitle.length}/200 caractere
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium mb-2">Conținut</label>
-                    <textarea
+                    <EnhancedTextarea
                       value={newThreadBody}
                       onChange={(e) => setNewThreadBody(e.target.value)}
-                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                       placeholder="Descrie problema, întrebarea sau subiectul..."
-                      rows={6}
+                      rows={8}
+                      maxLength={5000}
+                      showToolbar={true}
                     />
+                    <div className="text-xs text-gray-500 mt-1">
+                      {newThreadBody.length}/5000 caractere
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Anexe (opțional)</label>
-                    <div className="flex items-center space-x-2 mb-4">
-                      <label className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded cursor-pointer hover:bg-gray-200">
-                        <Upload size={16} />
-                        <span className="text-sm">Încarcă fișier</span>
-                        <input
-                          type="file"
-                          multiple
-                          onChange={handleFileUpload}
-                          className="hidden"
-                          accept="image/*,.pdf,.doc,.docx"
-                        />
-                      </label>
-                      {uploadingFiles && (
-                        <span className="text-sm text-orange-600">Se încarcă...</span>
+                    <label className="block text-sm font-medium mb-2">Link-uri (opțional)</label>
+                    
+                    <div className="space-y-3">
+                      <LinkInput onAddLink={handleAddLink} />
+                      
+                      {threadAttachments.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-gray-700">Link-uri adăugate:</h4>
+                          {threadAttachments.map((attachment, index) => (
+                            <LinkAttachment
+                              key={index}
+                              url={attachment.url}
+                              title={attachment.file_name}
+                              onRemove={() => handleRemoveAttachment(index)}
+                            />
+                          ))}
+                        </div>
                       )}
                     </div>
-
-                    {threadAttachments.length > 0 && (
-                      <div className="space-y-2">
-                        {threadAttachments.map((attachment, index) => (
-                          <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                            <span className="text-sm">{attachment.file_name}</span>
-                            <button
-                              onClick={() => setThreadAttachments(prev => prev.filter((_, i) => i !== index))}
-                              className="text-red-600"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-sm text-gray-600 mb-2">
+                      <strong>Formatare disponibilă:</strong>
+                    </div>
+                    <div className="text-xs text-gray-500 space-y-1">
+                      <div>• **text** pentru <strong>bold</strong></div>
+                      <div>• *text* pentru <em>italic</em></div>
+                      <div>• `cod` pentru <code className="bg-gray-200 px-1 rounded">cod</code></div>
+                      <div>• Link-urile sunt automat clickabile</div>
+                      <div>• Tabele suportate cu format: | Header 1 | Header 2 |</div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
                     <button
                       onClick={() => {
                         setShowCreateThread(false);
