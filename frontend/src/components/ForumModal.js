@@ -326,15 +326,10 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     setError("");
     
     try {
-      const response = await api.post('/forums/', {
-        title: newForumTitle.trim(),
-        description: newForumDescription.trim(),
-        slug: slug,
-        premium_only: true
-      });
+      const response = await api.createForum(newForumTitle.trim(), newForumDescription.trim(), slug);
 
       // Add new forum to the list
-      setForums(prev => [response.data, ...(prev || [])]);
+      setForums(prev => [response, ...(prev || [])]);
       
       // Reset form
       setNewForumTitle("");
