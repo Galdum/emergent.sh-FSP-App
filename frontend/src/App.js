@@ -6260,7 +6260,7 @@ const AppContent = () => {
         onClose={() => setForumModalOpen(false)}
         onUpgrade={() => {
           setForumModalOpen(false);
-          setSubscriptionUpgradeOpen(true);
+          alert("Upgrading subscription...");
         }}
       />
     </div>
