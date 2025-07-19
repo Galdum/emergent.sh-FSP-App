@@ -589,7 +589,9 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                             <h3 className="text-lg font-semibold text-gray-900 hover:text-orange-600 transition-colors mb-2">
                               {thread.title}
                             </h3>
-                            <p className="text-gray-700 mb-3 line-clamp-2">{thread.body}</p>
+                            <div className="text-gray-700 mb-3">
+                              <FormatText text={thread.body} className="line-clamp-2" />
+                            </div>
                             
                             <div className="flex items-center justify-between text-sm text-gray-500">
                               <div className="flex items-center space-x-4">
