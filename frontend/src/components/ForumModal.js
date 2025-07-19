@@ -541,7 +541,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(forums || []).map((forum) => (
+                    {(forums || []).filter(forum => forum && forum.title).map((forum) => (
                       <div
                         key={forum.id}
                         onClick={() => handleNavigateToForum(forum)}
