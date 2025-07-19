@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Lock, MessageCircle, Send, Hash, PlusCircle, ArrowLeft, ChevronUp, ChevronDown, Clock, Users, TrendingUp, Upload, X, Link, FileText, Image, User, Reply } from "react-feather";
+import { Lock, MessageCircle, Send, Hash, PlusCircle, ArrowLeft, ChevronUp, ChevronDown, Clock, Users, TrendingUp, X, Link, User, Reply } from "react-feather";
 import { api } from "../services/api";
 
-// Import the new forum components
-import ForumCard from "./forum/ForumCard";
-import ThreadCard from "./forum/ThreadCard";
-import CommentTree from "./forum/CommentTree";
-import AttachmentPreview from "./forum/AttachmentPreview";
-import UpgradeBanner from "./forum/UpgradeBanner";
+// Import enhanced text formatting components
+import { FormatText, EnhancedTextarea, LinkInput, LinkAttachment, EmojiPicker } from "./forum/TextFormatter";
 
 const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
   // Navigation state
