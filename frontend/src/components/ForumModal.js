@@ -776,7 +776,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto mb-4"></div>
                       <p className="text-gray-600">Se încarcă comentariile...</p>
                     </div>
-                  ) : comments.length === 0 ? (
+                  ) : (comments || []).length === 0 ? (
                     <div className="text-center py-8">
                       <MessageCircle className="mx-auto mb-4 text-gray-400" size={48} />
                       <p className="text-gray-600">Nu există comentarii încă</p>
