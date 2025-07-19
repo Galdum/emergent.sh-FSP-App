@@ -290,7 +290,7 @@ export const EmojiPicker = ({ onEmojiSelect }) => {
         <button
           key={index}
           onClick={() => onEmojiSelect(emoji)}
-          className="w-6 h-6 text-lg hover:bg-gray-100 rounded flex items-center justify-center"
+          className="w-8 h-8 text-xl hover:bg-gray-100 rounded flex items-center justify-center"
         >
           {emoji}
         </button>
