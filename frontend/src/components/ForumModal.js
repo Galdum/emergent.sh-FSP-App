@@ -693,7 +693,7 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                       </div>
 
                       {/* Attachments - Links only */}
-                      {selectedThread.attachments && selectedThread.attachments.length > 0 && (
+                      {selectedThread && selectedThread.attachments && (selectedThread.attachments || []).length > 0 && (
                         <div className="mb-4">
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Link-uri:</h4>
                           <div className="space-y-2">
