@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import json
 import shutil
 import mimetypes
+import uuid
 
 from backend.models_content import (
     NodeContent, NodeContentCreate, NodeContentUpdate, NodeContentResponse,
