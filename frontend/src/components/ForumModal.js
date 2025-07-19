@@ -265,7 +265,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
 
   // Handle attachment removal
   const handleRemoveAttachment = (index) => {
-    setThreadAttachments(prev => prev.filter((_, i) => i !== index));
+    setThreadAttachments(prev => (prev || []).filter((_, i) => i !== index));
   };
 
   // Handle emoji selection
