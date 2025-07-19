@@ -147,13 +147,11 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     
     try {
       // Load thread details
-      const threadResponse = await api.get(`/forums/thread/${threadId}`);
-      setSelectedThread(threadResponse.data);
+      const threadResponse = await api.getThread(threadId);
+      setSelectedThread(threadResponse);
       
       // Load comments
-      const commentsResponse = await api.get(`/forums/thread/${threadId}/comments`, {
-        params: { sort: commentSort }
-      });
+      const commentsResponse = await api.getThreadComments(threadId, commentSort);
       setComments(Array.isArray(commentsResponse) ? commentsResponse : []);
     } catch (err) {
       console.error('Error loading thread:', err);
