@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "ACTUALIZARE: Utilizatorul a cerut actualizarea aplicației cu ultimele modificări din GitHub main branch. S-a realizat cu succes sincronizarea cu ultimele 28 commits noi din repository, s-au rezolvat toate erorile de compilare și s-a restaurat funcționalitatea completă a aplicației FSP Navigator."
+user_problem_statement: "IMPLEMENTARE FORUM PREMIUM REDDIT-STYLE: Utilizatorul a cerut implementarea completă a unui sistem de forum premium cu funcționalități avansate: data models (forums, threads, comments, attachments), backend API cu verificare premium, Cloudflare R2 pentru file storage, frontend React cu componente dedicate, sistem de voting, comentarii nested, infinite scroll, seed data și documentație completă. Obiectiv: sistem funcțional complet pentru deployment."
 
 backend:
   - task: "Basic FastAPI server setup"
