@@ -196,133 +196,45 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-gray-50 border-b px-6">
-          <div className="flex gap-4">
-            <button
-              onClick={() => setActiveTab('badges')}
-              className={`py-4 px-2 border-b-2 font-medium transition-colors ${
-                activeTab === 'badges' 
-                  ? 'border-purple-500 text-purple-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Badge-urile Mele
-            </button>
-            <button
-              onClick={() => setActiveTab('leaderboard')}
-              className={`py-4 px-2 border-b-2 font-medium transition-colors flex items-center gap-2 ${
-                activeTab === 'leaderboard' 
-                  ? 'border-purple-500 text-purple-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Users className="h-4 w-4" />
-              Clasament
-            </button>
-          </div>
-        </div>
-
         {/* Content */}
         <div className="p-6 max-h-[60vh] overflow-y-auto">
-          {activeTab === 'badges' && (
-            <div>
-              {/* Quick Actions */}
-              <div className="mb-6">
-                <button
-                  onClick={checkForNewBadges}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all flex items-center gap-2"
+          {/* Simple Badges Grid - No tabs, no extra buttons */}
+          <div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {allBadges.map((badge) => (
+                <motion.div
+                  key={badge.badge_id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedBadge(badge)}
+                  className="cursor-pointer"
                 >
-                  <Star className="h-4 w-4" />
-                  Verifică Badge-uri Noi
-                </button>
-              </div>
-
-              {/* All Badges Grid */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <Trophy className="h-5 w-5 text-yellow-600" />
-                  Toate Badge-urile ({badges.length})
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {allBadges.map((badge) => (
-                    <motion.div
-                      key={badge.badge_id}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedBadge(badge)}
-                      className="cursor-pointer"
-                    >
-                      <div className={`aspect-square rounded-2xl ${
-                        badge.earned 
-                          ? getBadgeColor(badge.badge_id) 
-                          : 'bg-gray-300 border-2 border-gray-400'
-                      } text-white p-4 flex items-center justify-center shadow-lg hover:shadow-xl transition-all relative overflow-hidden`}>
-                        <span className={`text-3xl ${badge.earned ? '' : 'opacity-30'}`}>
-                          {getBadgeIcon(badge.badge_id)}
-                        </span>
-                        {!badge.earned && (
-                          <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                            <div className="bg-white rounded-full p-2 shadow-lg">
-                              <Lock className="h-5 w-5 text-gray-600" />
-                            </div>
-                          </div>
-                        )}
+                  <div className={`aspect-square rounded-lg ${
+                    badge.earned 
+                      ? 'bg-green-100 border-2 border-green-300' 
+                      : 'bg-gray-100 border-2 border-gray-300'
+                  } p-4 flex items-center justify-center shadow-md hover:shadow-lg transition-all relative`}>
+                    <span className={`text-3xl ${badge.earned ? '' : 'opacity-40'}`}>
+                      {getBadgeIcon(badge.badge_id)}
+                    </span>
+                    {!badge.earned && (
+                      <div className="absolute top-2 right-2">
+                        <Lock className="h-4 w-4 text-gray-400" />
                       </div>
-                      <div className="text-center mt-2">
-                        <div className={`font-medium text-sm ${badge.earned ? 'text-gray-800' : 'text-gray-500'}`}>
-                          {badge.name}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {badge.earned 
-                            ? `Obținut: ${new Date(badge.awarded_at).toLocaleDateString('ro-RO')}`
-                            : getBadgeCriteria(badge.badge_id)
-                          }
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'leaderboard' && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Crown className="h-5 w-5 text-yellow-600" />
-                Top Colecționari de Badge-uri
-              </h3>
-              <div className="space-y-3">
-                {leaderboard.map((user, index) => (
-                  <div key={user.user_id} className="bg-white border rounded-lg p-4 hover:shadow-md transition-all">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                          index === 0 ? 'bg-yellow-500' : 
-                          index === 1 ? 'bg-gray-400' : 
-                          index === 2 ? 'bg-amber-600' : 'bg-gray-300'
-                        }`}>
-                          {index + 1}
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-800">{user.name}</div>
-                          <div className="text-sm text-gray-500">{user.badge_count} badge-uri</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        {user.top_badges?.slice(0, 3).map((badge, i) => (
-                          <div key={i} className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm">
-                            {getBadgeIcon(badge.badge_id)}
-                          </div>
-                        ))}
-                      </div>
+                    )}
+                  </div>
+                  <div className="text-center mt-2">
+                    <div className={`font-medium text-sm ${badge.earned ? 'text-gray-800' : 'text-gray-500'}`}>
+                      {badge.name}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {getBadgeCriteria(badge.badge_id)}
                     </div>
                   </div>
-                ))}
-              </div>
+                </motion.div>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       </motion.div>
 
