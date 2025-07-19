@@ -260,7 +260,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
 
   // Handle link attachment
   const handleAddLink = (linkData) => {
-    setThreadAttachments(prev => [...prev, linkData]);
+    setThreadAttachments(prev => [...(prev || []), linkData]);
   };
 
   // Handle attachment removal
