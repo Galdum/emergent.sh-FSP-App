@@ -27,6 +27,7 @@
     "@craco/craco": "^7.1.0",
     "@craco/types": "^7.1.0",
     "@rollup/plugin-terser": "^0.4.4",
+    "cross-env": "^7.0.3",
     "glob": "^10.3.10",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
