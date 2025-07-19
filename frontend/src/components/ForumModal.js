@@ -686,8 +686,8 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                         </span>
                       </div>
 
-                      <div className="text-gray-800 whitespace-pre-wrap mb-4">
-                        {selectedThread.body}
+                      <div className="text-gray-800 mb-4">
+                        <FormatText text={selectedThread.body} />
                       </div>
 
                       {/* Attachments */}
