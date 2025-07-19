@@ -51,7 +51,7 @@ const AdminNodeEditor = ({ nodeId, nodeType, nodeName, onContentUpdate }) => {
 
       {/* Content Editor Modal */}
       {isEditorOpen && (
-        <ContentEditor
+        <SimpleContentEditor
           nodeId={nodeId}
           nodeType={nodeType}
           isOpen={isEditorOpen}
