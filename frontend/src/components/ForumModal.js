@@ -271,7 +271,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
 
   // Handle emoji selection
   const handleEmojiSelect = (emoji) => {
-    setNewThreadBody(prev => prev + emoji);
+    setNewThreadBody(prev => (prev || '') + emoji);
     setShowEmojiPicker(false);
   };
 
