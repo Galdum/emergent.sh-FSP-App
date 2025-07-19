@@ -456,7 +456,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
               Forum Premium
             </h2>
             <p className="text-gray-500 mb-6">
-              Accesibil doar pentru utilizatorii cu abonament Premium.
+              Accesul la forum este disponibil doar pentru utilizatorii cu abonament Premium.
             </p>
             
             {onUpgrade && (
