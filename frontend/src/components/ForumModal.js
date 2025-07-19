@@ -24,9 +24,8 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
     if (!isOpen || !isPremium) return;
     setLoadingChannels(true);
     setError("");
-    fetch(`${API}/channels`)
-      .then((r) => r.json())
-      .then(setChannels)
+    api.get('/forum/channels')
+      .then((response) => setChannels(response.data))
       .catch(() => setError("Eroare la încărcarea canalelor."))
       .finally(() => setLoadingChannels(false));
   }, [isOpen, isPremium]);
@@ -36,9 +35,8 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
     if (!selectedChannel || !isPremium) return;
     setLoadingThreads(true);
     setError("");
-    fetch(`${API}/channels/${selectedChannel.id}/threads`)
-      .then((r) => r.json())
-      .then(setThreads)
+    api.get(`/forum/channels/${selectedChannel.id}/threads`)
+      .then((response) => setThreads(response.data))
       .catch(() => setError("Eroare la încărcarea discuțiilor."))
       .finally(() => setLoadingThreads(false));
   }, [selectedChannel, isPremium]);
@@ -48,9 +46,8 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
     if (!selectedThread || !isPremium) return;
     setLoadingMessages(true);
     setError("");
-    fetch(`${API}/threads/${selectedThread.id}/messages`)
-      .then((r) => r.json())
-      .then(setMessages)
+    api.get(`/forum/threads/${selectedThread.id}/messages`)
+      .then((response) => setMessages(response.data))
       .catch(() => setError("Eroare la încărcarea mesajelor."))
       .finally(() => setLoadingMessages(false));
   }, [selectedThread, isPremium]);
