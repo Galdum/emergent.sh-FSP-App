@@ -5081,11 +5081,11 @@ const BonusNode = ({ node, isAccessible, onClick, isMobile = false }) => {
       
       {/* Admin Edit Button */}
       <foreignObject
-        x={node.position.x - 50}
-        y={node.position.y - 50}
-        width={100}
-        height={100}
-        style={{ pointerEvents: "auto" }}
+        x={node.position.x + radius + 5}
+        y={node.position.y - radius - 5}
+        width={20}
+        height={20}
+        style={{ pointerEvents: "auto", overflow: "visible" }}
       >
         <div className="relative w-full h-full">
           <AdminNodeEditor
