@@ -163,6 +163,26 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
     }
   };
 
+  // Load comments for a thread
+  const loadComments = async (threadId) => {
+    setLoading(true);
+    setError("");
+    
+    try {
+      const commentsResponse = await api.getThreadComments(threadId, commentSort);
+      setComments(Array.isArray(commentsResponse) ? commentsResponse : []);
+    } catch (err) {
+      console.error('Error loading comments:', err);
+      if (err.response?.status === 401) {
+        setError("Problemă de autentificare. Te rugăm să te conectezi din nou.");
+      } else {
+        setError("Eroare la încărcarea comentariilor: " + (err.response?.data?.detail || err.message));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle forum navigation
   const handleNavigateToForum = (forum) => {
     setSelectedForum(forum);
