@@ -542,7 +542,137 @@ class Leaderboard(BaseModel):
     class Config:
         use_enum_values = True
 
-# --- Forum Models ---
+# --- Reddit-Style Forum Models ---
+class AttachmentType(str, Enum):
+    IMAGE = "image"
+    FILE = "file"
+    LINK = "link"
+
+class Attachment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type: AttachmentType
+    url: str
+    file_name: Optional[str] = None
+    mime_type: Optional[str] = None
+    size: Optional[int] = None  # in bytes
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class Forum(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    slug: str  # URL-friendly identifier
+    title: str
+    description: str
+    premium_only: bool = True
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
+class Thread(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    forum_id: str
+    author_id: str
+    title: str
+    body: str
+    attachments: List[Attachment] = []
+    up_votes: int = 0
+    down_votes: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_locked: bool = False
+    is_pinned: bool = False
+
+class Comment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    thread_id: str
+    author_id: str
+    body: str
+    parent_id: Optional[str] = None  # For nested comments
+    up_votes: int = 0
+    down_votes: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_deleted: bool = False
+
+class Vote(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    target_id: str  # thread_id or comment_id
+    target_type: str  # "thread" or "comment"
+    value: int = Field(..., ge=-1, le=1)  # -1 for downvote, 1 for upvote
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Request/Response Models
+class ForumCreateRequest(BaseModel):
+    slug: str
+    title: str
+    description: str
+    premium_only: bool = True
+
+class ThreadCreateRequest(BaseModel):
+    title: str
+    body: str
+    attachments: List[Dict[str, Any]] = []
+
+class ThreadUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    body: Optional[str] = None
+
+class CommentCreateRequest(BaseModel):
+    body: str
+    parent_id: Optional[str] = None
+
+class CommentUpdateRequest(BaseModel):
+    body: str
+
+class VoteRequest(BaseModel):
+    value: int = Field(..., ge=-1, le=1)
+
+class ThreadResponse(BaseModel):
+    id: str
+    forum_id: str
+    author_id: str
+    author_name: Optional[str] = None
+    title: str
+    body: str
+    attachments: List[Attachment]
+    up_votes: int
+    down_votes: int
+    created_at: datetime
+    updated_at: datetime
+    is_locked: bool
+    is_pinned: bool
+    comment_count: int = 0
+    user_vote: Optional[int] = None  # User's vote on this thread
+
+class CommentResponse(BaseModel):
+    id: str
+    thread_id: str
+    author_id: str
+    author_name: Optional[str] = None
+    body: str
+    parent_id: Optional[str]
+    up_votes: int
+    down_votes: int
+    created_at: datetime
+    updated_at: datetime
+    is_deleted: bool
+    user_vote: Optional[int] = None  # User's vote on this comment
+    replies: List["CommentResponse"] = []  # Nested replies
+
+class ForumResponse(BaseModel):
+    id: str
+    slug: str
+    title: str
+    description: str
+    premium_only: bool
+    thread_count: int = 0
+    recent_activity: Optional[datetime] = None
+
+# Enable forward references for nested models
+CommentResponse.model_rebuild()
+
+# Legacy Forum Models (for backward compatibility)
 class ForumChannel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
