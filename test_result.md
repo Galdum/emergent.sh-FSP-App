@@ -491,11 +491,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Personal File Management"
-    - "InfoHub Modal with New Sections"
-  stuck_tasks:
-    - "Personal File Management"
-    - "InfoHub Modal with New Sections"
+    - "Authentication Modal UX Improvement"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
