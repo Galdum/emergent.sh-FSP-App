@@ -13,12 +13,12 @@ from contextlib import asynccontextmanager
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
-# Import settings
-from backend.settings import settings, get_settings
-
 # Add the parent directory to sys.path
 ROOT_DIR = Path(__file__).parent
 sys.path.append(str(ROOT_DIR.parent))
+
+# Import settings
+from backend.settings import settings, get_settings
 
 # Initialize Sentry for error tracking
 if settings.sentry_dsn and settings.environment != 'development':
