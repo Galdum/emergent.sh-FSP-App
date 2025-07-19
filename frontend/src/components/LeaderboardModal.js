@@ -91,7 +91,12 @@ export const LeaderboardModal = ({ isOpen, onClose }) => {
         }
       ]);
 
-      setCompetitions(competitionConfig.competitions);
+      // Add guard to prevent crash if competitionConfig is undefined
+      const list = competitionConfig?.competitions ?? [];
+      if (!competitionConfig?.competitions) {
+        console.warn('Competitions undefined – showing empty table');
+      }
+      setCompetitions(list);
     }
   }, [isOpen]);
 
