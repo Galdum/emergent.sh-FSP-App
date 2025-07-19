@@ -222,7 +222,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Initialize Redis connection for rate limiting
-redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+redis_url = os.environ.get('REDIS_URL')
 redis_client = None
 
 async def get_redis_client():
