@@ -1867,6 +1867,10 @@ def run_all_tests():
     forum_results = run_forum_tests()
     results.update(forum_results)
     
+    # 15. Content Management System Tests
+    content_results = run_content_management_tests()
+    results.update(content_results)
+    
     # Print summary
     print("\n" + "=" * 80)
     print("COMPLETE TEST SUMMARY")
