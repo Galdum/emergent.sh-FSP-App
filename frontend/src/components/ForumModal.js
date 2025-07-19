@@ -889,7 +889,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {(comments || []).map((comment) => (
+                      {(comments || []).filter(comment => comment && comment.body).map((comment) => (
                         <div key={comment.id} className="bg-white rounded-lg border p-4">
                           <div className="flex">
                             <div className="flex flex-col items-center mr-4">
