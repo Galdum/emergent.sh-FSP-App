@@ -116,7 +116,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
         setThreads(newThreads);
         setThreadsPage(2);
       } else {
-        setThreads(prev => [...prev, ...newThreads]);
+        setThreads(prev => [...(prev || []), ...newThreads]);
         setThreadsPage(prev => prev + 1);
       }
       
