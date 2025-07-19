@@ -218,6 +218,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       // Update selected thread if we're viewing it
       if (currentView === 'thread' && selectedThread && selectedThread.id === threadId) {
         setSelectedThread(prev => {
+          if (!prev) return prev;
           const oldVote = prev.user_vote || 0;
           let upChange = 0;
           let downChange = 0;
