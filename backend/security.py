@@ -243,6 +243,10 @@ async def get_redis_client():
 # Initialize slowapi limiter with error handling
 def create_limiter():
     """Create limiter with proper error handling"""
+    if not redis_url:
+        logger.warning("REDIS_URL not configured. Rate limiting disabled.")
+        return None
+        
     try:
         # Try to create limiter with Redis
         limiter = Limiter(
