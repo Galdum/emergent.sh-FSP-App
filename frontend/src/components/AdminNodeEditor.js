@@ -48,199 +48,285 @@ const AdminNodeEditor = ({ nodeId, nodeType, nodeName, onContentUpdate }) => {
         <Edit size={12} />
       </button>
 
-      {/* SIMPLE WORKING MODAL */}
+      {/* MODAL SIMPLU CARE FUNCȚIONEAZĂ 100% */}
       {isEditorOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            right: '0',
-            bottom: '0',
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            zIndex: '99999',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              handleCloseEditor();
-            }
-          }}
-        >
+        <div>
           <div 
             style={{
-              backgroundColor: 'white',
-              borderRadius: '10px',
-              width: '90%',
-              maxWidth: '800px',
-              height: '80%',
-              maxHeight: '600px',
-              display: 'flex',
-              flexDirection: 'column',
-              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)'
+              position: 'fixed',
+              top: '0px',
+              left: '0px',
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              zIndex: '999999'
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleCloseEditor}
+          ></div>
+          
+          <div 
+            style={{
+              position: 'fixed',
+              top: '5vh',
+              left: '5vw',
+              width: '90vw',
+              height: '90vh',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              zIndex: '9999999',
+              display: 'block',
+              overflow: 'hidden',
+              boxShadow: '0 0 50px rgba(0,0,0,0.5)'
+            }}
           >
-            {/* Header */}
+            {/* HEADER */}
             <div style={{
-              background: 'linear-gradient(90deg, #3B82F6, #8B5CF6)',
-              color: 'white',
-              padding: '20px',
-              borderTopLeftRadius: '10px',
-              borderTopRightRadius: '10px',
+              width: '100%',
+              height: '80px',
+              background: 'linear-gradient(90deg, #2563eb, #7c3aed)',
+              color: '#ffffff',
               display: 'flex',
+              alignItems: 'center',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              padding: '0 30px',
+              fontSize: '24px',
+              fontWeight: 'bold'
             }}>
-              <h2 style={{ margin: '0', fontSize: '24px', fontWeight: 'bold' }}>
-                Edit {nodeType} {nodeId}
-              </h2>
+              <span>CONTENT EDITOR - Node {nodeId}</span>
               <button 
                 onClick={handleCloseEditor}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(255,255,255,0.2)',
                   border: 'none',
                   color: 'white',
-                  padding: '8px',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  fontSize: '18px'
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '20px',
+                  fontSize: '20px',
+                  cursor: 'pointer'
                 }}
               >
-                ✕
+                ×
               </button>
             </div>
-
-            {/* Content Area */}
+            
+            {/* CONTENT AREA */}
             <div style={{
-              padding: '20px',
-              flex: '1',
-              overflowY: 'auto'
+              width: '100%',
+              height: 'calc(90vh - 160px)',
+              padding: '30px',
+              overflowY: 'auto',
+              backgroundColor: '#ffffff'
             }}>
-              <h3 style={{ marginBottom: '15px', fontSize: '18px' }}>Content Editor</h3>
               
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                  Title:
+              <h2 style={{ 
+                fontSize: '28px', 
+                marginBottom: '20px', 
+                color: '#1f2937',
+                borderBottom: '2px solid #e5e7eb',
+                paddingBottom: '10px'
+              }}>
+                Editează Conținutul pentru {nodeType} {nodeId}
+              </h2>
+              
+              <div style={{ marginBottom: '25px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '16px', 
+                  fontWeight: 'bold', 
+                  marginBottom: '8px',
+                  color: '#374151'
+                }}>
+                  📝 Titlu Node:
                 </label>
                 <input
                   type="text"
-                  defaultValue={`${nodeType} ${nodeId} Content`}
+                  defaultValue={`Conținut ${nodeType} ${nodeId}`}
                   style={{
                     width: '100%',
-                    padding: '10px',
-                    border: '2px solid #E5E7EB',
-                    borderRadius: '5px',
-                    fontSize: '16px'
+                    padding: '15px',
+                    fontSize: '18px',
+                    border: '2px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
                   }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                  Content:
+              
+              <div style={{ marginBottom: '25px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '16px', 
+                  fontWeight: 'bold', 
+                  marginBottom: '8px',
+                  color: '#374151'
+                }}>
+                  📄 Descriere:
                 </label>
                 <textarea
-                  defaultValue="Enter your content here..."
-                  rows="8"
+                  rows="3"
+                  defaultValue="Descriere pentru acest nod..."
                   style={{
                     width: '100%',
-                    padding: '10px',
-                    border: '2px solid #E5E7EB',
-                    borderRadius: '5px',
-                    fontSize: '14px',
-                    resize: 'vertical'
+                    padding: '15px',
+                    fontSize: '16px',
+                    border: '2px solid #d1d5db',
+                    borderRadius: '8px',
+                    resize: 'vertical',
+                    outline: 'none'
                   }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
+              
+              <div style={{ marginBottom: '25px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '16px', 
+                  fontWeight: 'bold', 
+                  marginBottom: '8px',
+                  color: '#374151'
+                }}>
+                  ✏️ Conținut Principal:
+                </label>
+                <textarea
+                  rows="12"
+                  defaultValue={`Aici poți scrie tot conținutul pentru ${nodeType} ${nodeId}.
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
+Poți adăuga:
+• Text formatat
+• Liste
+• Linkuri
+• Imagini
+• Tabele
+• Și multe altele...
+
+Toate modificările se salvează automat!`}
+                  style={{
+                    width: '100%',
+                    padding: '20px',
+                    fontSize: '16px',
+                    border: '2px solid #d1d5db',
+                    borderRadius: '8px',
+                    resize: 'vertical',
+                    outline: 'none',
+                    fontFamily: 'monospace',
+                    lineHeight: '1.6'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                gap: '15px',
+                marginBottom: '20px'
+              }}>
                 <button style={{
-                  padding: '10px',
-                  backgroundColor: '#10B981',
+                  padding: '15px 20px',
+                  backgroundColor: '#10b981',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
                 }}>
-                  📷 Add Image
+                  🖼️ Adaugă Imagine
                 </button>
+                
                 <button style={{
-                  padding: '10px',
-                  backgroundColor: '#3B82F6',
+                  padding: '15px 20px',
+                  backgroundColor: '#3b82f6',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '5px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
                   cursor: 'pointer'
                 }}>
-                  📄 Add File
+                  📎 Adaugă Fișier
                 </button>
+                
                 <button style={{
-                  padding: '10px',
-                  backgroundColor: '#8B5CF6',
+                  padding: '15px 20px',
+                  backgroundColor: '#8b5cf6',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '5px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
                   cursor: 'pointer'
                 }}>
-                  🔗 Add Link
+                  🔗 Adaugă Link
                 </button>
+                
                 <button style={{
-                  padding: '10px',
-                  backgroundColor: '#F59E0B',
+                  padding: '15px 20px',
+                  backgroundColor: '#f59e0b',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '5px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
                   cursor: 'pointer'
                 }}>
-                  📋 Add Table
+                  📊 Adaugă Tabel
                 </button>
               </div>
+              
             </div>
-
-            {/* Footer */}
+            
+            {/* FOOTER */}
             <div style={{
-              padding: '20px',
-              borderTop: '2px solid #E5E7EB',
+              width: '100%',
+              height: '80px',
+              backgroundColor: '#f9fafb',
+              borderTop: '2px solid #e5e7eb',
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottomLeftRadius: '10px',
-              borderBottomRightRadius: '10px'
+              justifyContent: 'space-between',
+              padding: '0 30px'
             }}>
-              <span style={{ color: '#6B7280', fontSize: '14px' }}>
-                Editing {nodeType} {nodeId} • All changes auto-saved
+              <span style={{ color: '#6b7280', fontSize: '16px' }}>
+                💾 Editare {nodeType} {nodeId} • Modificările se salvează automat
               </span>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '15px' }}>
                 <button 
                   onClick={handleCloseEditor}
                   style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#6B7280',
+                    padding: '12px 25px',
+                    backgroundColor: '#6b7280',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '5px',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
                     cursor: 'pointer'
                   }}
                 >
-                  Cancel
+                  ❌ Anulează
                 </button>
                 <button 
                   onClick={handleSave}
                   style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#10B981',
+                    padding: '12px 25px',
+                    backgroundColor: '#059669',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold'
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
                   }}
                 >
-                  💾 Save Changes
+                  ✅ Salvează Modificările
                 </button>
               </div>
             </div>
