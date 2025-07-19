@@ -48,7 +48,6 @@ async def create_system_user(db):
     try:
         existing_user = await db.users.find_one({"id": SYSTEM_USER_ID})
         if not existing_user:
-            from backend.models import UserInDB
             system_user = UserInDB(
                 id=SYSTEM_USER_ID,
                 email="system@fspnavigator.com",
