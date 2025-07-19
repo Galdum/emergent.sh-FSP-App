@@ -42,17 +42,11 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
 
   const checkForNewBadges = async () => {
     try {
-      const response = await fetch('/api/badges/check', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const result = await response.json();
+      const response = await api.post('/badges/check');
       
-      if (result.newly_awarded && result.newly_awarded.length > 0) {
+      if (response.data.newly_awarded && response.data.newly_awarded.length > 0) {
         // Trigger notification for first new badge
-        const newBadge = badges.find(b => b.badge_id === result.newly_awarded[0]);
+        const newBadge = badges.find(b => b.badge_id === response.data.newly_awarded[0]);
         if (newBadge && onBadgeEarned) {
           onBadgeEarned(newBadge);
         }
