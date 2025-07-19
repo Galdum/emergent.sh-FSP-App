@@ -4932,11 +4932,11 @@ const StepNode = ({
       
       {/* Admin Edit Button */}
       <foreignObject
-        x={position.x - 50}
-        y={position.y - 50}
-        width={100}
-        height={100}
-        style={{ pointerEvents: "auto" }}
+        x={position.x + radius + 5}
+        y={position.y - radius - 5}
+        width={20}
+        height={20}
+        style={{ pointerEvents: "auto", overflow: "visible" }}
       >
         <div className="relative w-full h-full">
           <AdminNodeEditor
