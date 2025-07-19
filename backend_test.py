@@ -31,6 +31,10 @@ admin_auth_token = None
 # Store PayPal test data
 paypal_approval_url = None
 
+# Store forum test data
+test_thread_id = None
+test_comment_id = None
+
 def random_string(length=8):
     """Generate a random string for testing."""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
