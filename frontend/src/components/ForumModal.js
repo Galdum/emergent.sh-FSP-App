@@ -160,7 +160,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       const commentsResponse = await api.get(`/forums/thread/${threadId}/comments`, {
         params: { sort: commentSort }
       });
-      setComments(commentsResponse.data);
+      setComments(Array.isArray(commentsResponse) ? commentsResponse : []);
     } catch (err) {
       console.error('Error loading thread:', err);
       setError("Eroare la încărcarea discuției.");
