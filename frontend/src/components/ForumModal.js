@@ -414,6 +414,31 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
 
   if (!isOpen) return null;
 
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 animate-fade-in-fast">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative animate-scale-in">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors"
+          >
+            <X size={28} />
+          </button>
+          
+          <div className="text-center">
+            <Lock size={48} className="text-gray-400 mb-4 mx-auto" />
+            <h2 className="text-2xl font-bold mb-2 text-gray-700">
+              Conectare necesară
+            </h2>
+            <p className="text-gray-500 mb-6">
+              Trebuie să te conectezi pentru a accesa forumul.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!isPremium) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 animate-fade-in-fast">
