@@ -124,7 +124,7 @@ const robots = `User-agent: *
 Disallow: /api/
 Allow: /
 
-Sitemap: https://6ebe632a-4242-488d-b857-c5467f0bf6b2.preview.emergentagent.com/sitemap.xml`;
+Sitemap: https://28dc2ea1-e40b-460e-be0f-ffac1d57b407.preview.emergentagent.com/sitemap.xml`;
 
 fs.writeFileSync(path.join(buildDir, 'robots.txt'), robots);
 
