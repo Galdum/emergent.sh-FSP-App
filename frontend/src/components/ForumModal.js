@@ -236,30 +236,20 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
     }
   };
 
-  // Handle file upload
-  const handleFileUpload = async (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length === 0) return;
+  // Handle link attachment
+  const handleAddLink = (linkData) => {
+    setThreadAttachments(prev => [...prev, linkData]);
+  };
 
-    setUploadingFiles(true);
-    
-    try {
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
+  // Handle attachment removal
+  const handleRemoveAttachment = (index) => {
+    setThreadAttachments(prev => prev.filter((_, i) => i !== index));
+  };
 
-        const response = await api.post('/forums/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-        setThreadAttachments(prev => [...prev, response.data]);
-      }
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      setError('Eroare la încărcarea fișierelor');
-    } finally {
-      setUploadingFiles(false);
-    }
+  // Handle emoji selection
+  const handleEmojiSelect = (emoji) => {
+    setNewThreadBody(prev => prev + emoji);
+    setShowEmojiPicker(false);
   };
 
   // Create thread
