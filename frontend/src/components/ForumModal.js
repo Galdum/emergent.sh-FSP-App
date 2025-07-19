@@ -62,17 +62,26 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
 
   // Load forums
   const loadForums = async () => {
-    if (!isPremium) return;
+    if (!isPremium) {
+      console.log('User is not premium, isPremium:', isPremium);
+      return;
+    }
     
     setLoading(true);
     setError("");
     
     try {
+      console.log('Loading forums...');
       const response = await api.get('/forums/');
+      console.log('Forums loaded:', response.data);
       setForums(response.data);
     } catch (err) {
       console.error('Error loading forums:', err);
-      setError("Eroare la încărcarea forumurilor.");
+      if (err.response?.status === 403) {
+        setError("Acces premium necesar pentru forum.");
+      } else {
+        setError("Eroare la încărcarea forumurilor.");
+      }
     } finally {
       setLoading(false);
     }
