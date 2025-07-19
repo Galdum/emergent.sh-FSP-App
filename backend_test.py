@@ -925,6 +925,423 @@ def test_paypal_cancel_subscription():
         print_test_result("Cancel PayPal Subscription", False, error=str(e))
         return False
 
+# --- Reddit-Style Forum Tests ---
+
+def test_forum_premium_user_setup():
+    """Setup a premium user for forum testing."""
+    global auth_token
+    
+    # Use the provided test credentials
+    test_email = "testuser@example.com"
+    test_password = "TestPassword123!"
+    
+    try:
+        # Try to register the user first
+        register_response = requests.post(
+            f"{API_URL}/auth/register",
+            json={"email": test_email, "password": test_password}
+        )
+        
+        # If registration fails because user exists, try login
+        if register_response.status_code == 400:
+            login_response = requests.post(
+                f"{API_URL}/auth/login",
+                json={"email": test_email, "password": test_password}
+            )
+            success = login_response.status_code == 200 and "access_token" in login_response.json()
+            if success:
+                auth_token = login_response.json().get("access_token")
+        else:
+            success = register_response.status_code == 200 and "access_token" in register_response.json()
+            if success:
+                auth_token = register_response.json().get("access_token")
+        
+        # Upgrade to PREMIUM using test endpoint (if available)
+        if auth_token:
+            try:
+                upgrade_response = requests.post(
+                    f"{API_URL}/subscription/upgrade-test",
+                    headers={"Authorization": f"Bearer {auth_token}"},
+                    json={"tier": "PREMIUM"}
+                )
+                print(f"Premium upgrade response: {upgrade_response.status_code}")
+            except:
+                print("Premium upgrade endpoint not available, continuing with existing subscription")
+        
+        print_test_result("Forum Premium User Setup", success and auth_token is not None)
+        return success and auth_token is not None
+    except Exception as e:
+        print_test_result("Forum Premium User Setup", False, error=str(e))
+        return False
+
+def test_forum_list():
+    """Test GET /api/forums - List all forums."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("List Forums", False, error="No auth token available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/forums/",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        success = response.status_code == 200 and isinstance(response.json(), list)
+        print_test_result("List Forums", success, response)
+        return success
+    except Exception as e:
+        print_test_result("List Forums", False, error=str(e))
+        return False
+
+def test_forum_get_specific():
+    """Test GET /api/forums/{forum_slug} - Get specific forum."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("Get Specific Forum", False, error="No auth token available")
+        return False
+    
+    # Test with known forum slug
+    forum_slug = "general-fsp-approbation"
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/forums/{forum_slug}",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        success = response.status_code == 200 and "slug" in response.json()
+        print_test_result("Get Specific Forum", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get Specific Forum", False, error=str(e))
+        return False
+
+def test_forum_create():
+    """Test POST /api/forums - Create new forum."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("Create Forum", False, error="No auth token available")
+        return False
+    
+    try:
+        forum_data = {
+            "slug": f"test-forum-{random_string()}",
+            "title": f"Test Forum {random_string()}",
+            "description": "A test forum created by automated testing",
+            "premium_only": True
+        }
+        
+        response = requests.post(
+            f"{API_URL}/forums/",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json=forum_data
+        )
+        
+        success = response.status_code == 200 and "id" in response.json()
+        print_test_result("Create Forum", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Create Forum", False, error=str(e))
+        return False
+
+def test_forum_threads_list():
+    """Test GET /api/forums/{forum_slug}/threads - List threads in forum."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("List Forum Threads", False, error="No auth token available")
+        return False
+    
+    forum_slug = "general-fsp-approbation"
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/forums/{forum_slug}/threads",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            params={"page": 1, "limit": 10, "sort": "recent"}
+        )
+        
+        success = response.status_code == 200 and isinstance(response.json(), list)
+        print_test_result("List Forum Threads", success, response)
+        return success
+    except Exception as e:
+        print_test_result("List Forum Threads", False, error=str(e))
+        return False
+
+def test_forum_thread_create():
+    """Test POST /api/forums/{forum_slug}/threads - Create new thread."""
+    global auth_token, test_thread_id
+    
+    if not auth_token:
+        print_test_result("Create Forum Thread", False, error="No auth token available")
+        return False
+    
+    forum_slug = "general-fsp-approbation"
+    
+    try:
+        thread_data = {
+            "title": f"Test Thread {random_string()}",
+            "body": "This is a test thread created by automated testing. It contains some **bold text** and [a link](https://example.com).",
+            "attachments": [
+                {
+                    "type": "link",
+                    "url": "https://example.com/test-resource",
+                    "file_name": "Test Resource"
+                }
+            ]
+        }
+        
+        response = requests.post(
+            f"{API_URL}/forums/{forum_slug}/threads",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json=thread_data
+        )
+        
+        success = response.status_code == 200 and "id" in response.json()
+        if success:
+            test_thread_id = response.json().get("id")
+        
+        print_test_result("Create Forum Thread", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Create Forum Thread", False, error=str(e))
+        return False
+
+def test_forum_thread_get():
+    """Test GET /api/forums/thread/{thread_id} - Get specific thread."""
+    global auth_token, test_thread_id
+    
+    if not auth_token:
+        print_test_result("Get Forum Thread", False, error="No auth token available")
+        return False
+    
+    if not test_thread_id:
+        print_test_result("Get Forum Thread", False, error="No test thread ID available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/forums/thread/{test_thread_id}",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        success = response.status_code == 200 and "id" in response.json()
+        print_test_result("Get Forum Thread", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get Forum Thread", False, error=str(e))
+        return False
+
+def test_forum_comments_list():
+    """Test GET /api/forums/thread/{thread_id}/comments - List comments."""
+    global auth_token, test_thread_id
+    
+    if not auth_token:
+        print_test_result("List Thread Comments", False, error="No auth token available")
+        return False
+    
+    if not test_thread_id:
+        print_test_result("List Thread Comments", False, error="No test thread ID available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/forums/thread/{test_thread_id}/comments",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            params={"sort": "best"}
+        )
+        
+        success = response.status_code == 200 and isinstance(response.json(), list)
+        print_test_result("List Thread Comments", success, response)
+        return success
+    except Exception as e:
+        print_test_result("List Thread Comments", False, error=str(e))
+        return False
+
+def test_forum_comment_create():
+    """Test POST /api/forums/thread/{thread_id}/comments - Create comment."""
+    global auth_token, test_thread_id, test_comment_id
+    
+    if not auth_token:
+        print_test_result("Create Thread Comment", False, error="No auth token available")
+        return False
+    
+    if not test_thread_id:
+        print_test_result("Create Thread Comment", False, error="No test thread ID available")
+        return False
+    
+    try:
+        comment_data = {
+            "body": f"This is a test comment created by automated testing. Random ID: {random_string()}"
+        }
+        
+        response = requests.post(
+            f"{API_URL}/forums/thread/{test_thread_id}/comments",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json=comment_data
+        )
+        
+        success = response.status_code == 200 and "id" in response.json()
+        if success:
+            test_comment_id = response.json().get("id")
+        
+        print_test_result("Create Thread Comment", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Create Thread Comment", False, error=str(e))
+        return False
+
+def test_forum_thread_vote():
+    """Test POST /api/forums/thread/{thread_id}/vote - Vote on thread."""
+    global auth_token, test_thread_id
+    
+    if not auth_token:
+        print_test_result("Vote on Thread", False, error="No auth token available")
+        return False
+    
+    if not test_thread_id:
+        print_test_result("Vote on Thread", False, error="No test thread ID available")
+        return False
+    
+    try:
+        vote_data = {"value": 1}  # Upvote
+        
+        response = requests.post(
+            f"{API_URL}/forums/thread/{test_thread_id}/vote",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json=vote_data
+        )
+        
+        success = response.status_code == 200 and "message" in response.json()
+        print_test_result("Vote on Thread", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Vote on Thread", False, error=str(e))
+        return False
+
+def test_forum_comment_vote():
+    """Test POST /api/forums/comment/{comment_id}/vote - Vote on comment."""
+    global auth_token, test_comment_id
+    
+    if not auth_token:
+        print_test_result("Vote on Comment", False, error="No auth token available")
+        return False
+    
+    if not test_comment_id:
+        print_test_result("Vote on Comment", False, error="No test comment ID available")
+        return False
+    
+    try:
+        vote_data = {"value": 1}  # Upvote
+        
+        response = requests.post(
+            f"{API_URL}/forums/comment/{test_comment_id}/vote",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json=vote_data
+        )
+        
+        success = response.status_code == 200 and "message" in response.json()
+        print_test_result("Vote on Comment", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Vote on Comment", False, error=str(e))
+        return False
+
+def test_forum_non_premium_access():
+    """Test that non-premium users cannot access forum endpoints."""
+    # Create a new non-premium user
+    non_premium_email = f"nonpremium_{random_string()}@example.com"
+    non_premium_password = "TestPassword123!"
+    
+    try:
+        # Register non-premium user
+        register_response = requests.post(
+            f"{API_URL}/auth/register",
+            json={"email": non_premium_email, "password": non_premium_password}
+        )
+        
+        if register_response.status_code != 200:
+            print_test_result("Non-Premium Access Control", False, error="Failed to create non-premium user")
+            return False
+        
+        non_premium_token = register_response.json().get("access_token")
+        
+        # Try to access forums with non-premium user
+        response = requests.get(
+            f"{API_URL}/forums/",
+            headers={"Authorization": f"Bearer {non_premium_token}"}
+        )
+        
+        # Should get 403 Forbidden
+        success = response.status_code == 403
+        print_test_result("Non-Premium Access Control", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Non-Premium Access Control", False, error=str(e))
+        return False
+
+def run_forum_tests():
+    """Run Reddit-style Forum API tests."""
+    print("\n" + "=" * 80)
+    print("REDDIT-STYLE FORUM API TEST SUITE")
+    print("=" * 80)
+    print(f"Testing Forum API at: {API_URL}")
+    print("-" * 80)
+    
+    # Initialize global variables for forum testing
+    global test_thread_id, test_comment_id
+    test_thread_id = None
+    test_comment_id = None
+    
+    # Track test results
+    forum_results = {}
+    
+    # 1. Setup Premium User
+    forum_results["forum_premium_setup"] = test_forum_premium_user_setup()
+    
+    # 2. Forum CRUD Operations
+    forum_results["forum_list"] = test_forum_list()
+    forum_results["forum_get_specific"] = test_forum_get_specific()
+    forum_results["forum_create"] = test_forum_create()
+    
+    # 3. Thread Operations
+    forum_results["forum_threads_list"] = test_forum_threads_list()
+    forum_results["forum_thread_create"] = test_forum_thread_create()
+    forum_results["forum_thread_get"] = test_forum_thread_get()
+    
+    # 4. Comment Operations
+    forum_results["forum_comments_list"] = test_forum_comments_list()
+    forum_results["forum_comment_create"] = test_forum_comment_create()
+    
+    # 5. Voting System
+    forum_results["forum_thread_vote"] = test_forum_thread_vote()
+    forum_results["forum_comment_vote"] = test_forum_comment_vote()
+    
+    # 6. Access Control
+    forum_results["forum_non_premium_access"] = test_forum_non_premium_access()
+    
+    # Print forum test summary
+    print("\n" + "=" * 80)
+    print("FORUM TEST SUMMARY")
+    print("=" * 80)
+    
+    passed = sum(1 for result in forum_results.values() if result)
+    total = len(forum_results)
+    
+    for test_name, result in forum_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"{test_name}: {status}")
+    
+    print("-" * 80)
+    print(f"FORUM TESTS: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
+    print("=" * 80)
+    
+    return forum_results
+
 def run_all_tests():
     """Run all tests and return a summary."""
     print("\n" + "=" * 80)
@@ -1002,9 +1419,13 @@ def run_all_tests():
     results["paypal_subscription_status"] = test_paypal_subscription_status()
     results["paypal_cancel_subscription"] = test_paypal_cancel_subscription()
     
+    # 14. Reddit-Style Forum Tests
+    forum_results = run_forum_tests()
+    results.update(forum_results)
+    
     # Print summary
     print("\n" + "=" * 80)
-    print("TEST SUMMARY")
+    print("COMPLETE TEST SUMMARY")
     print("=" * 80)
     
     passed = sum(1 for result in results.values() if result)
