@@ -260,9 +260,9 @@ frontend:
   
   - task: "InfoHub Modal with New Sections"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -284,6 +284,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Code analysis confirms that the fix has been implemented correctly. The isBonusNodeAccessible function now correctly makes the InfoHub node (index 3) accessible for all users. While I couldn't directly test UI interactions due to technical limitations, the code analysis confirms that all the required fixes have been implemented correctly."
+      - working: false
+        agent: "testing"
+        comment: "COMPREHENSIVE TESTING COMPLETED: InfoHub modal opens successfully when clicking the InfoHub bonus node, but the three required sections (YouTube Channels, Support Groups, Official Sites) are not found within the modal. The modal opens but the internal navigation sections are missing or not properly implemented. This is a critical issue as the core functionality of the InfoHub is not accessible."
   
   - task: "Journey Map with Steps and Bonus Nodes"
     implemented: true
