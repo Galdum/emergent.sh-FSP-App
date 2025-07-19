@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { LeaderboardModal } from '../components/LeaderboardModal';
 
 // Mock the dependencies
@@ -44,7 +44,9 @@ describe('LeaderboardModal', () => {
     
     // Click on competitions tab
     const competitionsTab = screen.getByText('🎮 Competiții');
-    competitionsTab.click();
+    act(() => {
+      competitionsTab.click();
+    });
     
     // Should show competitions section
     expect(screen.getByText('Competiții Active')).toBeInTheDocument();
