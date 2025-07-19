@@ -377,8 +377,8 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       
       // Update thread comment count
       setSelectedThread(prev => ({
-        ...prev,
-        comment_count: (prev.comment_count || 0) + 1
+        ...(prev || {}),
+        comment_count: ((prev || {}).comment_count || 0) + 1
       }));
     } catch (err) {
       console.error('Error creating comment:', err);
