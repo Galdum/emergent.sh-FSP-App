@@ -83,7 +83,7 @@ class ApiService {
   }
 
   async login(email, password) {
-    const response = await this.client.post('/auth/login/', { email, password });
+    const response = await this.client.post('/auth/login', { email, password });
     return response.data;
   }
 
