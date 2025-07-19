@@ -123,6 +123,13 @@ export const EnhancedTextarea = ({
 }) => {
   const insertText = (beforeText, afterText = '') => {
     const textarea = document.activeElement;
+    
+    // Check if textarea exists and has the required methods
+    if (!textarea || !textarea.setSelectionRange || typeof textarea.selectionStart !== 'number') {
+      console.warn('Cannot insert text: invalid textarea element');
+      return;
+    }
+    
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = value.substring(start, end);
@@ -132,8 +139,10 @@ export const EnhancedTextarea = ({
     
     // Set cursor position after insertion
     setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + beforeText.length + selectedText.length + afterText.length, start + beforeText.length + selectedText.length + afterText.length);
+      if (textarea && textarea.setSelectionRange && textarea.focus) {
+        textarea.focus();
+        textarea.setSelectionRange(start + beforeText.length + selectedText.length + afterText.length, start + beforeText.length + selectedText.length + afterText.length);
+      }
     }, 0);
   };
 
