@@ -503,15 +503,18 @@ metadata:
 
   - task: "Reddit-Style Forum Implementation"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/routes/reddit_forum.py, /app/frontend/src/components/ForumModal.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
         comment: "COMPLETE FORUM SYSTEM IMPLEMENTED: ✅ Backend API with premium access control ✅ Database seeded with 3 forums ✅ Enhanced ForumModal with Reddit-style interface ✅ Rich text formatting (bold, italic, links, emojis, tables) ✅ File uploads disabled, link attachments supported ✅ Voting system, nested comments, pagination ✅ Premium subscription required for access ✅ All functionality tested and working"
+      - working: false
+        agent: "main" 
+        comment: "CRITICAL CORS AND BACKEND ISSUES IDENTIFIED: User reports CORS errors blocking API calls to /badges/, /login, /me endpoints. Backend logs show: 1) Pydantic validation errors in StepProgress model causing 500 errors, 2) 307 redirects on /auth/me/ due to trailing slash mismatch, 3) OPTIONS requests failing with 400 Bad Request, 4) Mixed HTTP/HTTPS content issues. FIXING: Progress endpoint validation, API endpoint trailing slashes, CORS preflight handling."
 test_plan:
   current_focus:
     - "Reddit-Style Forum Implementation"
