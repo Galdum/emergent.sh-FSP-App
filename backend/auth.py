@@ -13,11 +13,11 @@ from backend.database import get_database
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings - Validate on module load
-JWT_SECRET = os.environ.get("JWT_SECRET_KEY")
-if not JWT_SECRET:
-    raise ValueError("JWT_SECRET_KEY environment variable must be set")
+from backend.settings import settings
 
-JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
+JWT_SECRET = settings.jwt_secret_key
+
+JWT_ALGORITHM = "HS256"
 
 # Token expiration (minutes). Prefer new var, fallback to legacy for backward compatibility
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
