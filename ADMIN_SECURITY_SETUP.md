@@ -11,14 +11,13 @@ This document outlines the secure admin account setup for the FSP Navigator appl
 ## 📋 Admin Account Configuration
 
 ### **Admin Credentials**
-- **Email:** `galburdumitru1@gmail.com`
-- **Password:** `Anestezie130697`
+- **Email:** [Configured in .env.admin file]
+- **Password:** [Configured in .env.admin file]
 - **Role:** Super Admin
 - **Subscription:** Premium (10 years)
 
 ### **Allowed IP Addresses**
-- `37.4.249.169` (Primary IP)
-- `80.187.118.113/32` (Secondary IP with CIDR notation)
+- [Configured in .env.admin file]
 
 ---
 

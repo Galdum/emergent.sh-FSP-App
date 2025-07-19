@@ -199,6 +199,10 @@ dmypy.json
 .dockerignore
 docker-compose.override.yml
 
+# Admin credentials - CRITICAL SECURITY
+.env.admin
+admin_security_report.json
+
 # Secrets and keys (keep these secure!)
 *.pem
 *.key

@@ -16,18 +16,41 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 from backend.database import get_database
 from backend.middleware.ip_security import IPSecurityMiddleware
 
-# Test configuration
-TEST_CONFIG = {
-    "base_url": "http://localhost:8000",  # Adjust to your server URL
-    "admin_email": "galburdumitru1@gmail.com",
-    "admin_password": "Anestezie130697",
-    "test_ips": [
-        "37.4.249.169",      # Should be allowed
-        "80.187.118.113",    # Should be allowed
-        "192.168.1.1",       # Should be denied
-        "8.8.8.8"           # Should be denied
-    ]
-}
+# Load test configuration from environment variables
+def load_test_config():
+    """Load test configuration from environment variables"""
+    from dotenv import load_dotenv
+    import os
+    
+    # Load .env.admin file if it exists
+    load_dotenv('.env.admin')
+    
+    admin_email = os.getenv('ADMIN_EMAIL')
+    admin_password = os.getenv('ADMIN_PASSWORD')
+    allowed_ips_str = os.getenv('ADMIN_ALLOWED_IPS', '')
+    
+    if not admin_email or not admin_password:
+        raise ValueError(
+            "Admin credentials not found in environment variables. "
+            "Please create a .env.admin file with ADMIN_EMAIL and ADMIN_PASSWORD"
+        )
+    
+    allowed_ips = [ip.strip() for ip in allowed_ips_str.split(',') if ip.strip()]
+    
+    return {
+        "base_url": "http://localhost:8000",  # Adjust to your server URL
+        "admin_email": admin_email,
+        "admin_password": admin_password,
+        "test_ips": allowed_ips + ["192.168.1.1", "8.8.8.8"]  # Add test IPs
+    }
+
+# Load test configuration
+try:
+    TEST_CONFIG = load_test_config()
+except Exception as e:
+    print(f"❌ Error loading test configuration: {e}")
+    print("Please create a .env.admin file with the required credentials")
+    sys.exit(1)
 
 class AdminAccessTester:
     def __init__(self):
@@ -37,7 +60,13 @@ class AdminAccessTester:
     
     async def initialize_database(self):
         """Initialize database connection"""
-        self.db = await get_database().__anext__()
+        try:
+            # Get database connection properly
+            db_gen = get_database()
+            self.db = await db_gen.__anext__()
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            raise
     
     async def test_admin_user_exists(self):
         """Test if admin user exists in database"""

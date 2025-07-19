@@ -17,7 +17,13 @@ class IPSecurityMiddleware:
     async def initialize_database(self):
         """Initialize database connection"""
         if not self.db:
-            self.db = await get_database().__anext__()
+            try:
+                # Get database connection properly
+                db_gen = get_database()
+                self.db = await db_gen.__anext__()
+            except Exception as e:
+                print(f"Error initializing database: {e}")
+                raise
     
     def validate_ip_address(self, ip_str: str) -> bool:
         """Validate IP address format"""
@@ -59,6 +65,9 @@ class IPSecurityMiddleware:
     async def verify_admin_access(self, request: Request, admin_user: UserInDB) -> bool:
         """Verify admin access with IP restrictions"""
         try:
+            # Initialize database if not already done
+            await self.initialize_database()
+            
             # Get client IP
             client_ip = self.get_client_ip(request)
             if not client_ip:

@@ -5989,7 +5989,7 @@ const AppContent = () => {
         </button>
 
         {/* Admin Panel Button - Only visible for admin users */}
-        {(user?.is_admin || user?.role === 'admin' || user?.email?.includes('admin')) && (
+        {(user?.is_admin || user?.role === 'admin') && (
           <button
             onClick={() =>
               setModalStates((prev) => ({ ...prev, adminPanel: true }))

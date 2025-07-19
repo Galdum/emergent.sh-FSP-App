@@ -5,13 +5,13 @@
 I have successfully set up a secure admin system for your FSP Navigator application with the following security features:
 
 ### **✅ Admin Account Created**
-- **Email:** `galburdumitru1@gmail.com`
-- **Password:** `Anestezie130697`
+- **Email:** [Configured in .env.admin file]
+- **Password:** [Configured in .env.admin file]
 - **Role:** Super Admin with full privileges
 - **Subscription:** Premium (10 years)
 
 ### **✅ IP-Based Access Control**
-- **Allowed IPs:** `37.4.249.169` and `80.187.118.113/32`
+- **Allowed IPs:** [Configured in .env.admin file]
 - **Real-time verification** on all admin endpoints
 - **Automatic blocking** of unauthorized IP attempts
 - **Detailed logging** of all access attempts
@@ -34,9 +34,9 @@ I have successfully set up a secure admin system for your FSP Navigator applicat
 
 ### **Step 2: Login with Admin Credentials**
 1. Click "Login" or "Sign In"
-2. Enter your admin credentials:
-   - **Email:** `galburdumitru1@gmail.com`
-   - **Password:** `Anestezie130697`
+2. Enter your admin credentials (configured in .env.admin file):
+   - **Email:** [From .env.admin file]
+   - **Password:** [From .env.admin file]
 
 ### **Step 3: Access Admin Panel**
 1. **Look for the red Admin button** in the action buttons area
@@ -253,9 +253,9 @@ This will verify:
 
 **This information is highly sensitive and should be kept confidential:**
 
-- **Admin Email:** `galburdumitru1@gmail.com`
-- **Admin Password:** `Anestezie130697`
-- **Allowed IPs:** `37.4.249.169`, `80.187.118.113/32`
+- **Admin Email:** [Configured in .env.admin file]
+- **Admin Password:** [Configured in .env.admin file]
+- **Allowed IPs:** [Configured in .env.admin file]
 
 **Do not share these credentials or IP addresses publicly. Keep this documentation secure and accessible only to authorized personnel.**
 

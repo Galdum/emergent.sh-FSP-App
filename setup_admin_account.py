@@ -21,17 +21,43 @@ from backend.auth import get_password_hash
 from backend.models import UserInDB, User
 from backend.security import AuditLogger
 
-# Admin Configuration (SECURE - DO NOT SHARE)
-ADMIN_CONFIG = {
-    "email": "galburdumitru1@gmail.com",
-    "password": "Anestezie130697",  # Should be changed to a stronger password
-    "allowed_ips": [
-        "37.4.249.169",
-        "80.187.118.113/32"
-    ],
-    "admin_granted_by": "system_setup",
-    "admin_granted_at": datetime.utcnow()
-}
+# Load admin configuration from environment variables
+def load_admin_config():
+    """Load admin configuration from environment variables"""
+    from dotenv import load_dotenv
+    import os
+    
+    # Load .env.admin file if it exists
+    load_dotenv('.env.admin')
+    
+    admin_email = os.getenv('ADMIN_EMAIL')
+    admin_password = os.getenv('ADMIN_PASSWORD')
+    allowed_ips_str = os.getenv('ADMIN_ALLOWED_IPS', '')
+    admin_granted_by = os.getenv('ADMIN_GRANTED_BY', 'system_setup')
+    
+    if not admin_email or not admin_password:
+        raise ValueError(
+            "Admin credentials not found in environment variables. "
+            "Please create a .env.admin file with ADMIN_EMAIL and ADMIN_PASSWORD"
+        )
+    
+    allowed_ips = [ip.strip() for ip in allowed_ips_str.split(',') if ip.strip()]
+    
+    return {
+        "email": admin_email,
+        "password": admin_password,
+        "allowed_ips": allowed_ips,
+        "admin_granted_by": admin_granted_by,
+        "admin_granted_at": datetime.utcnow()
+    }
+
+# Load admin configuration
+try:
+    ADMIN_CONFIG = load_admin_config()
+except Exception as e:
+    print(f"❌ Error loading admin configuration: {e}")
+    print("Please create a .env.admin file with the required credentials")
+    sys.exit(1)
 
 # Security settings
 SECURITY_CONFIG = {
@@ -48,8 +74,14 @@ class AdminSetupManager:
     
     async def initialize_database(self):
         """Initialize database connection"""
-        self.db = await get_database().__anext__()
-        self.audit_logger = AuditLogger(self.db)
+        try:
+            # Get database connection properly
+            db_gen = get_database()
+            self.db = await db_gen.__anext__()
+            self.audit_logger = AuditLogger(self.db)
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            raise
     
     def validate_ip_address(self, ip_str: str) -> bool:
         """Validate IP address format"""
