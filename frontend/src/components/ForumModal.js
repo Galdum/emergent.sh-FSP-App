@@ -900,7 +900,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
                                 <ChevronUp size={14} />
                               </button>
                               <span className="text-xs font-semibold">
-                                {comment.up_votes - comment.down_votes}
+                                {(comment?.up_votes || 0) - (comment?.down_votes || 0)}
                               </span>
                               <button
                                 onClick={() => handleCommentVote(comment.id, comment.user_vote === -1 ? 0 : -1)}
