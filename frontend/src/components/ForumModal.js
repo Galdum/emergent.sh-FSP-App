@@ -56,14 +56,9 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
     if (!newThreadTitle.trim()) return;
     setCreatingThread(true);
     setError("");
-    fetch(`${API}/channels/${selectedChannel.id}/threads`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newThreadTitle }),
-    })
-      .then((r) => r.json())
-      .then((thread) => {
-        setThreads((t) => [...t, thread]);
+    api.post(`/forum/channels/${selectedChannel.id}/threads`, { title: newThreadTitle })
+      .then((response) => {
+        setThreads((t) => [...t, response.data]);
         setNewThreadTitle("");
       })
       .catch(() => setError("Eroare la crearea discuției."))
@@ -74,14 +69,9 @@ export default function ForumModal({ isOpen, onClose, isPremium }) {
     if (!newMessage.trim()) return;
     setCreatingMessage(true);
     setError("");
-    fetch(`${API}/threads/${selectedThread.id}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: newMessage }),
-    })
-      .then((r) => r.json())
-      .then((msg) => {
-        setMessages((m) => [...m, msg]);
+    api.post(`/forum/threads/${selectedThread.id}/messages`, { content: newMessage })
+      .then((response) => {
+        setMessages((m) => [...m, response.data]);
         setNewMessage("");
       })
       .catch(() => setError("Eroare la trimiterea mesajului."))
