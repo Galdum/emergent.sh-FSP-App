@@ -58,6 +58,33 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
     }
   };
 
+  // Get badge criteria with short description
+  const getBadgeCriteria = (badgeId) => {
+    const criteriaMap = {
+      'first_upload': 'Încarcă primul document',
+      'profile_complete': 'Completează profilul',
+      'chat_starter': 'Primul mesaj AI',
+      'chat_marathon': 'Trimite 50 mesaje AI',
+      'checklist_begin': 'Prima sarcină completată',
+      'checklist_master': 'Toate sarcinile completate',
+      'fsp_simulator': 'Trece un caz FSP',
+      'doc_manager': 'Încarcă 20 documente',
+      'email_pro': 'Generează primul email',
+      'tutorial_complete': 'Termină tutorialul',
+      'daily_7': 'Activitate zilnică 7 zile',
+      'daily_30': 'Activitate zilnică 30 zile',
+      'referrer': 'Invită primul prieten',
+      'social_butterfly': 'Activitate socială intensă',
+      'badge_collector': 'Obține 5 badge-uri',
+      'data_master': 'Expert în analiză date',
+      'feedback_giver': 'Oferă primul feedback',
+      'land_explorer': 'Explorează 5 landuri',
+      'hospitation_hero': 'Expert Hospitation',
+      'champion': 'Obține 10 badge-uri'
+    };
+    return criteriaMap[badgeId] || 'Badge special';
+  };
+
   const getBadgeIcon = (badgeId) => {
     const iconMap = {
       'first_upload': '📄',
