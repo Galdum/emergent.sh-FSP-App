@@ -1,9 +1,7 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer
-from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
@@ -15,30 +13,25 @@ from contextlib import asynccontextmanager
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
+# Import settings
+from backend.settings import settings, get_settings
+
 # Add the parent directory to sys.path
 ROOT_DIR = Path(__file__).parent
 sys.path.append(str(ROOT_DIR.parent))
-load_dotenv(ROOT_DIR / '.env')
-
-# Validate required environment variables
-required_env_vars = ['MONGO_URL', 'DB_NAME', 'JWT_SECRET_KEY']
-missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
-if missing_vars:
-    raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 # Initialize Sentry for error tracking
-if os.environ.get('SENTRY_DSN') and os.environ.get('ENVIRONMENT') != 'development':
+if settings.sentry_dsn and settings.environment != 'development':
     sentry_sdk.init(
-        dsn=os.environ['SENTRY_DSN'],
+        dsn=settings.sentry_dsn,
         integrations=[FastApiIntegration()],
         traces_sample_rate=0.1,
-        environment=os.environ.get('ENVIRONMENT', 'production')
+        environment=settings.environment
     )
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+client = AsyncIOMotorClient(settings.mongo_url)
+db = client[settings.db_name]
 
 # Configure logging
 logging.basicConfig(
@@ -51,6 +44,15 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    try:
+        # Test MongoDB connection
+        await client.admin.command('ping')
+        logger.info(f"✅ Connected to MongoDB: {settings.db_name}")
+    except Exception as e:
+        logger.error(f"❌ MongoDB connection failed: {e}")
+        raise RuntimeError(f"MongoDB connection failed: {e}")
+    
+    # Create database indexes (non-critical, don't fail startup)
     try:
         await db.users.create_index("email", unique=True)
         await db.users.create_index("id", unique=True)
@@ -69,7 +71,7 @@ async def lifespan(app: FastAPI):
         await db.user_stats.create_index("user_id", unique=True)
         logger.info("Database indexes created successfully")
     except Exception as e:
-        logger.info(f"Database indexes already exist or error: {e}")
+        logger.warning(f"⚠️  Database index creation failed (non-critical): {e}")
     
     yield
     
@@ -206,15 +208,25 @@ async def get_status_checks(db = Depends(get_database)):
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow()}
 
+# MongoDB connection test endpoint
+@api_router.get("/ping")
+async def ping_mongodb():
+    """Test MongoDB connection and return 'pong' only if connection succeeds."""
+    try:
+        await client.admin.command('ping')
+        return {"message": "pong", "database": settings.db_name}
+    except Exception as e:
+        logger.error(f"MongoDB ping failed: {e}")
+        raise HTTPException(status_code=500, detail="MongoDB connection failed")
+
 # Include the router in the main app
 app.include_router(api_router)
 
 # Configure CORS with proper security
-allowed_origins = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=allowed_origins,
+    allow_origins=settings.allowed_origins_list,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
 )

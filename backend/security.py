@@ -20,10 +20,8 @@ class DataEncryption:
     
     def _get_or_create_key(self):
         """Get encryption key from environment"""
-        env_key = os.environ.get('ENCRYPTION_KEY')
-        if not env_key:
-            raise ValueError("ENCRYPTION_KEY environment variable must be set (no auto-generation).")
-        return env_key.encode()
+        from backend.settings import settings
+        return settings.encryption_key.encode()
     
     def encrypt_data(self, data: str) -> str:
         """Encrypt sensitive data"""
@@ -88,21 +86,15 @@ class SecurityManager:
         
         to_encode.update({"exp": expire})
         
-        # Get secret from environment - no fallback
-        secret_key = os.environ.get("JWT_SECRET_KEY")
-        if not secret_key:
-            raise ValueError("JWT_SECRET_KEY environment variable must be set")
-            
-        return jwt.encode(to_encode, secret_key, algorithm="HS256")
+        # Get secret from settings
+        from backend.settings import settings
+        return jwt.encode(to_encode, settings.jwt_secret_key, algorithm="HS256")
     
     def verify_jwt_token(self, token: str) -> dict:
         """Verify and decode JWT token"""
         try:
-            secret_key = os.environ.get("JWT_SECRET_KEY")
-            if not secret_key:
-                raise ValueError("JWT_SECRET_KEY environment variable must be set")
-                
-            payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+            from backend.settings import settings
+            payload = jwt.decode(token, settings.jwt_secret_key, algorithms=["HS256"])
             return payload
         except jwt.PyJWTError:
             return None
