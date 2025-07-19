@@ -3,7 +3,7 @@
  * Supports links, emojis, tables, and other rich formatting
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { ExternalLink } from 'lucide-react';
 
 // Enhanced text formatter
