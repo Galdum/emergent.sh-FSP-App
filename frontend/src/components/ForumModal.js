@@ -275,7 +275,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
   // Handle comment voting
   const handleCommentVote = async (commentId, value) => {
     try {
-      await api.post(`/forums/comment/${commentId}/vote`, { value });
+      await api.voteComment(commentId, value);
       // Reload comments to get updated vote counts
       if (selectedThread) {
         const response = await api.get(`/forums/thread/${selectedThread.id}/comments`, {
