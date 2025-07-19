@@ -388,7 +388,7 @@ const ForumModal = ({ isOpen, onClose, onUpgrade }) => {
       const response = await api.get(`/forums/thread/${selectedThread.id}/comments`, {
         params: { sort: commentSort }
       });
-      setComments(response.data);
+      setComments(Array.isArray(response) ? response : []);
       
       // Update thread comment count
       setSelectedThread(prev => ({
