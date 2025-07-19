@@ -1001,6 +1001,94 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
             </div>
           )}
 
+          {/* Create Forum Modal */}
+          {showCreateForum && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 p-4">
+              <div className="bg-white rounded-lg w-full max-w-md">
+                <div className="p-6 border-b">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Creează un forum nou</h3>
+                    <button
+                      onClick={() => {
+                        setShowCreateForum(false);
+                        setNewForumTitle("");
+                        setNewForumDescription("");
+                        setNewForumSlug("");
+                      }}
+                      className="p-2 hover:bg-gray-100 rounded"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Titlu forum</label>
+                    <input
+                      type="text"
+                      value={newForumTitle}
+                      onChange={(e) => setNewForumTitle(e.target.value)}
+                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="ex: Discuții generale"
+                      maxLength={100}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Descriere</label>
+                    <textarea
+                      value={newForumDescription}
+                      onChange={(e) => setNewForumDescription(e.target.value)}
+                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                      placeholder="Descrie scopul acestui forum..."
+                      rows={3}
+                      maxLength={300}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Slug URL (opțional)
+                    </label>
+                    <input
+                      type="text"
+                      value={newForumSlug}
+                      onChange={(e) => setNewForumSlug(e.target.value)}
+                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      placeholder="ex: discutii-generale (se generează automat)"
+                      maxLength={50}
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      Se va genera automat din titlu dacă nu este completat
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setShowCreateForum(false);
+                        setNewForumTitle("");
+                        setNewForumDescription("");
+                        setNewForumSlug("");
+                      }}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                      Anulează
+                    </button>
+                    <button
+                      onClick={handleCreateForum}
+                      disabled={!newForumTitle.trim() || !newForumDescription.trim() || creatingForum}
+                      className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50"
+                    >
+                      {creatingForum ? 'Se creează...' : 'Creează forum'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {error && (
             <div className="absolute bottom-4 left-4 right-4 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg">
               {error}
