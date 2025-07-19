@@ -92,3 +92,10 @@ class ErrorReport(BaseModel):
     user_agent: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     resolved: bool = False
+
+class FeatureFlag(BaseModel):
+    name: str
+    enabled: bool
+    description: Optional[str] = None
+    user_groups: List[str] = []
+    rollout_percentage: float = 100.0
