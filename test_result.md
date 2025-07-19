@@ -335,11 +335,11 @@ frontend:
   
   - task: "Personal File Management"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/hooks/usePersonalFiles.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
@@ -350,6 +350,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "Cannot test Personal File Management because the GDPR modal is blocking interaction with the rest of the application. The GDPR modal needs to be closed first."
+      - working: false
+        agent: "testing"
+        comment: "COMPREHENSIVE TESTING COMPLETED: Personal File Management functionality is not accessible through the UI. No buttons or elements found for 'Dosarul', 'Files', 'Personal', 'Fișiere' or similar file management terms. The usePersonalFiles hook may be implemented in code but there's no UI element to trigger it. This is a critical issue as users cannot access their personal file management features."
   
   - task: "AI Features (FSP Tutor, Email Generator)"
     implemented: true
