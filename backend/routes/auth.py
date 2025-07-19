@@ -97,7 +97,7 @@ async def register(
     
     return Token(
         access_token=access_token,
-        user=UserResponse(**user.dict())
+        user=UserResponse(**user_in_db.dict())
     )
 
 @router.post("/login", response_model=Token)
