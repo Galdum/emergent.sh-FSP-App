@@ -48,8 +48,12 @@ async def lifespan(app: FastAPI):
         # Test MongoDB connection
         await client.admin.command('ping')
         logger.info(f"✅ Connected to MongoDB: {settings.db_name}")
-        
-        # Create database indexes
+    except Exception as e:
+        logger.error(f"❌ MongoDB connection failed: {e}")
+        raise RuntimeError(f"MongoDB connection failed: {e}")
+    
+    # Create database indexes (non-critical, don't fail startup)
+    try:
         await db.users.create_index("email", unique=True)
         await db.users.create_index("id", unique=True)
         await db.user_progress.create_index("user_id")
@@ -67,8 +71,7 @@ async def lifespan(app: FastAPI):
         await db.user_stats.create_index("user_id", unique=True)
         logger.info("Database indexes created successfully")
     except Exception as e:
-        logger.error(f"❌ MongoDB connection failed: {e}")
-        raise HTTPException(status_code=500, detail="MongoDB connection failed")
+        logger.warning(f"⚠️  Database index creation failed (non-critical): {e}")
     
     yield
     

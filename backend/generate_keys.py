@@ -56,6 +56,12 @@ def main():
     
     print("💾 Keys also saved to .generated_keys.txt for easy copying")
     print("   (Remember to delete this file after copying to .env)")
+    print()
+    print("🔒 SECURITY REMINDER:")
+    print("   - Never commit these keys to version control")
+    print("   - Delete .generated_keys.txt after copying to .env")
+    print("   - Use different keys for different environments")
+    print("   - Keep your .env file secure and backed up")
 
 
 if __name__ == "__main__":

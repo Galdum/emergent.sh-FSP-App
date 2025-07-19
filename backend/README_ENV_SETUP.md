@@ -4,6 +4,8 @@ This document provides instructions for setting up secure environment variables 
 
 ## 🔐 Required Environment Variables
 
+**⚠️  SECURITY WARNING:** Never commit real credentials or cryptographic keys to version control. The `.env.example` file contains only placeholder values.
+
 The following environment variables must be set in your `.env` file:
 
 ### Database Configuration

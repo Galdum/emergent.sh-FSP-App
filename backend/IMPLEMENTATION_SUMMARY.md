@@ -45,19 +45,21 @@
 - ✅ `backend/README_ENV_SETUP.md`: Comprehensive setup instructions
 - ✅ `backend/IMPLEMENTATION_SUMMARY.md`: This summary document
 
-## 🔑 Generated Keys
+## 🔑 Key Generation
 
-The following keys were generated for demonstration:
+The following keys were generated for demonstration (these are examples, not real keys):
 
 **JWT_SECRET_KEY:**
 ```
-o6seWICoUlPEIFKiIhuOVjlF5H5W2xHez_X9BMjhs3qnhBi3dl7PzwBiQSmQ50Vl6uNm6ZHET6-Os_3j7-0opg
+your-generated-jwt-secret-key-here-minimum-32-characters-long
 ```
 
 **ENCRYPTION_KEY:**
 ```
-jNudeLvciyMwsL2_uXqFTKko2IVqpdFr2_M5GWg9oWk=
+your-generated-encryption-key-here-base64-encoded-32-bytes
 ```
+
+**⚠️  Security Note:** Never commit real cryptographic keys to version control. Use the `generate_keys.py` script to create your own secure keys.
 
 ## 🧪 Testing
 
