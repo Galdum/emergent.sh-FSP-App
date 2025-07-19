@@ -27,34 +27,6 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
     }
   };
 
-  const fetchLeaderboard = async () => {
-    try {
-      const response = await api.get('/badges/leaderboard');
-      setLeaderboard(response.data);
-    } catch (error) {
-      console.error('Failed to fetch leaderboard:', error);
-      setLeaderboard([]); // Set empty array on error
-    }
-  };
-
-  const checkForNewBadges = async () => {
-    try {
-      const response = await api.post('/badges/check');
-      
-      if (response.data.newly_awarded && response.data.newly_awarded.length > 0) {
-        // Trigger notification for first new badge
-        const newBadge = badges.find(b => b.badge_id === response.data.newly_awarded[0]);
-        if (newBadge && onBadgeEarned) {
-          onBadgeEarned(newBadge);
-        }
-        // Refresh badges to show updated status
-        fetchBadges();
-      }
-    } catch (error) {
-      console.error('Failed to check for new badges:', error);
-    }
-  };
-
   // Get badge criteria with short description
   const getBadgeCriteria = (badgeId) => {
     const criteriaMap = {
