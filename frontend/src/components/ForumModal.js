@@ -690,15 +690,17 @@ const ForumModal = ({ isOpen, onClose, isPremium, onUpgrade }) => {
                         <FormatText text={selectedThread.body} />
                       </div>
 
-                      {/* Attachments */}
+                      {/* Attachments - Links only */}
                       {selectedThread.attachments && selectedThread.attachments.length > 0 && (
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Anexe:</h4>
-                          <div className="flex flex-wrap gap-2">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Link-uri:</h4>
+                          <div className="space-y-2">
                             {selectedThread.attachments.map((attachment, index) => (
-                              <div key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                {attachment.file_name || attachment.url}
-                              </div>
+                              <LinkAttachment 
+                                key={index} 
+                                url={attachment.url}
+                                title={attachment.file_name}
+                              />
                             ))}
                           </div>
                         </div>
