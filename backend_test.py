@@ -1293,6 +1293,441 @@ def test_forum_non_premium_access():
         print_test_result("Non-Premium Access Control", False, error=str(e))
         return False
 
+# --- Content Management System Tests ---
+
+def test_content_admin_auth():
+    """Test admin authentication for content management."""
+    global admin_auth_token
+    
+    try:
+        # Try to login with admin credentials
+        response = requests.post(
+            f"{API_URL}/auth/login",
+            json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}
+        )
+        
+        success = response.status_code == 200 and "access_token" in response.json()
+        
+        if success:
+            admin_auth_token = response.json().get("access_token")
+            
+        print_test_result("Content Admin Authentication", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Content Admin Authentication", False, error=str(e))
+        return False
+
+def test_content_nodes_list():
+    """Test GET /content/nodes - List all node content."""
+    global admin_auth_token
+    
+    if not admin_auth_token:
+        print_test_result("List Node Content", False, error="No admin auth token available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/content/nodes",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            params={"page": 1, "per_page": 10}
+        )
+        
+        success = response.status_code == 200 and "contents" in response.json()
+        print_test_result("List Node Content", success, response)
+        return success
+    except Exception as e:
+        print_test_result("List Node Content", False, error=str(e))
+        return False
+
+def test_content_node_get():
+    """Test GET /content/nodes/{node_id} - Get specific node content."""
+    global admin_auth_token, test_node_id
+    
+    if not admin_auth_token:
+        print_test_result("Get Node Content", False, error="No admin auth token available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/content/nodes/{test_node_id}",
+            headers={"Authorization": f"Bearer {admin_auth_token}"}
+        )
+        
+        success = response.status_code == 200 and "node_id" in response.json()
+        print_test_result("Get Node Content", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get Node Content", False, error=str(e))
+        return False
+
+def test_content_node_update():
+    """Test PUT /content/nodes/{node_id} - Update node content."""
+    global admin_auth_token, test_node_id
+    
+    if not admin_auth_token:
+        print_test_result("Update Node Content", False, error="No admin auth token available")
+        return False
+    
+    try:
+        update_data = {
+            "title": f"Updated Test Node {random_string()}",
+            "description": "This is an updated test node for content management testing.",
+            "blocks": [
+                {
+                    "type": "text",
+                    "content": {"text": "This is a test text block"},
+                    "position": 0
+                },
+                {
+                    "type": "divider",
+                    "content": {},
+                    "position": 1
+                }
+            ]
+        }
+        
+        response = requests.put(
+            f"{API_URL}/content/nodes/{test_node_id}",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            json=update_data
+        )
+        
+        success = response.status_code == 200 and "message" in response.json()
+        print_test_result("Update Node Content", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Update Node Content", False, error=str(e))
+        return False
+
+def test_content_preview_create():
+    """Test POST /content/nodes/{node_id}/preview - Create preview."""
+    global admin_auth_token, test_node_id, test_preview_id
+    
+    if not admin_auth_token:
+        print_test_result("Create Content Preview", False, error="No admin auth token available")
+        return False
+    
+    try:
+        # First get the current content to create a preview
+        get_response = requests.get(
+            f"{API_URL}/content/nodes/{test_node_id}",
+            headers={"Authorization": f"Bearer {admin_auth_token}"}
+        )
+        
+        if get_response.status_code != 200:
+            print_test_result("Create Content Preview", False, error="Could not get current content")
+            return False
+        
+        current_content = get_response.json()
+        
+        preview_data = {
+            "content_id": current_content["id"],
+            "changes": {
+                "title": f"Preview Test Title {random_string()}",
+                "description": "This is a preview of changes to the content."
+            },
+            "preview_duration_hours": 24
+        }
+        
+        response = requests.post(
+            f"{API_URL}/content/nodes/{test_node_id}/preview",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            json=preview_data
+        )
+        
+        success = response.status_code == 200 and "preview_id" in response.json()
+        if success:
+            test_preview_id = response.json().get("preview_id")
+            
+        print_test_result("Create Content Preview", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Create Content Preview", False, error=str(e))
+        return False
+
+def test_content_preview_get():
+    """Test GET /content/nodes/{node_id}/preview/{preview_id} - Get preview."""
+    global admin_auth_token, test_node_id, test_preview_id
+    
+    if not admin_auth_token:
+        print_test_result("Get Content Preview", False, error="No admin auth token available")
+        return False
+    
+    if not test_preview_id:
+        print_test_result("Get Content Preview", False, error="No preview ID available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/content/nodes/{test_node_id}/preview/{test_preview_id}",
+            headers={"Authorization": f"Bearer {admin_auth_token}"}
+        )
+        
+        success = response.status_code == 200 and "preview_content" in response.json()
+        print_test_result("Get Content Preview", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get Content Preview", False, error=str(e))
+        return False
+
+def test_content_preview_publish():
+    """Test POST /content/previews/{preview_id}/publish - Publish preview."""
+    global admin_auth_token, test_preview_id
+    
+    if not admin_auth_token:
+        print_test_result("Publish Content Preview", False, error="No admin auth token available")
+        return False
+    
+    if not test_preview_id:
+        print_test_result("Publish Content Preview", False, error="No preview ID available")
+        return False
+    
+    try:
+        publish_data = {
+            "preview_id": test_preview_id,
+            "change_description": "Published test preview changes"
+        }
+        
+        response = requests.post(
+            f"{API_URL}/content/previews/{test_preview_id}/publish",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            json=publish_data
+        )
+        
+        success = response.status_code == 200 and "message" in response.json()
+        print_test_result("Publish Content Preview", success, response)
+        
+        # Clear preview ID since it's been published
+        if success:
+            test_preview_id = None
+            
+        return success
+    except Exception as e:
+        print_test_result("Publish Content Preview", False, error=str(e))
+        return False
+
+def test_content_file_upload():
+    """Test POST /content/upload - Upload file."""
+    global admin_auth_token, test_file_id
+    
+    if not admin_auth_token:
+        print_test_result("Upload Content File", False, error="No admin auth token available")
+        return False
+    
+    try:
+        # Create a test file
+        test_content = b"This is a test file for content management"
+        
+        files = {
+            'file': ('test_document.txt', test_content, 'text/plain')
+        }
+        data = {
+            'content_type': 'document'
+        }
+        
+        response = requests.post(
+            f"{API_URL}/content/upload",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            files=files,
+            data=data
+        )
+        
+        success = response.status_code == 200 and "file_id" in response.json()
+        if success:
+            test_file_id = response.json().get("file_id")
+            
+        print_test_result("Upload Content File", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Upload Content File", False, error=str(e))
+        return False
+
+def test_content_file_serve():
+    """Test GET /content/files/{file_id} - Serve uploaded file."""
+    global test_file_id
+    
+    if not test_file_id:
+        print_test_result("Serve Content File", False, error="No file ID available")
+        return False
+    
+    try:
+        response = requests.get(f"{API_URL}/content/files/{test_file_id}")
+        
+        success = response.status_code == 200 and len(response.content) > 0
+        print_test_result("Serve Content File", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Serve Content File", False, error=str(e))
+        return False
+
+def test_content_versions():
+    """Test GET /content/nodes/{node_id}/versions - Get version history."""
+    global admin_auth_token, test_node_id
+    
+    if not admin_auth_token:
+        print_test_result("Get Content Versions", False, error="No admin auth token available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/content/nodes/{test_node_id}/versions",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            params={"page": 1, "per_page": 5}
+        )
+        
+        success = response.status_code == 200 and "versions" in response.json()
+        print_test_result("Get Content Versions", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get Content Versions", False, error=str(e))
+        return False
+
+def test_content_revert():
+    """Test POST /content/nodes/{node_id}/revert/{version_number} - Revert to version."""
+    global admin_auth_token, test_node_id
+    
+    if not admin_auth_token:
+        print_test_result("Revert Content Version", False, error="No admin auth token available")
+        return False
+    
+    try:
+        # First get versions to find one to revert to
+        versions_response = requests.get(
+            f"{API_URL}/content/nodes/{test_node_id}/versions",
+            headers={"Authorization": f"Bearer {admin_auth_token}"}
+        )
+        
+        if versions_response.status_code != 200:
+            print_test_result("Revert Content Version", False, error="Could not get versions")
+            return False
+        
+        versions_data = versions_response.json()
+        if not versions_data.get("versions"):
+            print_test_result("Revert Content Version", False, error="No versions available to revert to")
+            return False
+        
+        # Try to revert to the first available version
+        version_to_revert = versions_data["versions"][0]["version_number"]
+        
+        response = requests.post(
+            f"{API_URL}/content/nodes/{test_node_id}/revert/{version_to_revert}",
+            headers={"Authorization": f"Bearer {admin_auth_token}"}
+        )
+        
+        success = response.status_code == 200 and "message" in response.json()
+        print_test_result("Revert Content Version", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Revert Content Version", False, error=str(e))
+        return False
+
+def test_content_notifications():
+    """Test GET /content/notifications - Get real-time notifications."""
+    global admin_auth_token
+    
+    if not admin_auth_token:
+        print_test_result("Get Content Notifications", False, error="No admin auth token available")
+        return False
+    
+    try:
+        response = requests.get(
+            f"{API_URL}/content/notifications",
+            headers={"Authorization": f"Bearer {admin_auth_token}"},
+            params={"limit": 10}
+        )
+        
+        success = response.status_code == 200 and "notifications" in response.json()
+        print_test_result("Get Content Notifications", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Get Content Notifications", False, error=str(e))
+        return False
+
+def test_content_non_admin_access():
+    """Test that non-admin users cannot access content management endpoints."""
+    global auth_token
+    
+    if not auth_token:
+        print_test_result("Content Non-Admin Access Control", False, error="No regular user token available")
+        return False
+    
+    try:
+        # Try to access content management with regular user token
+        response = requests.get(
+            f"{API_URL}/content/nodes",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        
+        # Should get 403 Forbidden
+        success = response.status_code == 403
+        print_test_result("Content Non-Admin Access Control", success, response)
+        return success
+    except Exception as e:
+        print_test_result("Content Non-Admin Access Control", False, error=str(e))
+        return False
+
+def run_content_management_tests():
+    """Run Content Management System API tests."""
+    print("\n" + "=" * 80)
+    print("CONTENT MANAGEMENT SYSTEM API TEST SUITE")
+    print("=" * 80)
+    print(f"Testing Content Management API at: {API_URL}")
+    print("-" * 80)
+    
+    # Initialize global variables for content testing
+    global test_node_id, test_preview_id, test_file_id
+    test_node_id = "step1"
+    test_preview_id = None
+    test_file_id = None
+    
+    # Track test results
+    content_results = {}
+    
+    # 1. Admin Authentication
+    content_results["content_admin_auth"] = test_content_admin_auth()
+    
+    # 2. Node Content CRUD Operations
+    content_results["content_nodes_list"] = test_content_nodes_list()
+    content_results["content_node_get"] = test_content_node_get()
+    content_results["content_node_update"] = test_content_node_update()
+    
+    # 3. Preview System Testing
+    content_results["content_preview_create"] = test_content_preview_create()
+    content_results["content_preview_get"] = test_content_preview_get()
+    content_results["content_preview_publish"] = test_content_preview_publish()
+    
+    # 4. File Upload System
+    content_results["content_file_upload"] = test_content_file_upload()
+    content_results["content_file_serve"] = test_content_file_serve()
+    
+    # 5. Version History
+    content_results["content_versions"] = test_content_versions()
+    content_results["content_revert"] = test_content_revert()
+    
+    # 6. Real-time Notifications
+    content_results["content_notifications"] = test_content_notifications()
+    
+    # 7. Access Control
+    content_results["content_non_admin_access"] = test_content_non_admin_access()
+    
+    # Print content management test summary
+    print("\n" + "=" * 80)
+    print("CONTENT MANAGEMENT TEST SUMMARY")
+    print("=" * 80)
+    
+    passed = sum(1 for result in content_results.values() if result)
+    total = len(content_results)
+    
+    for test_name, result in content_results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"{test_name}: {status}")
+    
+    print("-" * 80)
+    print(f"CONTENT MANAGEMENT TESTS: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
+    print("=" * 80)
+    
+    return content_results
+
 def run_forum_tests():
     """Run Reddit-style Forum API tests."""
     print("\n" + "=" * 80)
