@@ -6260,6 +6260,22 @@ const AppContent = () => {
         <FeedbackWidget />
       </div>
 
+      {/* Forum button - bottom left corner */}
+      <div className={`${isMobile ? "fixed bottom-20 left-4 z-40" : "fixed bottom-6 left-6 z-40"}`}>
+        <button
+          onClick={() => setForumModalOpen(true)}
+          className={`${subscriptionTier === "PREMIUM" ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-400 hover:bg-gray-500"} text-white ${isMobile ? "w-16 h-16" : "w-14 h-14"} rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110 no-select-mobile relative`}
+          title={subscriptionTier === "PREMIUM" ? "Forum Premium" : "Forum Premium (Necesită upgrade)"}
+        >
+          {subscriptionTier !== "PREMIUM" && (
+            <div className="absolute -top-1 -right-1 bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center">
+              <Lock size={12} />
+            </div>
+          )}
+          <MessageCircle size={isMobile ? 24 : 20} />
+        </button>
+      </div>
+
       <ForumModal
         isOpen={forumModalOpen}
         onClose={() => setForumModalOpen(false)}
