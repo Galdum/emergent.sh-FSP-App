@@ -256,34 +256,32 @@ export const BadgeSystem = ({ currentUser, onClose, onBadgeEarned }) => {
               className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
             >
               <div className="text-center">
-                <div className={`w-24 h-24 rounded-2xl ${
+                <div className={`w-20 h-20 rounded-lg ${
                   selectedBadge.earned 
-                    ? getBadgeColor(selectedBadge.badge_id) 
-                    : 'bg-gray-300 border-2 border-gray-400'
-                } text-white mx-auto mb-4 flex items-center justify-center shadow-lg relative overflow-hidden`}>
-                  <span className={`text-4xl ${selectedBadge.earned ? '' : 'opacity-30'}`}>
+                    ? 'bg-green-100 border-2 border-green-300' 
+                    : 'bg-gray-100 border-2 border-gray-300'
+                } mx-auto mb-4 flex items-center justify-center shadow-md relative`}>
+                  <span className={`text-3xl ${selectedBadge.earned ? '' : 'opacity-40'}`}>
                     {getBadgeIcon(selectedBadge.badge_id)}
                   </span>
                   {!selectedBadge.earned && (
-                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                      <div className="bg-white rounded-full p-3 shadow-lg">
-                        <Lock className="h-6 w-6 text-gray-600" />
-                      </div>
+                    <div className="absolute top-1 right-1">
+                      <Lock className="h-4 w-4 text-gray-400" />
                     </div>
                   )}
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{selectedBadge.name}</h3>
                 <p className="text-gray-600 mb-4">{selectedBadge.description}</p>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm ${
+                <div className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${
                   selectedBadge.earned 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-orange-100 text-orange-800'
+                    ? 'bg-green-100 text-green-700 border border-green-300' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-300'
                 }`}>
-                  {selectedBadge.earned ? '✅ Câștigat' : `🔒 ${getBadgeCriteria(selectedBadge.badge_id)}`}
+                  {selectedBadge.earned ? '✅ Obținut' : `Criteriu: ${getBadgeCriteria(selectedBadge.badge_id)}`}
                 </div>
                 {selectedBadge.earned && selectedBadge.awarded_at && (
-                  <div className="text-sm text-gray-500 mt-2">
-                    Câștigat pe {new Date(selectedBadge.awarded_at).toLocaleDateString('ro-RO')}
+                  <div className="text-sm text-gray-500 mt-3">
+                    Obținut pe {new Date(selectedBadge.awarded_at).toLocaleDateString('ro-RO')}
                   </div>
                 )}
               </div>
