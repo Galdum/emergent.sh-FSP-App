@@ -1,199 +1,163 @@
-# 🏥 ApprobMed - AI-Powered German Medical License Guide
+# FSP Navigator: AI-Powered Platform for German Medical License (Approbation)
 
-**A comprehensive application helping Romanian doctors obtain Approbation in Germany**
-
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)]()
-[![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)]()
-[![Backend](https://img.shields.io/badge/Backend-FastAPI-green)]()
-[![Database](https://img.shields.io/badge/Database-MongoDB-darkgreen)]()
+**A next-generation SaaS platform empowering Romanian doctors to obtain their German medical license (Approbation) with AI, automation, and community.**
 
 ---
 
-## 🎉 **FULLY IMPLEMENTED & READY TO USE**
+## 🚀 Vision & Purpose
 
-ApprobMed is now a **complete, production-ready application** with all advanced features implemented:
+FSP Navigator is a full-stack, production-grade application designed to radically simplify and accelerate the Approbation process for Romanian (and other international) doctors seeking to practice in Germany. The platform combines:
+- **Step-by-step process automation**
+- **AI-powered German medical language tutoring (Gemini AI)**
+- **Bundesland-specific document management**
+- **Gamification and community**
+- **Enterprise-grade security, GDPR compliance, and robust admin tools**
 
-- ✅ **Interactive Journey Map** - 6-step Approbation process
-- ✅ **AI-Powered German Tutor** - Medical language practice with Gemini AI
-- ✅ **Comprehensive Authentication** - Login, register, password reset, Google OAuth
-- ✅ **Advanced Settings** - Profile, notifications, security, data management
-- ✅ **Interactive Tutorials** - Step-by-step onboarding
-- ✅ **Mobile-First Design** - Responsive, touch-friendly interface
-- ✅ **Payment Integration** - PayPal and Stripe ready
-- ✅ **Document Management** - Personal Approbation folder
-- ✅ **Gamification** - Achievements, progress tracking, leaderboard
-- ✅ **Legal Compliance** - GDPR, terms & privacy
+**Target Market:** 10,000+ Romanian doctors annually; scalable to all international medical graduates.
 
 ---
 
-## 🚀 **Quick Start**
+## 🏗️ Architecture Overview
 
-### **Option 1: Use the Startup Script**
-```bash
-./start_approbmed.sh
+### Monorepo Structure
+```
+/fsp-navigator
+├── frontend/    # React 18, Tailwind, modern SPA
+│   └── src/
+│       ├── components/   # Modular UI, admin, gamification, onboarding, content editors
+│       ├── contexts/     # Auth, user state, global context
+│       ├── services/     # API, content, MongoDB, payment
+│       └── utils/        # Gamification, markdown, conversation mgmt
+├── backend/     # FastAPI, async, modular, secure
+│   ├── routes/  # REST API: auth, progress, content, admin, AI, payments, GDPR, forum, etc.
+│   ├── services/ # Stripe, PayPal, email, backup, etc.
+│   ├── models.py # Pydantic models: user, progress, docs, gamification, forum, etc.
+│   ├── server.py # Entrypoint, CORS, Sentry, MongoDB, index mgmt
+│   └── settings.py # Env config, validation, fail-fast
+└── docs/        # Technical, business, and deployment docs
 ```
 
-### **Option 2: Manual Start**
+### Key Technologies
+- **Frontend:** React 18, Tailwind CSS, Lucide, Axios, React Router, Framer Motion
+- **Backend:** FastAPI, MongoDB (async, Motor), Pydantic, JWT, Celery, Redis, Sentry, Stripe, PayPal, Google Gemini AI
+- **DevOps:** Docker-ready, Vercel/Netlify (frontend), Railway/Heroku (backend), MongoDB Atlas, Cloudflare, S3 backup
+- **Security:** JWT, rate limiting, audit logging, GDPR, secure password reset, Sentry
+
+---
+
+## 🧩 Backend: FastAPI Microservice
+
+- **API-First:** All features exposed via RESTful endpoints, documented with OpenAPI.
+- **Authentication:** JWT, Google OAuth, secure password reset, rate limiting, account lockout, audit logs.
+- **User Model:** Rich profile (medical background, target Bundesland, German level, etc.), roles (user, admin, moderator), subscription tier, GDPR consent.
+- **Progress Tracking:** 6-step Approbation journey, per-step tasks, real-time progress, sync with frontend.
+- **Document Management:** Bundesland-specific requirements, upload, verification, templates, status tracking, personal file vault.
+- **AI Assistant:** Gemini-powered chat, context-aware, multilingual (EN/DE/RO), FSP exam prep, document Q&A, timeline advice.
+- **Gamification:** Points, levels, achievements, badges, streaks, leaderboard, mini-games (clinical cases, Fachbegriffe, quizzes).
+- **Content Management:** Node-based content, versioning, preview, admin editors, file uploads, templates, notifications.
+- **Community:** Forum channels, threads, messages, premium access, moderation.
+- **Payments:** Stripe & PayPal subscriptions, webhooks, plan management, billing history, GDPR-compliant data export.
+- **Admin Panel:** Real-time system config, API keys, DB admin, payment/AI config, edit history, security, backup/restore, analytics.
+- **Backup & Restore:** Automated MongoDB and file backups (local/S3), restore, cleanup, audit logs.
+- **GDPR & Compliance:** Consent, data export, deletion, privacy settings, legal docs, audit logs, disclaimers.
+
+---
+
+## 🎨 Frontend: Modern React SPA
+
+- **Mobile-First:** Responsive, touch-friendly, PWA-ready.
+- **Authentication:** Register, login, Google OAuth, password reset, onboarding.
+- **Onboarding & Tutorials:** Interactive, step-by-step, context highlights, relaunchable.
+- **Journey Map:** Visual 6-step process, progress nodes, bonus resources, checklist, unlock logic.
+- **AI Tutor:** Chat interface, FSP practice, document Q&A, context-aware suggestions, language switch.
+- **Document Vault:** Upload, organize, verify, Bundesland-specific checklists, templates, status.
+- **Gamification:** Progress bars, XP, levels, badges, achievements, streaks, leaderboard, mini-games.
+- **Content Editors:** Rich content, block-based, versioning, preview, admin-only editors.
+- **Admin UI:** RealAdminPanel (system config, DB, payments, AI, security, edit history), ContentEditor, NodeEditor.
+- **Community:** Forum modal, threads, messages, premium gating.
+- **Settings:** Profile, notifications, subscription, GDPR tools, data export, account deletion.
+
+---
+
+## 🔄 Userflow (End-User)
+
+1. **Sign Up / Onboard:** Register (email or Google), complete profile (medical background, German level, target Bundesland).
+2. **Welcome Tutorial:** Interactive walkthrough of all key features (document vault, journey map, AI, settings, gamification).
+3. **Journey Progress:** Visual 6-step Approbation map, checklist, unlock next steps, see requirements per Bundesland.
+4. **AI Learning:** Practice FSP, ask questions, get document help, language switch (EN/DE/RO), context-aware answers.
+5. **Document Management:** Upload, organize, verify, see status, get templates, Bundesland-specific checklists.
+6. **Gamification:** Earn points, badges, achievements, compete on leaderboard, play mini-games (clinical cases, Fachbegriffe, quizzes).
+7. **Community:** Access forum (premium), post threads/messages, get peer support.
+8. **Settings & GDPR:** Manage profile, notifications, subscription, export/delete data, view legal docs.
+9. **Payments:** Upgrade to premium (Stripe/PayPal), manage billing, unlock AI and community features.
+
+---
+
+## 🛡️ Security & Compliance
+- **JWT authentication, Google OAuth, rate limiting, account lockout**
+- **Audit logging for all sensitive actions**
+- **GDPR: consent, data export, deletion, privacy settings**
+- **Sentry error tracking, CORS, secure password reset**
+- **Automated backups (local/S3), admin restore, audit logs**
+
+---
+
+## 🛠️ DevOps & Deployment
+- **.env-based config, fail-fast validation, key generation script**
+- **Docker-ready, Vercel/Netlify (frontend), Railway/Heroku (backend), MongoDB Atlas**
+- **Automated backup/restore, S3 support, monitoring hooks**
+- **Comprehensive test scripts for settings, MongoDB, rate limiting**
+
+---
+
+## 💡 Business Model
+- **Freemium:** Free tier (basic journey, 2 steps, 1 bonus), paid tiers (all steps, AI, community, advanced features)
+- **Subscription:** Stripe & PayPal, monthly/yearly, premium unlocks AI, forum, advanced analytics
+- **Value:** Save months of research, avoid mistakes, pass FSP faster, community support, legal compliance
+
+---
+
+## 📈 Success Metrics
+- **100% feature complete, production-ready, mobile-first, GDPR-compliant**
+- **All core flows tested, admin tools for scaling, Sentry for monitoring**
+- **Ready for launch and scale to thousands of users**
+
+---
+
+## 🧑‍💻 For Cofounders/Technical Partners
+- **Codebase:** Modular, scalable, modern stack, clear separation of concerns
+- **Admin:** Real admin panel (not just demo), full system config, DB, payments, AI, security, backup
+- **Docs:** See `/docs` for improvement plans, fixes, setup, and business vision
+- **Growth:** Built for rapid onboarding of new features, new user segments, and internationalization
+
+---
+
+## 🏁 Quick Start (Local Dev)
+
+### 1. Backend
 ```bash
-# Terminal 1 - Backend
 cd backend
-python -m uvicorn server:app --reload --port 8001
-
-# Terminal 2 - Frontend  
-cd frontend
-npm start
+python3 -m uvicorn server:app --reload --port 8001
 ```
 
-### **Access the Application**
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8001
-- **API Docs**: http://localhost:8001/docs
-
----
-
-## 📁 **Project Structure**
-
-```
-approbmed/
-├── frontend/                 # React application
-│   ├── src/
-│   │   ├── components/      # All UI components
-│   │   ├── contexts/        # React contexts
-│   │   ├── services/        # API services
-│   │   └── utils/           # Utility functions
-│   └── package.json
-├── backend/                 # FastAPI application
-│   ├── routes/             # API routes
-│   ├── models.py          # Data models
-│   ├── server.py          # Main server
-│   └── requirements.txt
-└── docs/                   # Documentation
-    ├── COMPREHENSIVE_IMPROVEMENT_PLAN.md
-    ├── CRITICAL_FIXES_SUMMARY.md
-    ├── IMMEDIATE_TECHNICAL_FIXES.md
-    └── FINAL_SETUP_STATUS.md
-```
-
----
-
-## 🎯 **Key Features**
-
-### **For Romanian Doctors**
-- **Step-by-step Approbation guide** with interactive progress tracking
-- **AI-powered German medical language tutor** for FSP preparation
-- **Document organization system** for all required paperwork
-- **Bundesland-specific information** and requirements
-- **Community features** with leaderboard and achievements
-
-### **For Administrators**
-- **Complete admin dashboard** for user and content management
-- **Analytics and user tracking** for business insights
-- **Payment and subscription management**
-- **GDPR compliance tools** and data export
-
----
-
-## 🛠 **Technology Stack**
-
-### **Frontend**
-- React 18 with modern hooks
-- Tailwind CSS for styling
-- Lucide React for icons
-- Axios for API communication
-- React Router for navigation
-
-### **Backend**
-- FastAPI (Python) for high-performance API
-- MongoDB for flexible data storage
-- JWT for secure authentication
-- Stripe & PayPal for payments
-- Google Gemini AI integration
-
-### **Security & Compliance**
-- JWT token authentication
-- Rate limiting and account protection
-- GDPR compliance features
-- Audit logging for all actions
-- Secure password reset system
-
----
-
-## 📈 **Production Deployment**
-
-### **Environment Configuration**
-
-1. **Frontend (.env)**:
-```env
-REACT_APP_BACKEND_URL=https://your-api-domain.com
-REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
-```
-
-2. **Backend (.env)**:
-```env
-MONGO_URL=mongodb://your-mongo-connection
-GEMINI_API_KEY=your-gemini-api-key
-JWT_SECRET=your-very-secure-secret
-STRIPE_API_KEY=your-stripe-key
-SMTP_USER=your-email@domain.com
-```
-
-### **Deployment Options**
-- **Vercel/Netlify** for frontend
-- **Railway/Heroku** for backend
-- **MongoDB Atlas** for database
-- **Cloudflare** for CDN and security
-
----
-
-## 👥 **User Journey**
-
-1. **Welcome Tutorial** - Interactive guide to all features
-2. **Profile Setup** - Medical background and German level assessment
-3. **Journey Progress** - Step-by-step Approbation tracking
-4. **AI Learning** - German medical language practice
-5. **Document Management** - Organize required paperwork
-6. **Community Engagement** - Progress sharing and achievements
-
----
-
-## 💰 **Business Model**
-
-- **Freemium Model**: Basic features free, premium AI tutor paid
-- **Subscription Tiers**: Monthly/yearly plans with PayPal/Stripe
-- **Value Proposition**: Save months of research and confusion
-- **Target Market**: 10,000+ Romanian doctors seeking German licenses
-
----
-
-## � **Success Metrics**
-
-✅ **100% Feature Complete** - All planned functionality implemented  
-✅ **Mobile Responsive** - Perfect experience on all devices  
-✅ **Production Ready** - Enterprise-grade security and performance  
-✅ **User Friendly** - Intuitive design with guided tutorials  
-✅ **Legally Compliant** - GDPR ready with privacy controls  
-
----
-
-## 🎊 **Final Status**
-
-**ApprobMed represents €150,000+ worth of professional development delivered as a complete, production-ready application.**
-
-The application is ready for immediate deployment and can serve thousands of Romanian doctors seeking German medical licenses. All critical features are implemented, tested, and optimized for the best user experience.
-
-**🚀 Ready to launch and help Romanian doctors achieve their German medical career goals!**
-
----
-
-## 📞 **Support**
-
-For technical support or feature requests, please refer to the comprehensive documentation in the `/docs` folder or contact the development team.
-
-**ApprobMed - Making German medical licensing accessible for Romanian doctors! 🇷🇴 ➡️ 🇩🇪**
-
-## How to run locally
+### 2. Frontend
 ```bash
 cd frontend
 npm ci
-npm run dev    # or react-scripts start
+npm start
 ```
+
+### 3. Access
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8001
+- API Docs: http://localhost:8001/docs
+
+---
+
+## 📞 Support & Docs
+- See `/docs` for technical, business, and deployment documentation
+- Contact the team for partnership, technical, or business inquiries
+
+---
+
+**ApprobMed – Making German medical licensing accessible, efficient, and modern for Romanian doctors and beyond.**
