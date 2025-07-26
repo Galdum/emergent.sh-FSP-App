@@ -1,4 +1,4 @@
-# ApprobMed (FSP Navigator): AI-Powered Platform for German Medical License (Approbation)
+# FSP Navigator: AI-Powered Platform for German Medical License (Approbation)
 
 **A next-generation SaaS platform empowering Romanian doctors to obtain their German medical license (Approbation) with AI, automation, and community.**
 
@@ -6,7 +6,7 @@
 
 ## 🚀 Vision & Purpose
 
-ApprobMed is a full-stack, production-grade application designed to radically simplify and accelerate the Approbation process for Romanian (and other international) doctors seeking to practice in Germany. The platform combines:
+FSP Navigator is a full-stack, production-grade application designed to radically simplify and accelerate the Approbation process for Romanian (and other international) doctors seeking to practice in Germany. The platform combines:
 - **Step-by-step process automation**
 - **AI-powered German medical language tutoring (Gemini AI)**
 - **Bundesland-specific document management**
@@ -21,7 +21,7 @@ ApprobMed is a full-stack, production-grade application designed to radically si
 
 ### Monorepo Structure
 ```
-/approbmed
+/fsp-navigator
 ├── frontend/    # React 18, Tailwind, modern SPA
 │   └── src/
 │       ├── components/   # Modular UI, admin, gamification, onboarding, content editors
